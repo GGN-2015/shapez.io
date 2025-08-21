@@ -179,16 +179,16 @@ export class GameCore {
         }
 
         // Place the hub
-        const hub = gMetaBuildingRegistry.findByClass(MetaHubBuilding).createEntity({
-            root: this.root,
-            origin: new Vector(-2, -2),
-            rotation: 0,
-            originalRotation: 0,
-            rotationVariant: 0,
-            variant: defaultBuildingVariant,
-        });
-        this.root.map.placeStaticEntity(hub);
-        this.root.entityMgr.registerEntity(hub);
+        // const hub = gMetaBuildingRegistry.findByClass(MetaHubBuilding).createEntity({
+        //     root: this.root,
+        //     origin: new Vector(-2, -2),
+        //     rotation: 0,
+        //     originalRotation: 0,
+        //     rotationVariant: 0,
+        //     variant: defaultBuildingVariant,
+        // });
+        // this.root.map.placeStaticEntity(hub);
+        // this.root.entityMgr.registerEntity(hub);
         this.root.camera.center = new Vector(-5, 2).multiplyScalar(globalConfig.tileSize);
     }
 

@@ -216,8 +216,8 @@ export class HUDInteractiveTutorial extends BaseHUDPart {
             }
         }
 
-        this.currentHintId.set(targetHintId);
-        this.domAttach.update(!!targetHintId);
+        //this.currentHintId.set(targetHintId);
+        //this.domAttach.update(!!targetHintId);
     }
 
     /**

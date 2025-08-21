@@ -171,12 +171,12 @@ export class HUDPinnedShapes extends BaseHUDPart {
         this.handles = [];
 
         // Pin story goal
-        this.internalPinShape({
-            key: currentKey,
-            canUnpin: false,
-            className: "goal",
-            throughputOnly: currentGoal.throughputOnly,
-        });
+        // this.internalPinShape({
+        //     key: currentKey,
+        //     canUnpin: false,
+        //     className: "goal",
+        //     throughputOnly: currentGoal.throughputOnly,
+        // });
 
         // Pin blueprint shape as well
         if (this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_blueprints)) {

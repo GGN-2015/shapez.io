@@ -272,7 +272,7 @@ export class HubGoals extends BasicSerializableObject {
         ++this.level;
         this.computeNextGoal();
 
-        this.root.signals.storyGoalCompleted.dispatch(this.level - 1, reward);
+        //this.root.signals.storyGoalCompleted.dispatch(this.level - 1, reward);
     }
 
     /**

@@ -88,7 +88,7 @@ export class MapChunk {
          */
         this.patches = [];
 
-        this.generateLowerLayer();
+        //this.generateLowerLayer();
     }
 
     /**
