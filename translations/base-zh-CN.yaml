@@ -482,33 +482,33 @@ shopUpgrades:
 buildings:
     belt:
         default:
-            name: 传送带
-            description: 运送物品，选中后<strong>按住鼠标并拖动</strong>可一次性放置多个传送带。
+            name: 编辑模式
+            description: 绘制扭结，选中后<strong>按住鼠标并拖动</strong>进行绘制, 按住 shift 可快速绘制; 点击交点可改变交点状态。
     miner:
         default:
-            name: 开采器
-            description: 放置在<strong>图形</strong>或者<strong>颜色</strong>上进行开采。
+            name: 反向工具
+            description: 点击扭结进行反向。
         chainable:
             name: 开采器（链式）
             description: 放置在<strong>图形</strong>或者<strong>颜色</strong>上进行开采。它们可以被链接在一起。
     underground_belt:
         default:
-            name: 隧道
-            description: 可放置在<strong>传送带</strong>或<strong>设施</strong>下方以运送物品。
+            name: 绿点设置
+            description: 设置扭结上两个绿点, 作为要移动 arc 的分割点。
         tier2:
             name: 二级隧道
             description: 可放置在<strong>传送带</strong>或<strong>设施</strong>下方以运送物品。
     cutter:
         default:
-            name: 切割机
-            description: 始终将<strong>图形</strong>从上到下切开并分别输出。<strong>如果您只需要其中一半的图形，使用<strong>垃圾桶</strong>清除另一半图形，否则切割机会停止工作！</strong>
+            name: 此项无用
+            description: 
         quad:
             name: 切割机（四向）
             description: 将输入的图形切成四块。<strong>如果您只需要其中一块图形，使用<strong>垃圾桶</strong>清除其他图形，否则切割机会停止工作！</strong>
     rotater:
         default:
-            name: 旋转机
-            description: 将<strong>图形</strong>顺时针旋转 90 度。
+            name: 绿色道路
+            description: 绘制一条以绿点为端点的绿色道路, 这条道路的定向将决定扭结的哪一段被染成红色道路, 反向此绿色道路可以改变红色道路. 红色和绿色道路将界定提供移动合法性检验的圆盘区域.
         ccw:
             name: 旋转机（逆时针）
             description: 将<strong>图形</strong>逆时针旋转 90 度。
@@ -521,12 +521,12 @@ buildings:
             description: 将输入的<strong>图形</strong>在同一层内组合在一起。如果不能被直接组合，则右边输入<strong>图形</strong>会堆叠在左边输入<strong>图形</strong>上面。
     mixer:
         default:
-            name: 混色器
-            description: 用叠加混色法将两个<strong>颜色</strong>混合。
+            name: 此项无用
+            description: 
     painter:
         default:
-            name: 上色器
-            description: 将整个<strong>图形</strong>涂上输入的<strong>颜色</strong>。
+            name: 此项无用
+            description: 
         double:
             name: 上色器（双面）
             description: 使用顶部输入的<strong>颜色</strong>为左侧输入的<strong>图形</strong>上色。
@@ -538,8 +538,8 @@ buildings:
             description: 将整个<strong>图形</strong>涂上输入的颜色。
     trash:
         default:
-            name: 垃圾桶
-            description: 可以从所有四个方向上输入物品并永久清除它们。
+            name: 道路移动
+            description: 从红色道路移动到绿色道路, 如果移动合法, 自动设置移动后的交点上下关系.
     hub:
         deliver: 交付
         toUnlock: 解锁
@@ -556,8 +556,8 @@ buildings:
                 不同颜色的<strong>电线</strong>不会互相连接
     balancer:
         default:
-            name: 平衡器
-            description: 多功能的设施：可将所有输入均匀地分配到所有输出上。
+            name: 此项无用
+            description: 
         merger:
             name: 合并器（小型）
             description: 可将两条传送带合并为一条。
