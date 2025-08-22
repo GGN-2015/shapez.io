@@ -138,10 +138,10 @@ export class HUDMassSelector extends BaseHUDPart {
 
     startCopy() {
         if (this.selectedUids.size > 0) {
-            if (!this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_blueprints)) {
-                this.showBlueprintsNotUnlocked();
-                return;
-            }
+            // if (!this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_blueprints)) {
+            //     this.showBlueprintsNotUnlocked();
+            //     return;
+            // }
             this.root.hud.signals.buildingsSelectedForCopy.dispatch(Array.from(this.selectedUids));
             this.selectedUids = new Set();
             this.root.soundProxy.playUiClick();
@@ -161,24 +161,24 @@ export class HUDMassSelector extends BaseHUDPart {
     }
 
     confirmCut() {
-        if (!this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_blueprints)) {
-            this.showBlueprintsNotUnlocked();
-        } else if (
-            !this.root.app.settings.getAllSettings().disableCutDeleteWarnings &&
-            this.selectedUids.size > 100
-        ) {
-            const { ok } = this.root.hud.parts.dialogs.showWarning(
-                T.dialogs.massCutConfirm.title,
-                T.dialogs.massCutConfirm.desc.replace(
-                    "<count>",
-                    "" + formatBigNumberFull(this.selectedUids.size)
-                ),
-                ["cancel:good:escape", "ok:bad:enter"]
-            );
-            ok.add(() => this.doCut());
-        } else {
+        // if (!this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_blueprints)) {
+        //     this.showBlueprintsNotUnlocked();
+        // } else if (
+        //     !this.root.app.settings.getAllSettings().disableCutDeleteWarnings &&
+        //     this.selectedUids.size > 100
+        // ) {
+        //     const { ok } = this.root.hud.parts.dialogs.showWarning(
+        //         T.dialogs.massCutConfirm.title,
+        //         T.dialogs.massCutConfirm.desc.replace(
+        //             "<count>",
+        //             "" + formatBigNumberFull(this.selectedUids.size)
+        //         ),
+        //         ["cancel:good:escape", "ok:bad:enter"]
+        //     );
+        //     ok.add(() => this.doCut());
+        // } else {
             this.doCut();
-        }
+        //}
     }
 
     doCut() {
