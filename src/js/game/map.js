@@ -167,6 +167,64 @@ export class BaseMap extends BasicSerializableObject {
     }
 
     /**
+     * 获取地图上一个 belt 的出口下一个位置
+     * @param {Entity} entity
+     * @returns {Vector}
+    */
+     getNextOrigin(entity){  
+        let sMapEntity = entity.components.StaticMapEntity;
+        if (!sMapEntity)
+            return null;
+        let outRot;
+        switch (sMapEntity.code){
+            case 1: // 通常 belt
+                outRot = sMapEntity.rotation;
+                break;
+            case 2: // 左转 belt
+                outRot = (sMapEntity.rotation  + 270) % 360;
+                break;
+            case 3: // 右转 belt
+                outRot = (sMapEntity.rotation  + 90) % 360;
+                break;
+        }
+        
+        let nextEntity = new Vector();
+        switch (outRot){
+            case 0: // 上
+                nextEntity.x = sMapEntity.origin.x;
+                nextEntity.y = sMapEntity.origin.y -1;
+                break;
+            case 90: // 右
+                nextEntity.x = sMapEntity.origin.x + 1;
+                nextEntity.y = sMapEntity.origin.y;
+                break;
+            case 180: // 下
+                nextEntity.x = sMapEntity.origin.x;
+                nextEntity.y = sMapEntity.origin.y + 1;
+                break;
+            case 270: // 左
+                nextEntity.x = sMapEntity.origin.x - 1;
+                nextEntity.y = sMapEntity.origin.y;
+                break;
+        }
+        return nextEntity;
+    }
+
+    /**
+     * 判断这个位置上的 belt 是否是一个 crossing, 依据它是否有 4 个临接 belt (忽略定向)
+     * @param {Vector} ori 
+     * @returns {boolean} 
+     */
+    isCrossingEntity(ori) {
+        const { ejectors, acceptors } = this.root.logic.getEjectorsAndAcceptorsAtTile(ori);  
+        if (ejectors.length + acceptors.length === 4) {  
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Returns the tile contents of a given tile
      * @param {number} x
      * @param {number} y

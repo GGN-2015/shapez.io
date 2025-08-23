@@ -118,6 +118,10 @@ export class BeltSystem extends GameSystem {
         if (!this.root.gameInitialized) {
             return;
         }
+        if (this.root.map.isCrossingEntity(entity.components.StaticMapEntity.origin)){
+            // 跳过 crossing 的自动修正
+            return;
+        }
 
         const staticComp = entity.components.StaticMapEntity;
         if (!staticComp) {

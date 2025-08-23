@@ -490,7 +490,7 @@ buildings:
             description: 点击扭结进行反向。
         chainable:
             name: 定向整理工具
-            description: 点击扭结进行全局定向整理, 再次点击反向.
+            description: 点击扭结进行全局定向整理, r 旋转后可反向. 由于有相邻自动修正, 请至少点击两次设置. 并注意<strong>先整理定向, 后设置交点, 否则可能对破坏交点上下关系!</strong>
     underground_belt:
         default:
             name: 绿点设置

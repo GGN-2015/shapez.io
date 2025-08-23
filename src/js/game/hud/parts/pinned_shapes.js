@@ -179,21 +179,21 @@ export class HUDPinnedShapes extends BaseHUDPart {
         // });
 
         // Pin blueprint shape as well
-        if (this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_blueprints)) {
-            this.internalPinShape({
-                key: this.root.gameMode.getBlueprintShapeKey(),
-                canUnpin: false,
-                className: "blueprint",
-            });
-        }
+        // if (this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_blueprints)) {
+        //     this.internalPinShape({
+        //         key: this.root.gameMode.getBlueprintShapeKey(),
+        //         canUnpin: false,
+        //         className: "blueprint",
+        //     });
+        // }
 
         // Pin manually pinned shapes
-        for (let i = 0; i < this.pinnedShapes.length; ++i) {
-            const key = this.pinnedShapes[i];
-            if (key !== currentKey) {
-                this.internalPinShape({ key });
-            }
-        }
+        // for (let i = 0; i < this.pinnedShapes.length; ++i) {
+        //     const key = this.pinnedShapes[i];
+        //     if (key !== currentKey) {
+        //         this.internalPinShape({ key });
+        //     }
+        // }
     }
 
     /**

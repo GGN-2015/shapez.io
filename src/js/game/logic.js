@@ -3,6 +3,7 @@ import { createLogger } from "../core/logging";
 import { STOP_PROPAGATION } from "../core/signal";
 import { round2Digits } from "../core/utils";
 import { enumDirection, enumDirectionToVector, enumInvertedDirections, Vector } from "../core/vector";
+import { MetaBeltBuilding } from "./buildings/belt";
 import { getBuildingDataFromCode } from "./building_codes";
 import { Component } from "./component";
 import { enumWireVariant } from "./components/wire";
@@ -103,6 +104,135 @@ export class GameLogic {
         return true;
     }
 
+    
+   
+    // hook, 在这里处理 定向整理, 绿点设置, 间距调整 等与地图相关的点击操作
+    // 或许写到别的地方更好, 或许应该新开一个 class...
+    // anyway, 先跑起来再说
+    tryPlaceBuildingHook({ origin, rotation, rotationVariant, originalRotation, variant, building }){
+        if (building.id === "miner"){ // 开采器, 用来实现定向整理
+            console.log("定向整理")
+            let initEntity = this.root.map.getLayerContentXY(origin.x, origin.y, "regular");
+            if (!initEntity)
+                return true;
+            
+            let sMapEntity = initEntity.components.StaticMapEntity;
+            if (sMapEntity.code != 1)    // 是 corner, 不处理
+                return true;
+            if ((sMapEntity.rotation - rotation + 180) % 180  !== 0){ // 与目标定向成垂直关系, 不处理
+                return true;
+            } 
+            if (this.root.map.isCrossingEntity(sMapEntity.origin)){
+                return true;
+            }
+
+            // 确实与目标定向相同或相反            
+            sMapEntity.rotation = sMapEntity.originalRotation = rotation;
+            let curEntity = initEntity;
+            let nextOrigin = null;
+            let nextEntity = null;
+
+            while (true) {
+                console.log (curEntity);
+                nextOrigin = this.root.map.getNextOrigin(curEntity);
+                console.log(nextOrigin)
+                nextEntity = this.root.map.getLayerContentXY(nextOrigin.x, nextOrigin.y, "regular");
+                if (!nextEntity)
+                    break;
+
+                if (this.root.map.isCrossingEntity(nextOrigin)) {
+                    console.log("crossing!")
+                    console.log(nextEntity.components.StaticMapEntity.rotation, curEntity.components.StaticMapEntity.rotation)
+                    if ((nextEntity.components.StaticMapEntity.rotation - curEntity.components.StaticMapEntity.rotation + 180) % 180  === 0 ) { // 如果上上方弧段
+                        //&& nextEntity.components.StaticMapEntity.rotation !== curEntity.components.StaticMapEntity.rotation
+                        console.log("===================上方弧段=============================")
+                        console.log(nextEntity.components.StaticMapEntity.rotation, curEntity.components.StaticMapEntity.rotation)
+                        nextEntity = this.root.map.getLayerContentXY(nextOrigin.x, nextOrigin.y, "regular");
+                        nextEntity.components.StaticMapEntity.rotation = curEntity.components.StaticMapEntity.rotation;
+                        //nextEntity.components.StaticMapEntity.originalRotation = curEntity.components.StaticMapEntity.originalRotation;
+                        // let _building = new MetaBeltBuilding();
+                        // let oriRot, rotVar;
+                        // oriRot = curEntity.components.StaticMapEntity.originalRotation;
+                        // rotVar = 0;
+
+                        // let entity = _building.createEntity({
+                        //     root: this.root,
+                        //     origin: nextOrigin,
+                        //     rotation: curEntity.components.StaticMapEntity.originalRotation,
+                        //     originalRotation: oriRot,
+                        //     rotationVariant: rotVar,
+                        //     variant: "default"
+                            
+                        // });
+    
+    
+                        // this.freeEntityAreaBeforeBuild(entity);
+                        // this.root.map.placeStaticEntity(entity);
+                        // this.root.entityMgr.registerEntity(entity);
+
+                        // curEntity = entity;
+
+                        // continue;
+                    }
+
+                    // 这是一个交点, 需要去寻找下一个位置
+                    let curOrigine = curEntity.components.StaticMapEntity.origin;
+                    nextOrigin.x = 2 * nextOrigin.x - curOrigine.x;
+                    nextOrigin.y = 2 * nextOrigin.y - curOrigine.y;
+                    nextEntity = this.root.map.getLayerContentXY(nextOrigin.x, nextOrigin.y, "regular");
+                }
+                if (nextEntity === initEntity)
+                    break;
+                let entity = nextEntity;
+                // 设置下一个位置上的定向
+                if (nextEntity.components.StaticMapEntity.rotation !== curEntity.components.StaticMapEntity.rotation) {
+                    // 如果 rot 不同
+                    let _building = new MetaBeltBuilding();
+                    let oriRot, rotVar;
+                    switch (nextEntity.components.StaticMapEntity.code) {
+                        case 1: // 通常 belt
+                            oriRot = curEntity.components.StaticMapEntity.originalRotation;
+                            rotVar = 0;
+                            break;
+                        case 2: // 左转 belt
+                            //nextEntity.components.StaticMapEntity.code = 2;
+                            oriRot = (curEntity.components.StaticMapEntity.originalRotation + 90) % 360;
+                            rotVar = 2;
+                            break;
+                        case 3: // 右转 belt
+                            //nextEntity.components.StaticMapEntity.code = 1;
+                            oriRot = (curEntity.components.StaticMapEntity.originalRotation + 270) % 360;
+                            rotVar = 1;
+                            break;
+                    }
+
+                    entity = _building.createEntity({
+                        root: this.root,
+                        origin: nextEntity.components.StaticMapEntity.origin,
+                        rotation: curEntity.components.StaticMapEntity.originalRotation,
+                        originalRotation: oriRot,
+                        rotationVariant: rotVar,
+                        variant: "default"
+                    });
+
+
+                    this.freeEntityAreaBeforeBuild(entity);
+                    this.root.map.placeStaticEntity(entity);
+                    this.root.entityMgr.registerEntity(entity);
+                }
+
+                curEntity = entity;
+            }
+
+
+
+
+
+            return true; // true for handled
+        }
+            return false;
+    }
+
     /**
      * Attempts to place the given building
      * @param {object} param0
@@ -115,6 +245,12 @@ export class GameLogic {
      * @returns {Entity}
      */
     tryPlaceBuilding({ origin, rotation, rotationVariant, originalRotation, variant, building }) {
+
+        if (this.tryPlaceBuildingHook({ origin, rotation, rotationVariant, originalRotation, variant, building })){
+            // 已经 hook 过, 不再执行实际放置
+            return null;
+        }
+
         const entity = building.createEntity({
             root: this.root,
             origin,
