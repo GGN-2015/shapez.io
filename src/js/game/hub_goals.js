@@ -194,6 +194,8 @@ export class HubGoals extends BasicSerializableObject {
      * @param {enumHubGoalRewards} reward
      */
     isRewardUnlocked(reward) {
+        return true;
+        
         if (G_IS_DEV && globalConfig.debug.allBuildingsUnlocked) {
             return true;
         }

@@ -489,8 +489,8 @@ buildings:
             name: 反向工具
             description: 点击扭结进行反向。
         chainable:
-            name: 开采器（链式）
-            description: 放置在<strong>图形</strong>或者<strong>颜色</strong>上进行开采。它们可以被链接在一起。
+            name: 定向整理工具
+            description: 点击扭结进行全局定向整理, 再次点击反向.
     underground_belt:
         default:
             name: 绿点设置
@@ -613,12 +613,12 @@ buildings:
             description: 在顶侧输出和<strong>信号</strong>匹配的内容，在右侧输出不匹配的内容。如果是开关量的话，开（1）信号从顶侧输出，关（0）信号从右侧输出。
     display:
         default:
-            name: 显示器
-            description: 在显示器上显示连接的<strong>信号</strong>（信号可以是：图形、颜色、开关值）。
+            name: 减距工具
+            description: 减少相邻线间距, 可旋转使用.
     reader:
         default:
-            name: 传送带读取器
-            description: 可以读取<strong>传送带</strong>平均<strong>吞吐量</strong>。输出最后在<strong>电线层</strong>上读取的物品（一旦解锁。）
+            name: 增距工具
+            description: 增加相邻线间距, 可旋转使用.
     analyzer:
         default:
             name: 图形分析器
