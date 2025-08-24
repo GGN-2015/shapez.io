@@ -483,14 +483,14 @@ buildings:
     belt:
         default:
             name: 编辑模式
-            description: 绘制扭结，选中后<strong>按住鼠标并拖动</strong>进行绘制, 按住 shift 可快速绘制; 点击交点可改变交点状态。
+            description: 绘制扭结，选中后<strong>按住鼠标并拖动</strong>进行绘制, 按住 shift 可快速绘制; 点击交点可改变交点状态. 改变交点状态注意保持原位非转动状态, 才会自适应交点类型.
     miner:
         default:
             name: 反向工具
             description: 点击扭结进行反向。
         chainable:
             name: 定向整理工具
-            description: 点击扭结进行全局定向整理, r 旋转后可反向. 由于有相邻自动修正, 请至少点击两次设置. 并注意<strong>先整理定向, 后设置交点, 否则可能对破坏交点上下关系!</strong>
+            description: 点击扭结进行全局定向整理, r 旋转后可反向.
     underground_belt:
         default:
             name: 绿点设置

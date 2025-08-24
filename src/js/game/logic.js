@@ -11,6 +11,7 @@ import { Entity } from "./entity";
 import { CHUNK_OVERLAY_RES } from "./map_chunk_view";
 import { MetaBuilding } from "./meta_building";
 import { GameRoot } from "./root";
+import { BeltSystem } from "./systems/belt";
 import { WireNetwork } from "./systems/wire";
 
 const logger = createLogger("ingame/logic");
@@ -112,6 +113,7 @@ export class GameLogic {
     tryPlaceBuildingHook({ origin, rotation, rotationVariant, originalRotation, variant, building }){
         if (building.id === "miner"){ // 开采器, 用来实现定向整理
             console.log("定向整理")
+            
             let initEntity = this.root.map.getLayerContentXY(origin.x, origin.y, "regular");
             if (!initEntity)
                 return true;
@@ -126,6 +128,9 @@ export class GameLogic {
                 return true;
             }
 
+            // 设置不进行周围自动处理
+            this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
+
             // 确实与目标定向相同或相反            
             sMapEntity.rotation = sMapEntity.originalRotation = rotation;
             let curEntity = initEntity;
@@ -133,21 +138,21 @@ export class GameLogic {
             let nextEntity = null;
 
             while (true) {
-                console.log (curEntity);
+                //console.log (curEntity);
                 nextOrigin = this.root.map.getNextOrigin(curEntity);
-                console.log(nextOrigin)
+                //console.log(nextOrigin)
                 nextEntity = this.root.map.getLayerContentXY(nextOrigin.x, nextOrigin.y, "regular");
                 if (!nextEntity)
                     break;
 
                 if (this.root.map.isCrossingEntity(nextOrigin)) {
-                    console.log("crossing!")
-                    console.log(nextEntity.components.StaticMapEntity.rotation, curEntity.components.StaticMapEntity.rotation)
+                    //console.log("crossing!")
+                    //console.log(nextEntity.components.StaticMapEntity.rotation, curEntity.components.StaticMapEntity.rotation)
                     if ((nextEntity.components.StaticMapEntity.rotation - curEntity.components.StaticMapEntity.rotation + 180) % 180  === 0 ) { // 如果上上方弧段
                         //&& nextEntity.components.StaticMapEntity.rotation !== curEntity.components.StaticMapEntity.rotation
-                        console.log("===================上方弧段=============================")
-                        console.log(nextEntity.components.StaticMapEntity.rotation, curEntity.components.StaticMapEntity.rotation)
-                        nextEntity = this.root.map.getLayerContentXY(nextOrigin.x, nextOrigin.y, "regular");
+                        //console.log("===================上方弧段=============================")
+                        //console.log(nextEntity.components.StaticMapEntity.rotation, curEntity.components.StaticMapEntity.rotation)
+                        //nextEntity = this.root.map.getLayerContentXY(nextOrigin.x, nextOrigin.y, "regular");
                         nextEntity.components.StaticMapEntity.rotation = curEntity.components.StaticMapEntity.rotation;
                         //nextEntity.components.StaticMapEntity.originalRotation = curEntity.components.StaticMapEntity.originalRotation;
                         // let _building = new MetaBeltBuilding();
@@ -224,8 +229,8 @@ export class GameLogic {
                 curEntity = entity;
             }
 
-
-
+            // 恢复周围自动处理
+            this.root.systemMgr.systems.belt.bUpdateSurrounding = true; 
 
 
             return true; // true for handled

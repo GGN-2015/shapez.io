@@ -205,7 +205,7 @@ export class MetaBeltBuilding extends MetaBuilding {
                 let content = root.map.getLayerContentXY(tile.x, tile.y, "regular");
                 if (content) { // 确实是交点
                     // 此时的处理逻辑与本身的 rotation 无关, 而基于地图的原始交点
-                    console.log("crossing at ", tile.x, tile.y);
+                    //console.log("crossing at ", tile.x, tile.y);
                     // if (content.components.StaticMapEntity.originalRotation) {
                     //     let dir = content.components.Belt.direction;
                     //     console.log(dir)

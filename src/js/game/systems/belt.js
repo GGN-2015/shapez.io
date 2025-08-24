@@ -26,6 +26,7 @@ const logger = createLogger("belt");
 export class BeltSystem extends GameSystem {
     constructor(root) {
         super(root);
+        this.bUpdateSurrounding = true;
         /**
          * @type {Object.<enumDirection, Array<AtlasSprite>>}
          */
@@ -116,6 +117,9 @@ export class BeltSystem extends GameSystem {
      */
     updateSurroundingBeltPlacement(entity) {
         if (!this.root.gameInitialized) {
+            return;
+        }
+        if (!this.bUpdateSurrounding){
             return;
         }
         if (this.root.map.isCrossingEntity(entity.components.StaticMapEntity.origin)){
