@@ -105,323 +105,30 @@ export class GameLogic {
         return true;
     }
 
-    /**
-     * 增距
-     * @param {Vector} origin 
-     * @param {number} rotation 
-     * @returns 
-     */
-    increaseDistance(origin, rotation){
-        console.log("增距工具")
-            this.root.systemMgr.systems.belt.bUpdateSurrounding = false; 
-            if (rotation % 180 === 0){  // 加一列
-                let toBuildTiles = [];
-                let toDeleteTiles = [];
-                let max_y = -4096;  // 先写死成这样吧, 大概够用
-                let min_y = 4096; 
-                for (let entity of this.root.entityMgr.entities){ // 非破坏性遍历, 不要一边遍历一边删除, 会死的很惨
-                    if (entity.components.StaticMapEntity.origin.x >= origin.x){
-                        // 在当前位置的左边缘切断
-                        if (entity.components.StaticMapEntity.origin.x === origin.x){
-                            if (entity.components.StaticMapEntity.origin.y > max_y){
-                                max_y = entity.components.StaticMapEntity.origin.y;
-                            }
-                            if (entity.components.StaticMapEntity.origin.y < min_y){
-                                min_y = entity.components.StaticMapEntity.origin.y;
-                            }
-                        }
-                        let _building = new MetaBeltBuilding();
-                        let new_entity = _building.createEntity({
-                            root: this.root,
-                            origin: new Vector(entity.components.StaticMapEntity.origin.x + 1, entity.components.StaticMapEntity.origin.y),
-                            rotation: entity.components.StaticMapEntity.rotation,
-                            originalRotation: entity.components.StaticMapEntity.originalRotation,
-                            rotationVariant: entity.components.StaticMapEntity.getRotationVariant(),
-                            variant: entity.components.StaticMapEntity.getVariant()
-                        });
-                        toBuildTiles.push(new_entity);
-                        toDeleteTiles.push(entity);
-                    }
-                }
-                for (let de of toDeleteTiles){
-                    this.tryDeleteBuilding(de);
-                }
-                for (let entity of toBuildTiles) {
-                    this.root.map.placeStaticEntity(entity);
-                    this.root.entityMgr.registerEntity(entity);
-                }
-                for (let y = min_y; y <= max_y; y++){
-                    // 检查左边缘切口
-                    let rot;
-                    let oriRot;
-                    let left_entity = this.root.map.getLayerContentXY(origin.x - 1, y, "regular");
-                    if (!left_entity){
-                        continue;
-                    }
 
-                    switch (left_entity.components.StaticMapEntity.code) {
-                        case 1: // 通常 belt
-                            if (left_entity.components.StaticMapEntity.rotation % 180 !== 0) {
-                                rot = oriRot = left_entity.components.StaticMapEntity.rotation;
-                            } else {
-                                continue;
-                            }
-                            break;
-                        case 2: // 左转 belt
-                            if (left_entity.components.StaticMapEntity.rotation == 270) {
-                                rot = oriRot = 270
-                            } else if (left_entity.components.StaticMapEntity.rotation == 180) {
-                                rot = oriRot = 90
-                            } else {
-                                continue;
-                            }
-                            break;
-                        case 3: // 右转 belt
-                            if (left_entity.components.StaticMapEntity.rotation == 0) {
-                                rot = oriRot = 90
-                            } else if (left_entity.components.StaticMapEntity.rotation == 270) {
-                                rot = oriRot = 270
-                            } else {
-                                continue;
-                            }
-                            break;
-                    }
-
-                    let _building = new MetaBeltBuilding();
-                    let entity = _building.createEntity({
-                        root: this.root,
-                        origin: new Vector(origin.x, y),
-                        rotation: rot,
-                        originalRotation: oriRot,
-                        rotationVariant: 0,
-                        variant: "default"
-                    });
-    
-                    this.freeEntityAreaBeforeBuild(entity);
-                    this.root.map.placeStaticEntity(entity);
-                    this.root.entityMgr.registerEntity(entity);
-                }
-                for (let y = min_y; y <= max_y; y++){
-                    // 检查右边缘切口
-                    let rot;
-                    let oriRot;
-                    if (this.root.map.getLayerContentXY(origin.x, y, "regular")){  // 左切口已经 handle, 不再处理
-                        continue;
-                    }
-                    let right_entity = this.root.map.getLayerContentXY(origin.x + 1, y, "regular");
-                    if (!right_entity){
-                        continue;
-                    }
-
-                    switch (right_entity.components.StaticMapEntity.code) {
-                        case 1: // 通常 belt
-                            if (right_entity.components.StaticMapEntity.rotation % 180 !== 0) {
-                                rot = oriRot = right_entity.components.StaticMapEntity.rotation;
-                            } else {
-                                continue;
-                            }
-                            break;
-                        case 2: // 左转 belt
-                            if (right_entity.components.StaticMapEntity.rotation === 0) {
-                                rot = oriRot = 270
-                            } else if (right_entity.components.StaticMapEntity.rotation === 90) {
-                                rot = oriRot = 90
-                            } else {
-                                continue;
-                            }
-                            break;
-                        case 3: // 右转 belt
-                            if (right_entity.components.StaticMapEntity.rotation === 90) {
-                                rot = oriRot = 90
-                            } else if (right_entity.components.StaticMapEntity.rotation === 180) {
-                                rot = oriRot = 270
-                            } else {
-                                continue;
-                            }
-                            break;
-                    }
-
-                    let _building = new MetaBeltBuilding();
-                    let entity = _building.createEntity({
-                        root: this.root,
-                        origin: new Vector(origin.x, y),
-                        rotation: rot,
-                        originalRotation: oriRot,
-                        rotationVariant: 0,
-                        variant: "default"
-                    });
-    
-                    this.freeEntityAreaBeforeBuild(entity);
-                    this.root.map.placeStaticEntity(entity);
-                    this.root.entityMgr.registerEntity(entity);
-                }
-            } else {    // 加一行
-                let toBuildTiles = [];
-                let toDeleteTiles = [];
-                let max_x = -4096;  // 先写死成这样吧, 大概够用
-                let min_x = 4096; 
-                for (let entity of this.root.entityMgr.entities){ // 非破坏性遍历, 不要一边遍历一边删除, 会死的很惨
-                    if (entity.components.StaticMapEntity.origin.y >= origin.y){
-                        // 在当前位置的左边缘切断
-                        if (entity.components.StaticMapEntity.origin.y === origin.y){
-                            if (entity.components.StaticMapEntity.origin.x > max_x){
-                                max_x = entity.components.StaticMapEntity.origin.x;
-                            }
-                            if (entity.components.StaticMapEntity.origin.x < min_x){
-                                min_x = entity.components.StaticMapEntity.origin.x;
-                            }
-                        }
-                        let _building = new MetaBeltBuilding();
-                        let new_entity = _building.createEntity({
-                            root: this.root,
-                            origin: new Vector(entity.components.StaticMapEntity.origin.x, entity.components.StaticMapEntity.origin.y + 1),
-                            rotation: entity.components.StaticMapEntity.rotation,
-                            originalRotation: entity.components.StaticMapEntity.originalRotation,
-                            rotationVariant: entity.components.StaticMapEntity.getRotationVariant(),
-                            variant: entity.components.StaticMapEntity.getVariant()
-                        });
-                        toBuildTiles.push(new_entity);
-                        toDeleteTiles.push(entity);
-                    }
-                }
-                for (let de of toDeleteTiles){
-                    this.tryDeleteBuilding(de);
-                }
-                for (let entity of toBuildTiles) {
-                    this.root.map.placeStaticEntity(entity);
-                    this.root.entityMgr.registerEntity(entity);
-                }
-                for (let x = min_x; x <= max_x; x++){
-                    // 检查上边缘切口
-                    let rot;
-                    let oriRot;
-                    let top_entity = this.root.map.getLayerContentXY(x, origin.y - 1, "regular");
-                    if (!top_entity){
-                        continue;
-                    }
-
-                    switch (top_entity.components.StaticMapEntity.code) {
-                        case 1: // 通常 belt
-                            if (top_entity.components.StaticMapEntity.rotation % 180 === 0) {
-                                rot = oriRot = top_entity.components.StaticMapEntity.rotation;
-                            } else {
-                                continue;
-                            }
-                            break;
-                        case 2: // 左转 belt
-                            if (top_entity.components.StaticMapEntity.rotation === 0) {
-                                rot = oriRot = 0
-                            } else if (top_entity.components.StaticMapEntity.rotation === 270) {
-                                rot = oriRot = 180
-                            } else {
-                                continue;
-                            }
-                            break;
-                        case 3: // 右转 belt
-                            if (top_entity.components.StaticMapEntity.rotation == 0) {
-                                rot = oriRot = 0
-                            } else if (top_entity.components.StaticMapEntity.rotation == 90) {
-                                rot = oriRot = 180
-                            } else {
-                                continue;
-                            }
-                            break;
-                    }
-
-                    let _building = new MetaBeltBuilding();
-                    let entity = _building.createEntity({
-                        root: this.root,
-                        origin: new Vector(x, origin.y),
-                        rotation: rot,
-                        originalRotation: oriRot,
-                        rotationVariant: 0,
-                        variant: "default"
-                    });
-    
-                    this.freeEntityAreaBeforeBuild(entity);
-                    this.root.map.placeStaticEntity(entity);
-                    this.root.entityMgr.registerEntity(entity);
-                }
-                for (let x = min_x; x <= max_x; x++){
-                    // 检查下边缘切口
-                    let rot;
-                    let oriRot;
-                    if (this.root.map.getLayerContentXY(x, origin.y + 1, "regular")){  // 左切口已经 handle, 不再处理
-                        continue;
-                    }
-                    let bottom_entity = this.root.map.getLayerContentXY(x, origin.y + 1, "regular");
-                    if (!bottom_entity){
-                        continue;
-                    }
-
-                    switch (bottom_entity.components.StaticMapEntity.code) {
-                        case 1: // 通常 belt
-                            if (bottom_entity.components.StaticMapEntity.rotation % 180 === 0) {
-                                rot = oriRot = bottom_entity.components.StaticMapEntity.rotation;
-                            } else {
-                                continue;
-                            }
-                            break;
-                        case 2: // 左转 belt
-                            if (bottom_entity.components.StaticMapEntity.rotation === 90) {
-                                rot = oriRot = 0
-                            } else if (bottom_entity.components.StaticMapEntity.rotation === 180) {
-                                rot = oriRot = 180
-                            } else {
-                                continue;
-                            }
-                            break;
-                        case 3: // 右转 belt
-                            if (bottom_entity.components.StaticMapEntity.rotation === 270) {
-                                rot = oriRot = 0
-                            } else if (bottom_entity.components.StaticMapEntity.rotation === 180) {
-                                rot = oriRot = 180
-                            } else {
-                                continue;
-                            }
-                            break;
-                    }
-
-                    let _building = new MetaBeltBuilding();
-                    let entity = _building.createEntity({
-                        root: this.root,
-                        origin: new Vector(x, origin.y),
-                        rotation: rot,
-                        originalRotation: oriRot,
-                        rotationVariant: 0,
-                        variant: "default"
-                    });
-    
-                    this.freeEntityAreaBeforeBuild(entity);
-                    this.root.map.placeStaticEntity(entity);
-                    this.root.entityMgr.registerEntity(entity);
-                }
-            }
-    }
-    
     /**
      * 定向整理
      * @param {Vector} origin 
      * @param {number} rotation 
      * @returns 
      */
-    orientationRebuild(origin, rotation){
-        
+    orientationRebuild(origin, rotation) {
+
         let initEntity = this.root.map.getLayerContentXY(origin.x, origin.y, "regular");
         if (!initEntity)
             return;
-        
+
         let sMapEntity = initEntity.components.StaticMapEntity;
         if (sMapEntity.code != 1)    // 是 corner, 不处理
             return;
-        if ((sMapEntity.rotation - rotation + 180) % 180  !== 0){ // 与目标定向成垂直关系, 不处理
+        if ((sMapEntity.rotation - rotation + 180) % 180 !== 0) { // 与目标定向成垂直关系, 不处理
             return;
-        } 
-        if (this.root.map.isCrossingEntity(sMapEntity.origin)){
+        }
+        if (this.root.map.isCrossingEntity(sMapEntity.origin)) {
             return;
         }
 
-        
+
 
         // 确实与目标定向相同或相反            
         sMapEntity.rotation = sMapEntity.originalRotation = rotation;
@@ -440,7 +147,7 @@ export class GameLogic {
             if (this.root.map.isCrossingEntity(nextOrigin)) {
                 //console.log("crossing!")
                 //console.log(nextEntity.components.StaticMapEntity.rotation, curEntity.components.StaticMapEntity.rotation)
-                if ((nextEntity.components.StaticMapEntity.rotation - curEntity.components.StaticMapEntity.rotation + 180) % 180  === 0 ) { // 如果上上方弧段
+                if ((nextEntity.components.StaticMapEntity.rotation - curEntity.components.StaticMapEntity.rotation + 180) % 180 === 0) { // 如果上上方弧段
                     //&& nextEntity.components.StaticMapEntity.rotation !== curEntity.components.StaticMapEntity.rotation
                     //console.log("===================上方弧段=============================")
                     //console.log(nextEntity.components.StaticMapEntity.rotation, curEntity.components.StaticMapEntity.rotation)
@@ -461,7 +168,7 @@ export class GameLogic {
                     //     originalRotation: oriRot,
                     //     rotationVariant: rotVar,
                     //     variant: "default"
-                        
+
                     // });
 
 
@@ -524,30 +231,409 @@ export class GameLogic {
         }
     }
 
+
+    /**
+     * 增距
+     * @param {Vector} origin 
+     * @param {number} rotation 
+     * @returns 
+     */
+    increaseDistance(origin, rotation) {
+        if (rotation % 180 === 0) {  // 加一列
+            let toBuildTiles = [];
+            let toDeleteTiles = [];
+            let max_y = -4096;  // 先写死成这样吧, 大概够用
+            let min_y = 4096;
+            for (let entity of this.root.entityMgr.entities) { // 非破坏性遍历, 不要一边遍历一边删除, 会死的很惨
+                if (entity.components.StaticMapEntity.origin.x >= origin.x) {
+                    // 在当前位置的左边缘切断
+                    if (entity.components.StaticMapEntity.origin.x === origin.x) {
+                        if (entity.components.StaticMapEntity.origin.y > max_y) {
+                            max_y = entity.components.StaticMapEntity.origin.y;
+                        }
+                        if (entity.components.StaticMapEntity.origin.y < min_y) {
+                            min_y = entity.components.StaticMapEntity.origin.y;
+                        }
+                    }
+                    let _building = new MetaBeltBuilding();
+                    let new_entity = _building.createEntity({
+                        root: this.root,
+                        origin: new Vector(entity.components.StaticMapEntity.origin.x + 1, entity.components.StaticMapEntity.origin.y),
+                        rotation: entity.components.StaticMapEntity.rotation,
+                        originalRotation: entity.components.StaticMapEntity.originalRotation,
+                        rotationVariant: entity.components.StaticMapEntity.getRotationVariant(),
+                        variant: entity.components.StaticMapEntity.getVariant()
+                    });
+                    toBuildTiles.push(new_entity);
+                    toDeleteTiles.push(entity);
+                }
+            }
+            for (let de of toDeleteTiles) {
+                this.tryDeleteBuilding(de);
+            }
+            for (let entity of toBuildTiles) {
+                this.root.map.placeStaticEntity(entity);
+                this.root.entityMgr.registerEntity(entity);
+            }
+            for (let y = min_y; y <= max_y; y++) {
+                // 检查左边缘切口
+                let rot;
+                let oriRot;
+                let left_entity = this.root.map.getLayerContentXY(origin.x - 1, y, "regular");
+                if (!left_entity) {
+                    continue;
+                }
+
+                switch (left_entity.components.StaticMapEntity.code) {
+                    case 1: // 通常 belt
+                        if (left_entity.components.StaticMapEntity.rotation % 180 !== 0) {
+                            rot = oriRot = left_entity.components.StaticMapEntity.rotation;
+                        } else {
+                            continue;
+                        }
+                        break;
+                    case 2: // 左转 belt
+                        if (left_entity.components.StaticMapEntity.rotation == 270) {
+                            rot = oriRot = 270
+                        } else if (left_entity.components.StaticMapEntity.rotation == 180) {
+                            rot = oriRot = 90
+                        } else {
+                            continue;
+                        }
+                        break;
+                    case 3: // 右转 belt
+                        if (left_entity.components.StaticMapEntity.rotation == 0) {
+                            rot = oriRot = 90
+                        } else if (left_entity.components.StaticMapEntity.rotation == 270) {
+                            rot = oriRot = 270
+                        } else {
+                            continue;
+                        }
+                        break;
+                }
+
+                let _building = new MetaBeltBuilding();
+                let entity = _building.createEntity({
+                    root: this.root,
+                    origin: new Vector(origin.x, y),
+                    rotation: rot,
+                    originalRotation: oriRot,
+                    rotationVariant: 0,
+                    variant: "default"
+                });
+
+                this.freeEntityAreaBeforeBuild(entity);
+                this.root.map.placeStaticEntity(entity);
+                this.root.entityMgr.registerEntity(entity);
+            }
+            for (let y = min_y; y <= max_y; y++) {
+                // 检查右边缘切口
+                let rot;
+                let oriRot;
+                if (this.root.map.getLayerContentXY(origin.x, y, "regular")) {  // 左切口已经 handle, 不再处理
+                    continue;
+                }
+                let right_entity = this.root.map.getLayerContentXY(origin.x + 1, y, "regular");
+                if (!right_entity) {
+                    continue;
+                }
+
+                switch (right_entity.components.StaticMapEntity.code) {
+                    case 1: // 通常 belt
+                        if (right_entity.components.StaticMapEntity.rotation % 180 !== 0) {
+                            rot = oriRot = right_entity.components.StaticMapEntity.rotation;
+                        } else {
+                            continue;
+                        }
+                        break;
+                    case 2: // 左转 belt
+                        if (right_entity.components.StaticMapEntity.rotation === 0) {
+                            rot = oriRot = 270
+                        } else if (right_entity.components.StaticMapEntity.rotation === 90) {
+                            rot = oriRot = 90
+                        } else {
+                            continue;
+                        }
+                        break;
+                    case 3: // 右转 belt
+                        if (right_entity.components.StaticMapEntity.rotation === 90) {
+                            rot = oriRot = 90
+                        } else if (right_entity.components.StaticMapEntity.rotation === 180) {
+                            rot = oriRot = 270
+                        } else {
+                            continue;
+                        }
+                        break;
+                }
+
+                let _building = new MetaBeltBuilding();
+                let entity = _building.createEntity({
+                    root: this.root,
+                    origin: new Vector(origin.x, y),
+                    rotation: rot,
+                    originalRotation: oriRot,
+                    rotationVariant: 0,
+                    variant: "default"
+                });
+
+                this.freeEntityAreaBeforeBuild(entity);
+                this.root.map.placeStaticEntity(entity);
+                this.root.entityMgr.registerEntity(entity);
+            }
+        } else {    // 加一行
+            let toBuildTiles = [];
+            let toDeleteTiles = [];
+            let max_x = -4096;  // 先写死成这样吧, 大概够用
+            let min_x = 4096;
+            for (let entity of this.root.entityMgr.entities) { // 非破坏性遍历, 不要一边遍历一边删除, 会死的很惨
+                if (entity.components.StaticMapEntity.origin.y >= origin.y) {
+                    // 在当前位置的左边缘切断
+                    if (entity.components.StaticMapEntity.origin.y === origin.y) {
+                        if (entity.components.StaticMapEntity.origin.x > max_x) {
+                            max_x = entity.components.StaticMapEntity.origin.x;
+                        }
+                        if (entity.components.StaticMapEntity.origin.x < min_x) {
+                            min_x = entity.components.StaticMapEntity.origin.x;
+                        }
+                    }
+                    let _building = new MetaBeltBuilding();
+                    let new_entity = _building.createEntity({
+                        root: this.root,
+                        origin: new Vector(entity.components.StaticMapEntity.origin.x, entity.components.StaticMapEntity.origin.y + 1),
+                        rotation: entity.components.StaticMapEntity.rotation,
+                        originalRotation: entity.components.StaticMapEntity.originalRotation,
+                        rotationVariant: entity.components.StaticMapEntity.getRotationVariant(),
+                        variant: entity.components.StaticMapEntity.getVariant()
+                    });
+                    toBuildTiles.push(new_entity);
+                    toDeleteTiles.push(entity);
+                }
+            }
+            for (let de of toDeleteTiles) {
+                this.tryDeleteBuilding(de);
+            }
+            for (let entity of toBuildTiles) {
+                this.root.map.placeStaticEntity(entity);
+                this.root.entityMgr.registerEntity(entity);
+            }
+            for (let x = min_x; x <= max_x; x++) {
+                // 检查上边缘切口
+                let rot;
+                let oriRot;
+                let top_entity = this.root.map.getLayerContentXY(x, origin.y - 1, "regular");
+                if (!top_entity) {
+                    continue;
+                }
+
+                switch (top_entity.components.StaticMapEntity.code) {
+                    case 1: // 通常 belt
+                        if (top_entity.components.StaticMapEntity.rotation % 180 === 0) {
+                            rot = oriRot = top_entity.components.StaticMapEntity.rotation;
+                        } else {
+                            continue;
+                        }
+                        break;
+                    case 2: // 左转 belt
+                        if (top_entity.components.StaticMapEntity.rotation === 0) {
+                            rot = oriRot = 0
+                        } else if (top_entity.components.StaticMapEntity.rotation === 270) {
+                            rot = oriRot = 180
+                        } else {
+                            continue;
+                        }
+                        break;
+                    case 3: // 右转 belt
+                        if (top_entity.components.StaticMapEntity.rotation == 0) {
+                            rot = oriRot = 0
+                        } else if (top_entity.components.StaticMapEntity.rotation == 90) {
+                            rot = oriRot = 180
+                        } else {
+                            continue;
+                        }
+                        break;
+                }
+
+                let _building = new MetaBeltBuilding();
+                let entity = _building.createEntity({
+                    root: this.root,
+                    origin: new Vector(x, origin.y),
+                    rotation: rot,
+                    originalRotation: oriRot,
+                    rotationVariant: 0,
+                    variant: "default"
+                });
+
+                this.freeEntityAreaBeforeBuild(entity);
+                this.root.map.placeStaticEntity(entity);
+                this.root.entityMgr.registerEntity(entity);
+            }
+            for (let x = min_x; x <= max_x; x++) {
+                // 检查下边缘切口
+                let rot;
+                let oriRot;
+                if (this.root.map.getLayerContentXY(x, origin.y, "regular")) {  // 上切口已经 handle, 不再处理
+                    continue;
+                }
+                let bottom_entity = this.root.map.getLayerContentXY(x, origin.y + 1, "regular");
+                if (!bottom_entity) {
+                    continue;
+                }
+
+                switch (bottom_entity.components.StaticMapEntity.code) {
+                    case 1: // 通常 belt
+                        if (bottom_entity.components.StaticMapEntity.rotation % 180 === 0) {
+                            rot = oriRot = bottom_entity.components.StaticMapEntity.rotation;
+                        } else {
+                            continue;
+                        }
+                        break;
+                    case 2: // 左转 belt
+                        if (bottom_entity.components.StaticMapEntity.rotation === 90) {
+                            rot = oriRot = 0
+                        } else if (bottom_entity.components.StaticMapEntity.rotation === 180) {
+                            rot = oriRot = 180
+                        } else {
+                            continue;
+                        }
+                        break;
+                    case 3: // 右转 belt
+                        if (bottom_entity.components.StaticMapEntity.rotation === 270) {
+                            rot = oriRot = 0
+                        } else if (bottom_entity.components.StaticMapEntity.rotation === 180) {
+                            rot = oriRot = 180
+                        } else {
+                            continue;
+                        }
+                        break;
+                }
+
+                let _building = new MetaBeltBuilding();
+                let entity = _building.createEntity({
+                    root: this.root,
+                    origin: new Vector(x, origin.y),
+                    rotation: rot,
+                    originalRotation: oriRot,
+                    rotationVariant: 0,
+                    variant: "default"
+                });
+
+                this.freeEntityAreaBeforeBuild(entity);
+                this.root.map.placeStaticEntity(entity);
+                this.root.entityMgr.registerEntity(entity);
+            }
+        }
+    }
+
+    /**
+     * 减距
+     * @param {Vector} origin 
+     * @param {number} rotation 
+     * @returns 
+     */
+    decreaseDistance(origin, rotation) {
+        if (rotation % 180 === 0) {  // 减一列
+            let toBuildTiles = [];
+            let toDeleteTiles = [];
+
+            for (let entity of this.root.entityMgr.entities) { // 第一次循环检查这两列是否可满足要求
+                if (entity.components.StaticMapEntity.origin.x === origin.x || entity.components.StaticMapEntity.origin.x === origin.x + 1) {
+                    if (entity.components.StaticMapEntity.code !== 1 || entity.components.StaticMapEntity.rotation % 180 === 0){
+                        //不能切掉这一列
+                        return;
+                    }
+                }
+            }
+
+            for (let entity of this.root.entityMgr.entities) { // 第二次遍历, 准备左移
+                if (entity.components.StaticMapEntity.origin.x > origin.x ) {
+                    let _building = new MetaBeltBuilding();
+                    let new_entity = _building.createEntity({
+                        root: this.root,
+                        origin: new Vector(entity.components.StaticMapEntity.origin.x - 1, entity.components.StaticMapEntity.origin.y),
+                        rotation: entity.components.StaticMapEntity.rotation,
+                        originalRotation: entity.components.StaticMapEntity.originalRotation,
+                        rotationVariant: entity.components.StaticMapEntity.getRotationVariant(),
+                        variant: entity.components.StaticMapEntity.getVariant()
+                    });
+                    toBuildTiles.push(new_entity);
+                    toDeleteTiles.push(entity);
+                }
+            }
+            for (let de of toDeleteTiles) {
+                this.tryDeleteBuilding(de);
+            }
+            for (let entity of toBuildTiles) {
+                this.freeEntityAreaBeforeBuild(entity);
+                this.root.map.placeStaticEntity(entity);
+                this.root.entityMgr.registerEntity(entity);
+            }
+            
+        } else {    // 减一行
+            let toBuildTiles = [];
+            let toDeleteTiles = [];
+
+            for (let entity of this.root.entityMgr.entities) { // 第一次循环检查这两列是否可满足要求
+                if (entity.components.StaticMapEntity.origin.y === origin.y || entity.components.StaticMapEntity.origin.y === origin.y + 1) {
+                    if (entity.components.StaticMapEntity.code !== 1 || entity.components.StaticMapEntity.rotation % 180 !== 0){
+                        //不能切掉这一行
+                        return;
+                    }
+                }
+            }
+
+            for (let entity of this.root.entityMgr.entities) { // 第二次遍历, 准备上移
+                if (entity.components.StaticMapEntity.origin.y > origin.y ) {
+                    let _building = new MetaBeltBuilding();
+                    let new_entity = _building.createEntity({
+                        root: this.root,
+                        origin: new Vector(entity.components.StaticMapEntity.origin.x, entity.components.StaticMapEntity.origin.y - 1),
+                        rotation: entity.components.StaticMapEntity.rotation,
+                        originalRotation: entity.components.StaticMapEntity.originalRotation,
+                        rotationVariant: entity.components.StaticMapEntity.getRotationVariant(),
+                        variant: entity.components.StaticMapEntity.getVariant()
+                    });
+                    toBuildTiles.push(new_entity);
+                    toDeleteTiles.push(entity);
+                }
+            }
+            for (let de of toDeleteTiles) {
+                this.tryDeleteBuilding(de);
+            }
+            for (let entity of toBuildTiles) {
+                this.freeEntityAreaBeforeBuild(entity);
+                this.root.map.placeStaticEntity(entity);
+                this.root.entityMgr.registerEntity(entity);
+            }
+        }
+    }
+
     // hook, 在这里处理 定向整理, 绿点设置, 间距调整 等与地图相关的点击操作
     // 或许写到别的地方更好, 或许应该新开一个 class...
     // anyway, 先跑起来再说
-    tryPlaceBuildingHook({ origin, rotation, rotationVariant, originalRotation, variant, building }){
-        if (building.id === "miner"){ // 开采器, 用来实现定向整理
+    tryPlaceBuildingHook({ origin, rotation, rotationVariant, originalRotation, variant, building }) {
+        if (building.id === "miner") { // 开采器, 用来实现定向整理
             console.log("定向整理")
             // 设置不进行周围自动处理
             this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
             this.orientationRebuild(origin, rotation);
             // 恢复周围自动处理
-            this.root.systemMgr.systems.belt.bUpdateSurrounding = true; 
+            this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
             return true; // true for handled
 
         } else if (building.id === "reader") {  // 增距工具
             console.log("增距工具")
-            this.root.systemMgr.systems.belt.bUpdateSurrounding = false; 
+            this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
             this.increaseDistance(origin, rotation);
-            this.root.systemMgr.systems.belt.bUpdateSurrounding = true; 
+            this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
             return true;
         } else if (building.id === "display") {  // 减距工具
             console.log("减距工具")
+            this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
+            this.decreaseDistance(origin, rotation);
+            this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
             return true;
         }
-            return false;
+        return false;
     }
 
     /**
@@ -563,7 +649,7 @@ export class GameLogic {
      */
     tryPlaceBuilding({ origin, rotation, rotationVariant, originalRotation, variant, building }) {
 
-        if (this.tryPlaceBuildingHook({ origin, rotation, rotationVariant, originalRotation, variant, building })){
+        if (this.tryPlaceBuildingHook({ origin, rotation, rotationVariant, originalRotation, variant, building })) {
             // 已经 hook 过, 不再执行实际放置
             return null;
         }
