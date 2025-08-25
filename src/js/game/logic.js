@@ -255,26 +255,39 @@ export class GameLogic {
                             min_y = entity.components.StaticMapEntity.origin.y;
                         }
                     }
-                    let _building = new MetaBeltBuilding();
-                    let new_entity = _building.createEntity({
-                        root: this.root,
-                        origin: new Vector(entity.components.StaticMapEntity.origin.x + 1, entity.components.StaticMapEntity.origin.y),
-                        rotation: entity.components.StaticMapEntity.rotation,
-                        originalRotation: entity.components.StaticMapEntity.originalRotation,
-                        rotationVariant: entity.components.StaticMapEntity.getRotationVariant(),
-                        variant: entity.components.StaticMapEntity.getVariant()
-                    });
+                    // let _building = new MetaBeltBuilding();
+                    // let new_entity = _building.createEntity({
+                    //     root: this.root,
+                    //     origin: new Vector(entity.components.StaticMapEntity.origin.x + 1, entity.components.StaticMapEntity.origin.y),
+                    //     rotation: entity.components.StaticMapEntity.rotation,
+                    //     originalRotation: entity.components.StaticMapEntity.originalRotation,
+                    //     rotationVariant: entity.components.StaticMapEntity.getRotationVariant(),
+                    //     variant: entity.components.StaticMapEntity.getVariant()
+                    // });
+                    let new_entity = entity.clone();
+                    new_entity.components.StaticMapEntity.origin.x += 1;
                     toBuildTiles.push(new_entity);
                     toDeleteTiles.push(entity);
                 }
             }
-            for (let de of toDeleteTiles) {
-                this.tryDeleteBuilding(de);
-            }
-            for (let entity of toBuildTiles) {
-                this.root.map.placeStaticEntity(entity);
-                this.root.entityMgr.registerEntity(entity);
-            }
+            // 此处应参考 game\hud\parts\mass_selector.js L99 大批量操作, 
+            // 然而并未感到明显性能提升, 其他地方暂时先不改吧
+            this.root.logic.performBulkOperation(() => {
+                for (let de of toDeleteTiles) {
+                    this.tryDeleteBuilding(de);
+                }
+            });
+            
+            // 参考 game\blueprint.js L157
+            this.performBulkOperation(() => {
+                return this.performImmutableOperation(() => {
+                    for (let entity of toBuildTiles) {
+                        this.root.map.placeStaticEntity(entity);
+                        this.root.entityMgr.registerEntity(entity);
+                    }
+                });
+            });
+
             for (let y = min_y; y <= max_y; y++) {
                 // 检查左边缘切口
                 let rot;

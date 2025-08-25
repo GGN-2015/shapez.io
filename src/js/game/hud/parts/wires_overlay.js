@@ -56,7 +56,7 @@ export class HUDWiresOverlay extends BaseHUDPart {
             label: "wires-tile-pattern",
         });
         context.clearRect(0, 0, dims, dims);
-        overlayTile.draw(context, 0, 0, dims, dims);
+        //  overlayTile.draw(context, 0, 0, dims, dims); 去掉绿色背景
         this.tilePatternCanvas = canvas;
     }
 

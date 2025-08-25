@@ -577,7 +577,7 @@ export class WireSystem extends GameSystem {
             // There is no network, it's empty
             return {
                 spriteSet: this.wireSprites[wireComp.variant],
-                opacity: 0.5,
+                opacity: 1, // 不要透明看的清楚一点
             };
         }
 

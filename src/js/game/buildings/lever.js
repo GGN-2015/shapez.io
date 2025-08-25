@@ -11,6 +11,14 @@ export class MetaLeverBuilding extends MetaBuilding {
         super("lever");
     }
 
+    // /**
+    //  * Returns the edit layer of the building
+    //  * @returns {Layer}
+    //  */
+    // getLayer(){
+    //     return "wires";
+    // }
+
     static getAllVariantCombinations() {
         return [
             {
