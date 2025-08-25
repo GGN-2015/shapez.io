@@ -8,6 +8,7 @@ import { KEYMAPPINGS } from "../../key_action_mapper";
 import { enumHubGoalRewards } from "../../tutorial_goals";
 import { BaseHUDPart } from "../base_hud_part";
 import { Knot } from "../../knot";
+import { enumNotificationType } from "./notifications";
 
 const copy = require("clipboard-copy");
 const wiresBackgroundDpi = 4;
@@ -30,6 +31,14 @@ export class HUDWiresOverlay extends BaseHUDPart {
     */
     initKnot(root) {
         this.root.knot= new Knot(this.root);
+        if (!this.root.knot.corners.length){// 可以没有 crossing, 但至少要有 corner 
+            this.root.hud.signals.notification.dispatch(this.root.knot.unLeagleMessage, enumNotificationType.error);
+            return false
+
+        } else {
+            this.root.hud.signals.notification.dispatch("构建扭结成功", enumNotificationType.success);
+            return true;
+        }       
     }
 
     /**
@@ -44,8 +53,10 @@ export class HUDWiresOverlay extends BaseHUDPart {
                 this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_wires_painter_and_levers) ||
                 (G_IS_DEV && globalConfig.debug.allBuildingsUnlocked)
             ) {
-                this.root.currentLayer = "wires";
-                this.initKnot(this.root);
+                if (this.initKnot(this.root)){
+                    this.root.currentLayer = "wires";
+                }
+                
             }
         } else {
             this.root.currentLayer = "regular";

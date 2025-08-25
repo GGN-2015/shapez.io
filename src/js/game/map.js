@@ -167,6 +167,26 @@ export class BaseMap extends BasicSerializableObject {
     }
 
     /**
+     * 判断对角线上 4 个临接位置全空, 检查合法性
+     * @param {Vector} origin 
+     * @returns {boolean}
+     */
+    checkDiagonalEntities(origin) {
+        if (this.getLayerContentXY(origin.x - 1, origin.y - 1, "regular")){
+            return false;
+        }
+        if (this.getLayerContentXY(origin.x - 1, origin.y + 1, "regular")){
+            return false;
+        }
+        if (this.getLayerContentXY(origin.x + 1, origin.y - 1, "regular")){
+            return false;
+        }
+        if (this.getLayerContentXY(origin.x + 1, origin.y + 1, "regular")){
+            return false;
+        }
+        return true;
+    }
+    /**
      * 获取地图上一个 belt 的出口下一个位置
      * @param {Entity} entity
      * @returns {Vector}
