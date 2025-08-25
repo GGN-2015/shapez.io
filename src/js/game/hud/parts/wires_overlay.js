@@ -7,6 +7,7 @@ import { SOUNDS } from "../../../platform/sound";
 import { KEYMAPPINGS } from "../../key_action_mapper";
 import { enumHubGoalRewards } from "../../tutorial_goals";
 import { BaseHUDPart } from "../base_hud_part";
+import { Knot } from "../../knot";
 
 const copy = require("clipboard-copy");
 const wiresBackgroundDpi = 4;
@@ -25,6 +26,13 @@ export class HUDWiresOverlay extends BaseHUDPart {
     }
 
     /**
+     * 
+    */
+    initKnot(root) {
+        this.root.knot= new Knot(this.root);
+    }
+
+    /**
      * Switches between layers
      */
     switchLayers() {
@@ -37,6 +45,7 @@ export class HUDWiresOverlay extends BaseHUDPart {
                 (G_IS_DEV && globalConfig.debug.allBuildingsUnlocked)
             ) {
                 this.root.currentLayer = "wires";
+                this.initKnot(this.root);
             }
         } else {
             this.root.currentLayer = "regular";
