@@ -8,6 +8,7 @@ import { getBuildingDataFromCode } from "./building_codes";
 import { Component } from "./component";
 import { enumWireVariant } from "./components/wire";
 import { Entity } from "./entity";
+import { enumNotificationType } from "./hud/parts/notifications";
 import { CHUNK_OVERLAY_RES } from "./map_chunk_view";
 import { MetaBuilding } from "./meta_building";
 import { GameRoot } from "./root";
@@ -128,7 +129,7 @@ export class GameLogic {
             return;
         }
 
-
+        this.root.hud.signals.notification.dispatch("定向整理", enumNotificationType.success);
 
         // 确实与目标定向相同或相反            
         sMapEntity.rotation = sMapEntity.originalRotation = rotation;
@@ -239,6 +240,7 @@ export class GameLogic {
      * @returns 
      */
     increaseDistance(origin, rotation) {
+        this.root.hud.signals.notification.dispatch("增距", enumNotificationType.success);
         if (rotation % 180 === 0) {  // 加一列
             let toBuildTiles = [];
             let toDeleteTiles = [];
@@ -544,13 +546,14 @@ export class GameLogic {
      * @returns 
      */
     decreaseDistance(origin, rotation) {
+        this.root.hud.signals.notification.dispatch("减距", enumNotificationType.success);
         if (rotation % 180 === 0) {  // 减一列
             let toBuildTiles = [];
             let toDeleteTiles = [];
 
             for (let entity of this.root.entityMgr.entities) { // 第一次循环检查这两列是否可满足要求
                 if (entity.components.StaticMapEntity.origin.x === origin.x || entity.components.StaticMapEntity.origin.x === origin.x + 1) {
-                    if (entity.components.StaticMapEntity.code !== 1 || entity.components.StaticMapEntity.rotation % 180 === 0){
+                    if (entity.components.StaticMapEntity.code !== 1 || entity.components.StaticMapEntity.rotation % 180 === 0) {
                         //不能切掉这一列
                         return;
                     }
@@ -558,7 +561,7 @@ export class GameLogic {
             }
 
             for (let entity of this.root.entityMgr.entities) { // 第二次遍历, 准备左移
-                if (entity.components.StaticMapEntity.origin.x > origin.x ) {
+                if (entity.components.StaticMapEntity.origin.x > origin.x) {
                     let _building = new MetaBeltBuilding();
                     let new_entity = _building.createEntity({
                         root: this.root,
@@ -580,14 +583,14 @@ export class GameLogic {
                 this.root.map.placeStaticEntity(entity);
                 this.root.entityMgr.registerEntity(entity);
             }
-            
+
         } else {    // 减一行
             let toBuildTiles = [];
             let toDeleteTiles = [];
 
             for (let entity of this.root.entityMgr.entities) { // 第一次循环检查这两列是否可满足要求
                 if (entity.components.StaticMapEntity.origin.y === origin.y || entity.components.StaticMapEntity.origin.y === origin.y + 1) {
-                    if (entity.components.StaticMapEntity.code !== 1 || entity.components.StaticMapEntity.rotation % 180 !== 0){
+                    if (entity.components.StaticMapEntity.code !== 1 || entity.components.StaticMapEntity.rotation % 180 !== 0) {
                         //不能切掉这一行
                         return;
                     }
@@ -595,7 +598,7 @@ export class GameLogic {
             }
 
             for (let entity of this.root.entityMgr.entities) { // 第二次遍历, 准备上移
-                if (entity.components.StaticMapEntity.origin.y > origin.y ) {
+                if (entity.components.StaticMapEntity.origin.y > origin.y) {
                     let _building = new MetaBeltBuilding();
                     let new_entity = _building.createEntity({
                         root: this.root,
@@ -620,12 +623,42 @@ export class GameLogic {
         }
     }
 
+    /**
+     * 减距
+     * @param {Vector} origin 
+     * @returns {boolean}
+     */
+    setSeperator(origin) {
+        let entity = this.root.map.getLayerContentXY(origin.x, origin.y, "regular");
+        if (!entity) {
+            this.root.hud.signals.notification.dispatch("只能在扭结上设置分割点", enumNotificationType.error);
+            return true;
+        }
+        if (this.root.map.isCrossingEntity(origin)){
+            this.root.hud.signals.notification.dispatch("不能在交点上设置分割点", enumNotificationType.error);
+            return true;
+        }
+        if (this.root.map.isCrossingEntity(new Vector(origin.x - 1, origin.y)) ||   
+            this.root.map.isCrossingEntity(new Vector(origin.x + 1, origin.y))||    
+            this.root.map.isCrossingEntity(new Vector(origin.x, origin.y - 1))|| 
+            this.root.map.isCrossingEntity(new Vector(origin.x, origin.y + 1))) { 
+            this.root.hud.signals.notification.dispatch("不能离交点太近", enumNotificationType.error);
+            return true;
+        }
+        if (this.root.knot.seperators.length >= 2){
+            this.root.hud.signals.notification.dispatch("只能设置两个分割点", enumNotificationType.error);
+            return true;
+        }
+        this.root.knot.seperators.push(origin);
+        return false;
+    }
+
     // hook, 在这里处理 定向整理, 绿点设置, 间距调整 等与地图相关的点击操作
     // 或许写到别的地方更好, 或许应该新开一个 class...
     // anyway, 先跑起来再说
     tryPlaceBuildingHook({ origin, rotation, rotationVariant, originalRotation, variant, building }) {
         if (building.id === "miner") { // 开采器, 用来实现定向整理
-            console.log("定向整理")
+            //console.log("定向整理")
             // 设置不进行周围自动处理
             this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
             this.orientationRebuild(origin, rotation);
@@ -634,17 +667,25 @@ export class GameLogic {
             return true; // true for handled
 
         } else if (building.id === "reader") {  // 增距工具
-            console.log("增距工具")
+            //console.log("增距工具")
             this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
             this.increaseDistance(origin, rotation);
             this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
             return true;
         } else if (building.id === "display") {  // 减距工具
-            console.log("减距工具")
+            //console.log("减距工具")
             this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
             this.decreaseDistance(origin, rotation);
             this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
             return true;
+        } else if (building.id === "wire_tunnel"){  // 设置分割节点
+            this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
+            let result = this.setSeperator(origin)
+            this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
+            return result;
+        } else if (building.id === "wire"){  // 设置绿线
+            this.root.knot.greenLineOK = false;
+            return false;
         }
         return false;
     }
@@ -770,6 +811,9 @@ export class GameLogic {
     tryDeleteBuilding(building) {
         if (!this.canDeleteBuilding(building)) {
             return false;
+        }
+        if (building.components.StaticMapEntity.code === 39) {// "wire_tunnel"
+            this.root.knot.seperators.splice(this.root.knot.seperators.indexOf(building.components.StaticMapEntity.origin), 1);
         }
         this.root.map.removeStaticEntity(building);
         this.root.entityMgr.destroyEntity(building);

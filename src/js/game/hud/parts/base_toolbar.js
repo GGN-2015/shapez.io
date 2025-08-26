@@ -250,6 +250,10 @@ export class HUDBaseToolbar extends BaseHUDPart {
             // Not active
             return;
         }
+        if (metaBuilding.id === "trash"){
+            this.root.knot.checkGreenLine();
+            return;
+        }
 
         if (!metaBuilding.getIsUnlocked(this.root)) {
             this.root.soundProxy.playUiError();

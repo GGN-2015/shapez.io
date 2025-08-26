@@ -1,4 +1,5 @@
 import { Vector } from "../core/vector";
+import { enumNotificationType } from "./hud/parts/notifications";
 import { GameRoot } from "./root";
 
 /**
@@ -16,13 +17,25 @@ export class Knot {
                 this.root = root;
                 this.crossings = [];
                 this.corners = [];
+                this.seperators = [];
+                this.greenLineOK = false;
 
+                let reg_entities = []
+                for (let ent of this.root.entityMgr.entities){
+                        if (ent.layer === "regular"){
+                                reg_entities.push(ent)
+                        }
+                }
                 // 检查 regular 层的 belt 是否构成合法扭结
-                let initEntity = this.root.entityMgr.entities[0];
+                let initEntity = reg_entities[0];
+                if (!initEntity){
+                        this.clear("请先绘制扭结");
+                        return;
+                }
 
                 if (initEntity.components.StaticMapEntity.code < 1 || initEntity.components.StaticMapEntity.code > 3) {
                         //不是 belt 的 building
-                        this.unLeagleMessage = "存在非 belt 的建筑块"
+                        this.clear("存在非 belt 的建筑块");
                         return;
                 }
                 let initOrigin = initEntity.components.StaticMapEntity.origin;
@@ -35,7 +48,7 @@ export class Knot {
                         initOrigin = initEntity.components.StaticMapEntity.origin;
                 }
                 if (this.root.map.isCrossingEntity(initOrigin)) {
-                        this.unLeagleMessage = "连续的 crossing 或 corner"
+                        this.clear("连续的 crossing 或 corner");
                         return;
                 }
 
@@ -50,24 +63,18 @@ export class Knot {
                         let nextOrigin = this.root.map.getNextOrigin(curEntity);
                         let nextEntity = this.root.map.getLayerContentXY(nextOrigin.x, nextOrigin.y, "regular");
                         if (!nextEntity){
-                                // 未完整闭锁
-                                this.unLeagleMessage = "未完整闭锁"
-                                this.crossings = [];
-                                this.corners = [];
+                                // 未完整闭合
+                                this.clear("未完整闭合");
                                 return;
                         }
                         if (passedEntities.indexOf(nextEntity) > 0 && !this.root.map.isCrossingEntity(nextEntity.components.StaticMapEntity.origin)) {
                                 // 通常点二次到达
-                                this.unLeagleMessage = "定向整理错误"
-                                this.crossings = [];
-                                this.corners = [];
+                                this.clear("定向整理错误");
                                 return;
                         }
                         if (passedEntities.indexOf(nextEntity) !== passedEntities.lastIndexOf(nextEntity) && this.root.map.isCrossingEntity(nextEntity.components.StaticMapEntity.origin)) {// crossing 已经经过两次以上
                                 // 交点的三次到达
-                                this.unLeagleMessage = "定向整理错误"
-                                this.crossings = [];
-                                this.corners = [];
+                                this.clear("定向整理错误");
                                 return;
                         }
 
@@ -88,29 +95,28 @@ export class Knot {
                                 this.corners.push(nextEntity);
                         } else if (nextEntity.components.StaticMapEntity.code !== 1){
                                 // 非法
-                                this.unLeagleMessage = "存在非 belt 的建筑块"
-                                this.crossings = [];
-                                this.corners = [];
+                                this.clear("存在非 belt 的建筑块");
                                 return;
+                        } else {
+                                if (!this.root.map.checkNeighborsNull(nextEntity)){
+                                        this.clear("过密 lines"); 
+                                        return;
+                                }
                         }
                         curEntity = nextEntity;
                         mapBeltCount++;
                 } while (curEntity !== initEntity)
 
-                if (mapBeltCount !== this.root.entityMgr.entities.length){
+                if (mapBeltCount !== reg_entities.length){
                         // 有多余 tile
-                        this.unLeagleMessage = "有多余 tile"
-                        this.crossings = [];
-                        this.corners = [];
+                        this.clear("有多余 tile")
                         return;
                 }
 
                 for (let cros of this.crossings) {
                         if (!this.root.map.checkDiagonalEntities(cros.components.StaticMapEntity.origin)) {
                                 // 过密位置非法
-                                this.unLeagleMessage = "过密位置"
-                                this.crossings = [];
-                                this.corners = [];
+                                this.clear("过密 crossing");
                                 return;
                         }
                 }
@@ -118,12 +124,42 @@ export class Knot {
                 for (let cor of this.corners) {
                         if (!this.root.map.checkDiagonalEntities(cor.components.StaticMapEntity.origin)) {
                                 // 过密位置非法
-                                this.unLeagleMessage = "过密位置"
-                                this.crossings = [];
-                                this.corners = [];
+                                this.clear("过密 corner");
                                 return;
                         }
                 }
+        }
+
+        /**
+         * 
+         * @param {String} msg 
+         */
+        clear(msg){
+                this.unLeagleMessage = msg;
+                this.crossings = [];
+                this.corners = [];
+        }
+
+        /**
+         * 
+         * @returns {String}
+         */
+        getPDcode(){
+                return ""
+        }
+
+        
+        checkGreenLine(){
+                if (this.greenLineOK ) {
+                        // 已经合规, 第二阶段的 move knot
+
+                        return;
+                }
+                this.greenLineOK = true;
+                
+                // do check
+
+                this.root.hud.signals.notification.dispatch("绿线合规!", enumNotificationType.success);
         }
 
 }

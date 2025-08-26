@@ -167,6 +167,34 @@ export class BaseMap extends BasicSerializableObject {
     }
 
     /**
+     * 
+     * @param {Entity} entity 
+     * @returns {boolean}
+     */
+    checkNeighborsNull(entity){
+        let sMapEntity = entity.components.StaticMapEntity;
+        if (sMapEntity.code !== 1){
+            return true;
+        }
+        if (sMapEntity.rotation % 180 === 0){
+            if (this.getLayerContentXY(sMapEntity.origin.x - 1, sMapEntity.origin.y, "regular")){
+                return false;
+            }
+            if (this.getLayerContentXY(sMapEntity.origin.x + 1, sMapEntity.origin.y, "regular")){
+                return false;
+            }
+        } else {
+            if (this.getLayerContentXY(sMapEntity.origin.x, sMapEntity.origin.y - 1, "regular")){
+                return false;
+            }
+            if (this.getLayerContentXY(sMapEntity.origin.x, sMapEntity.origin.y + 1, "regular")){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * 判断对角线上 4 个临接位置全空, 检查合法性
      * @param {Vector} origin 
      * @returns {boolean}
