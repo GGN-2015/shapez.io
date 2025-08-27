@@ -30,15 +30,24 @@ export class HUDWiresOverlay extends BaseHUDPart {
      * 
     */
     initKnot(root) {
-        this.root.knot= new Knot(this.root);
-        if (!this.root.knot.corners.length){// 可以没有 crossing, 但至少要有 corner 
+        this.root.knot = new Knot(this.root);
+        if (!this.root.knot.corners.length) {// 可以没有 crossing, 但至少要有 corner 
             this.root.hud.signals.notification.dispatch(this.root.knot.unLeagleMessage, enumNotificationType.error);
             return false
 
-        } else {
-            this.root.hud.signals.notification.dispatch("构建扭结成功", enumNotificationType.success);
-            return true;
-        }       
+        }
+
+        if (this.root.knot) {
+            for (let ori of this.root.knot.seperators) {
+                if (this.root.knot.checkSeperatorIleagle(ori)) {
+                    return false;
+                }
+            }
+        }
+
+        this.root.hud.signals.notification.dispatch("构建扭结成功", enumNotificationType.success);
+        return true;
+
     }
 
     /**

@@ -171,23 +171,23 @@ export class BaseMap extends BasicSerializableObject {
      * @param {Entity} entity 
      * @returns {boolean}
      */
-    checkNeighborsNull(entity){
+    checkNeighborsNull(entity, layer){
         let sMapEntity = entity.components.StaticMapEntity;
-        if (sMapEntity.code !== 1){
-            return true;
-        }
+        // if (sMapEntity.code !== 1){
+        //     return true;
+        // }
         if (sMapEntity.rotation % 180 === 0){
-            if (this.getLayerContentXY(sMapEntity.origin.x - 1, sMapEntity.origin.y, "regular")){
+            if (this.getLayerContentXY(sMapEntity.origin.x - 1, sMapEntity.origin.y, layer)){
                 return false;
             }
-            if (this.getLayerContentXY(sMapEntity.origin.x + 1, sMapEntity.origin.y, "regular")){
+            if (this.getLayerContentXY(sMapEntity.origin.x + 1, sMapEntity.origin.y, layer)){
                 return false;
             }
         } else {
-            if (this.getLayerContentXY(sMapEntity.origin.x, sMapEntity.origin.y - 1, "regular")){
+            if (this.getLayerContentXY(sMapEntity.origin.x, sMapEntity.origin.y - 1, layer)){
                 return false;
             }
-            if (this.getLayerContentXY(sMapEntity.origin.x, sMapEntity.origin.y + 1, "regular")){
+            if (this.getLayerContentXY(sMapEntity.origin.x, sMapEntity.origin.y + 1, layer)){
                 return false;
             }
         }

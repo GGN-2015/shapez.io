@@ -247,6 +247,9 @@ export class GameLogic {
             let max_y = -4096;  // 先写死成这样吧, 大概够用
             let min_y = 4096;
             for (let entity of this.root.entityMgr.entities) { // 非破坏性遍历, 不要一边遍历一边删除, 会死的很惨
+                if (entity.layer !== "regular"){
+                    continue;
+                }
                 if (entity.components.StaticMapEntity.origin.x >= origin.x) {
                     // 在当前位置的左边缘切断
                     if (entity.components.StaticMapEntity.origin.x === origin.x) {
@@ -401,6 +404,9 @@ export class GameLogic {
             let max_x = -4096;  // 先写死成这样吧, 大概够用
             let min_x = 4096;
             for (let entity of this.root.entityMgr.entities) { // 非破坏性遍历, 不要一边遍历一边删除, 会死的很惨
+                if (entity.layer !== "regular"){
+                    continue;
+                }
                 if (entity.components.StaticMapEntity.origin.y >= origin.y) {
                     // 在当前位置的左边缘切断
                     if (entity.components.StaticMapEntity.origin.y === origin.y) {
@@ -552,6 +558,9 @@ export class GameLogic {
             let toDeleteTiles = [];
 
             for (let entity of this.root.entityMgr.entities) { // 第一次循环检查这两列是否可满足要求
+                if (entity.layer !== "regular"){
+                    continue;
+                }
                 if (entity.components.StaticMapEntity.origin.x === origin.x || entity.components.StaticMapEntity.origin.x === origin.x + 1) {
                     if (entity.components.StaticMapEntity.code !== 1 || entity.components.StaticMapEntity.rotation % 180 === 0) {
                         //不能切掉这一列
@@ -561,6 +570,9 @@ export class GameLogic {
             }
 
             for (let entity of this.root.entityMgr.entities) { // 第二次遍历, 准备左移
+                if (entity.layer !== "regular"){
+                    continue;
+                }
                 if (entity.components.StaticMapEntity.origin.x > origin.x) {
                     let _building = new MetaBeltBuilding();
                     let new_entity = _building.createEntity({
@@ -589,6 +601,9 @@ export class GameLogic {
             let toDeleteTiles = [];
 
             for (let entity of this.root.entityMgr.entities) { // 第一次循环检查这两列是否可满足要求
+                if (entity.layer !== "regular"){
+                    continue;
+                }
                 if (entity.components.StaticMapEntity.origin.y === origin.y || entity.components.StaticMapEntity.origin.y === origin.y + 1) {
                     if (entity.components.StaticMapEntity.code !== 1 || entity.components.StaticMapEntity.rotation % 180 !== 0) {
                         //不能切掉这一行
@@ -598,6 +613,9 @@ export class GameLogic {
             }
 
             for (let entity of this.root.entityMgr.entities) { // 第二次遍历, 准备上移
+                if (entity.layer !== "regular"){
+                    continue;
+                }
                 if (entity.components.StaticMapEntity.origin.y > origin.y) {
                     let _building = new MetaBeltBuilding();
                     let new_entity = _building.createEntity({
@@ -624,31 +642,17 @@ export class GameLogic {
     }
 
     /**
-     * 减距
+     * 设置切分点
      * @param {Vector} origin 
      * @returns {boolean}
      */
     setSeperator(origin) {
-        let entity = this.root.map.getLayerContentXY(origin.x, origin.y, "regular");
-        if (!entity) {
-            this.root.hud.signals.notification.dispatch("只能在扭结上设置分割点", enumNotificationType.error);
-            return true;
-        }
-        if (this.root.map.isCrossingEntity(origin)){
-            this.root.hud.signals.notification.dispatch("不能在交点上设置分割点", enumNotificationType.error);
-            return true;
-        }
-        if (this.root.map.isCrossingEntity(new Vector(origin.x - 1, origin.y)) ||   
-            this.root.map.isCrossingEntity(new Vector(origin.x + 1, origin.y))||    
-            this.root.map.isCrossingEntity(new Vector(origin.x, origin.y - 1))|| 
-            this.root.map.isCrossingEntity(new Vector(origin.x, origin.y + 1))) { 
-            this.root.hud.signals.notification.dispatch("不能离交点太近", enumNotificationType.error);
-            return true;
-        }
-        if (this.root.knot.seperators.length >= 2){
+        if (this.root.knot.seperators.length === 2) {
             this.root.hud.signals.notification.dispatch("只能设置两个分割点", enumNotificationType.error);
             return true;
         }
+        if (this.root.knot.checkSeperatorIleagle(origin))
+            return true;
         this.root.knot.seperators.push(origin);
         return false;
     }
