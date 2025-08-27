@@ -492,6 +492,7 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
      * Cycles through the variants
      */
     cycleVariants() {
+        return;
         const metaBuilding = this.currentMetaBuilding.get();
         if (!metaBuilding) {
             this.currentVariant.set(defaultBuildingVariant);

@@ -199,17 +199,17 @@ export class BaseMap extends BasicSerializableObject {
      * @param {Vector} origin 
      * @returns {boolean}
      */
-    checkDiagonalEntities(origin) {
-        if (this.getLayerContentXY(origin.x - 1, origin.y - 1, "regular")){
+    checkDiagonalEntities(origin, layer) {
+        if (this.getLayerContentXY(origin.x - 1, origin.y - 1, layer)){
             return false;
         }
-        if (this.getLayerContentXY(origin.x - 1, origin.y + 1, "regular")){
+        if (this.getLayerContentXY(origin.x - 1, origin.y + 1, layer)){
             return false;
         }
-        if (this.getLayerContentXY(origin.x + 1, origin.y - 1, "regular")){
+        if (this.getLayerContentXY(origin.x + 1, origin.y - 1, layer)){
             return false;
         }
-        if (this.getLayerContentXY(origin.x + 1, origin.y + 1, "regular")){
+        if (this.getLayerContentXY(origin.x + 1, origin.y + 1, layer)){
             return false;
         }
         return true;
@@ -266,6 +266,20 @@ export class BaseMap extends BasicSerializableObject {
     isCrossingEntity(ori) {
         const { ejectors, acceptors } = this.root.logic.getEjectorsAndAcceptorsAtTile(ori);  
         if (ejectors.length + acceptors.length === 4) {  
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * 判断这个位置上的 belt 是否是一个 corner
+     * @param {Vector} ori 
+     * @returns {boolean} 
+     */
+     isCornerEntity(ori) {
+        const entity = this.getLayerContentXY(ori.x, ori.y, "regular"); 
+        if (entity && (entity.components.StaticMapEntity.code === 2 || entity.components.StaticMapEntity.code === 3)) {  
             return true;
         } else {
             return false;

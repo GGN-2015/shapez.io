@@ -187,9 +187,9 @@ export class HUDBuildingPlacer extends HUDBuildingPlacerLogic {
             return;
         }
         const availableVariants = metaBuilding.getAvailableVariants(this.root);
-        if (availableVariants.length === 1) {
+        //if (availableVariants.length === 1) {
             return;
-        }
+        //}
 
         makeDiv(
             this.variantsElement,
