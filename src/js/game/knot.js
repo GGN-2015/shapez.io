@@ -460,7 +460,6 @@ export class Knot {
                                 } else {
                                         rot = (curNode.outRotation + 180) % 360
                                 }
-                                rot = curNode.outRotation
                         }
                         let entity = _building.createEntity({
                                 root: this.root,
@@ -499,6 +498,7 @@ export class Knot {
                 
                 this.root.hud.signals.notification.dispatch("绿线合规!", enumNotificationType.success);
                 this.redPathForward.length = this.redPathReverse.length = 0;
+                this.root.systemMgr.systems.wire.bUpdateSuround = false;
                 this.initRedPathForward(true, this.redPathForward);
                 this.initRedPathForward(false, this.redPathReverse);
                 if (this.redPathForward.length === 0 && this.redPathReverse.length === 0){
