@@ -1,4 +1,5 @@
 import { Vector } from "../core/vector";
+import { MetaWireBuilding } from "./buildings/wire";
 import { enumNotificationType } from "./hud/parts/notifications";
 import { GameRoot } from "./root";
 
@@ -33,6 +34,9 @@ export class Knot {
                 this.corners = [];
                 this.seperators = [];
                 this.greenLineOK = false;
+
+                this.redPathForward = [];
+                this.redPathReverse = [];
                 //this.greenCrossings = [];
 
                 let reg_entities = []
@@ -144,7 +148,7 @@ export class Knot {
                 }
 
                 for (let cros of this.crossings) {
-                        if (!this.root.map.checkDiagonalEntities(cros.components.StaticMapEntity.origin)) {
+                        if (!this.root.map.checkDiagonalEntities(cros.components.StaticMapEntity.origin, "regular")) {
                                 // 过密位置非法
                                 this.clear("过密 crossing");
                                 return;
@@ -152,7 +156,7 @@ export class Knot {
                 }
 
                 for (let cor of this.corners) {
-                        if (!this.root.map.checkDiagonalEntities(cor.components.StaticMapEntity.origin)) {
+                        if (!this.root.map.checkDiagonalEntities(cor.components.StaticMapEntity.origin, "regular")) {
                                 // 过密位置非法
                                 this.clear("过密 corner");
                                 return;
@@ -290,7 +294,7 @@ export class Knot {
                                 }
                                 let belowEnt = this.root.map.getLayerContentXY(nextGreen.components.StaticMapEntity.origin.x, nextGreen.components.StaticMapEntity.origin.y, "regular"); // 获取下方 belt, 应当为 null 或横截.
                                 if (belowEnt) {
-                                        if (belowBelt.components.StaticMapEntity.code !== 1) {
+                                        if (belowEnt.components.StaticMapEntity.code !== 1) {
                                                 this.root.hud.signals.notification.dispatch("绿线 lines 与下层位置矛盾", enumNotificationType.error);
                                                 return false;
                                         }
@@ -313,6 +317,11 @@ export class Knot {
                                 let node = this.createNodeFromEntity(nextGreen, "green", outRot, false);
                                 this.greenNodes.push(node);
                         } else if (nextGreen.components.StaticMapEntity.code === 28){ // 转角绿线
+                                if (!this.root.map.checkDiagonalEntities(nextGreen.components.StaticMapEntity.origin, "wire")) {
+                                        // 过密位置非法
+                                        this.root.hud.signals.notification.dispatch("绿线 corner 过密", enumNotificationType.error);
+                                        return false ;
+                                }
                                 if (nextGreen.components.StaticMapEntity.rotation === outRot){
                                         outRot = (outRot + 90) % 360;
                                 } else if (nextGreen.components.StaticMapEntity.rotation === (outRot + 90) % 360){
@@ -332,6 +341,21 @@ export class Knot {
                 } 
 
         }
+
+        /**
+         * 
+         * @param {Vector} origin 
+         * @returns {number}
+         */
+        getBeltNodeIndex(origin){
+                for (let n of this.nodes){
+                        if (n.origin.x === origin.x && n.origin.y === origin.y){
+                                return this.nodes.indexOf(n);
+                        }
+                }
+                return Infinity;
+        }
+
 
         /**
          * 返回 true 表示非法
@@ -355,6 +379,13 @@ export class Knot {
                         this.root.hud.signals.notification.dispatch("不能离交点太近", enumNotificationType.error);
                         return true;
                 }
+                if (this.root.map.isCornerEntity(new Vector(origin.x - 1, origin.y)) ||
+                        this.root.map.isCornerEntity(new Vector(origin.x + 1, origin.y)) ||
+                        this.root.map.isCornerEntity(new Vector(origin.x, origin.y - 1)) ||
+                        this.root.map.isCornerEntity(new Vector(origin.x, origin.y + 1))) {
+                        this.root.hud.signals.notification.dispatch("不能离 corner 太近 (可以设置在 corner 上)", enumNotificationType.error);
+                        return true;
+                }
                 if (this.root.knot.seperators.length > 2) {
                         this.root.hud.signals.notification.dispatch("只能设置两个分割点", enumNotificationType.error);
                         return true;
@@ -363,6 +394,85 @@ export class Knot {
                 return false;
         }
 
+        /**
+         * 
+         * @param {boolean} bForward 
+         * @param {any[]} redPath 
+         */
+        initRedPathForward(bForward, redPath){
+                let startOrigin;
+                let endOrigine;
+                if (bForward) {
+                        startOrigin = this.seperators[0];
+                        endOrigine = this.seperators[1];
+                } else {
+                        startOrigin = this.seperators[1];
+                        endOrigine = this.seperators[0];
+                }
+
+
+                let initIndex = (this.getBeltNodeIndex(startOrigin) + 1) % this.nodes.length;
+                let lastIndex = (this.getBeltNodeIndex(endOrigine) + 1) % this.nodes.length;
+                let curIndex = initIndex; 
+                while (true) {
+                        let curNode = this.nodes[curIndex];
+                        if ((curIndex + 1)% this.nodes.length === lastIndex) {
+                                break
+                        }
+                        for (let no of redPath){
+                                if (no.origin.x === curNode.origin.x && no.origin.y === curNode.origin.y){
+                                        // 红线有自交,
+                                        redPath.length = 0;
+                                        return;
+                                }
+                        }
+                        for (let no of this.greenNodes){
+                                if (no.origin.x === curNode.origin.x && no.origin.y === curNode.origin.y){
+                                        // 与绿线相交,
+                                        redPath.length = 0;
+                                        return;
+                                }
+                        }
+                        redPath.push(curNode);
+                        
+                        curIndex = (curIndex + 1) % this.nodes.length;
+                }
+
+                // 绘制红线
+                let prevRot;
+                for (let curNode of redPath) {
+                        let _building = new MetaWireBuilding();
+
+                        let rotVar;
+                        let rot;
+                        if (curNode.isCorner){
+                                rotVar = 1;
+                                if (curNode.outRotation === (prevRot + 90) % 360){
+                                        rot = prevRot;
+                                } else {
+                                        rot = (prevRot + 90) % 360;
+                                }
+                        } else {
+                                rotVar = 0;
+                                rot = curNode.outRotation
+                        }
+                        let entity = _building.createEntity({
+                                root: this.root,
+                                origin: curNode.origin,
+                                rotation: rot,
+                                originalRotation: curNode.outRotation,
+                                rotationVariant: rotVar,
+                                variant: "second"
+                        });
+                        //entity.components.Wire.variant = "second";
+
+                        this.root.logic.freeEntityAreaBeforeBuild(entity);
+                        this.root.map.placeStaticEntity(entity);
+                        this.root.entityMgr.registerEntity(entity);
+                        prevRot = curNode.outRotation;
+                }
+                
+        }
         checkGreenLine() {
                 if (this.seperators.length !==2){
                         this.root.hud.signals.notification.dispatch("请先设置 2 个分离器", enumNotificationType.success);
@@ -382,6 +492,12 @@ export class Knot {
                 }
                 this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
                 this.root.hud.signals.notification.dispatch("绿线合规!", enumNotificationType.success);
+                this.root.systemMgr.systems.wire.bUpdateSuround = false;
+                this.initRedPathForward(true, this.redPathForward);
+                this.initRedPathForward(false, this.redPathReverse);
+                if (this.redPathForward.length === 0 && this.redPathReverse.length === 0){
+                        this.root.hud.signals.notification.dispatch("没找到合法红线", enumNotificationType.error);
+                }
         }
 
 }

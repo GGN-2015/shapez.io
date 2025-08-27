@@ -29,7 +29,7 @@ export const wireVariants = {
 
 const enumWireVariantToVariant = {
     [defaultBuildingVariant]: enumWireVariant.first,
-    //[wireVariants.second]: enumWireVariant.second,
+    [wireVariants.second]: enumWireVariant.second,
 };
 
 export class MetaWireBuilding extends MetaBuilding {
@@ -59,11 +59,11 @@ export class MetaWireBuilding extends MetaBuilding {
                 variant: defaultBuildingVariant,
                 rotationVariant: 3,
             },
-            // {
-            //     internalId: 52,
-            //     variant: enumWireVariant.second,
-            //     rotationVariant: 0,
-            // },
+            {
+                internalId: 52,
+                variant: enumWireVariant.second,
+                rotationVariant: 0,
+            },
             {
                 internalId: 53,
                 variant: enumWireVariant.second,
@@ -91,7 +91,7 @@ export class MetaWireBuilding extends MetaBuilding {
     }
 
     getAvailableVariants() {
-        //return [defaultBuildingVariant, wireVariants.second];
+        return [defaultBuildingVariant, wireVariants.second];
         return [defaultBuildingVariant];
     }
 

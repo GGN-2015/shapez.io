@@ -94,6 +94,10 @@ export class WireNetwork {
 export class WireSystem extends GameSystem {
     constructor(root) {
         super(root);
+        /**
+         * @type {boolean}
+         */
+         this.bUpdateSuround = true;
 
         /**
          * @type {Object<enumWireVariant, Object<enumWireType, AtlasSprite>>}
@@ -712,6 +716,9 @@ export class WireSystem extends GameSystem {
      * @param {Rectangle} affectedArea
      */
     updateSurroundingWirePlacement(affectedArea) {
+        if (!this.bUpdateSuround){
+            return;
+        }
         const metaWire = gMetaBuildingRegistry.findByClass(MetaWireBuilding);
 
         for (let x = affectedArea.x; x < affectedArea.right(); ++x) {

@@ -46,6 +46,8 @@ export class HUDWiresOverlay extends BaseHUDPart {
         }
 
         this.root.hud.signals.notification.dispatch("构建扭结成功", enumNotificationType.success);
+        // 打开 wire 路径自适应, 方便绘制绿线
+        this.root.systemMgr.systems.wire.bUpdateSuround = true;
         return true;
 
     }
