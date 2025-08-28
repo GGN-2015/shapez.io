@@ -16,6 +16,8 @@ export class Node {
                this.isCrossing = false;
                this.outRotation = 0;
                this.isCorner = false; 
+
+               this.crosType = "";      // over 表示 black 线在上, under 表示 black 线在下
         }
 }
 
@@ -40,14 +42,22 @@ export class Knot {
                 this.redPathReverse = [];
                 //this.greenCrossings = [];
 
-                let reg_entities = []
+                let reg_entities = [];
+                let red_entities = [];
                 for (let ent of this.root.entityMgr.entities) {
                         if (ent.layer === "regular") {
                                 reg_entities.push(ent)
                         } else if (ent.layer === "wires" && ent.components.StaticMapEntity.code === 39) { // seprator
                                 this.seperators.push(ent.components.StaticMapEntity.origin)
+                        } else if (ent.layer === "wires" && (ent.components.StaticMapEntity.code === 52 || ent.components.StaticMapEntity.code === 53)){ // 红线
+                                red_entities.push(ent);
                         }
                 }
+
+                for (let de of red_entities){
+                        this.root.logic.tryDeleteBuilding(de);
+                }
+
                 // 检查 regular 层的 belt 是否构成合法扭结
                 let initEntity = reg_entities[0];
                 if (!initEntity) {
@@ -119,6 +129,9 @@ export class Knot {
                                 nextOrigin.x = 2 * nextOrigin.x - curOrigine.x;
                                 nextOrigin.y = 2 * nextOrigin.y - curOrigine.y;
                                 nextEntity = this.root.map.getLayerContentXY(nextOrigin.x, nextOrigin.y, "regular");
+                                if (nextEntity === initEntity){
+                                        break;
+                                }
                                 node = this.createNodeFromEntity(nextEntity, "black", nextEntity.components.StaticMapEntity.rotation, false);
                                 this.nodes.push(node);
                         } else if (nextEntity.components.StaticMapEntity.code === 2 || nextEntity.components.StaticMapEntity.code === 3) {
@@ -400,7 +413,7 @@ export class Knot {
          * @param {boolean} bForward 
          * @param {any[]} redPath 
          */
-        initRedPathForward(bForward, redPath){
+        initRedPath(bForward, redPath){
                 let startOrigin;
                 let endOrigine;
                 if (bForward) {
@@ -435,10 +448,20 @@ export class Knot {
                                 }
                         }
                         redPath.push(curNode);
-                        
                         curIndex = (curIndex + 1) % this.nodes.length;
                 }
 
+                for (let rNode of redPath){
+                        if (!rNode.isCrossing){
+                                continue;
+                        }
+                        let belowEnt = this.root.map.getLayerContentXY(rNode.origin.x, rNode.origin.y, "regular");
+                        if (rNode.outRotation === belowEnt.components.StaticMapEntity.rotation) {
+                                rNode.crosType = "under";
+                        } else {
+                                rNode.crosType = "over";
+                        }
+                }
                 // 绘制红线
                 let prevRot;
                 for (let curNode of redPath) {
@@ -461,6 +484,11 @@ export class Knot {
                                         rot = (curNode.outRotation + 180) % 360
                                 }
                         }
+
+                        if (curNode.crosType === "over"){
+                                continue;
+                        }
+                        
                         let entity = _building.createEntity({
                                 root: this.root,
                                 origin: curNode.origin,
@@ -469,7 +497,6 @@ export class Knot {
                                 rotationVariant: rotVar,
                                 variant: "second"
                         });
-                        //entity.components.Wire.variant = "second";
 
                         this.root.logic.freeEntityAreaBeforeBuild(entity);
                         this.root.map.placeStaticEntity(entity);
@@ -478,6 +505,11 @@ export class Knot {
                 }
                 
         }
+
+        do_check(red_path, green_path, direction){
+                return true;
+        }
+
         checkGreenLine() {
                 if (this.seperators.length !==2){
                         this.root.hud.signals.notification.dispatch("请先设置 2 个分离器", enumNotificationType.success);
@@ -498,14 +530,36 @@ export class Knot {
                 
                 this.root.hud.signals.notification.dispatch("绿线合规!", enumNotificationType.success);
                 this.redPathForward.length = this.redPathReverse.length = 0;
+                // 关闭道路自适应
                 this.root.systemMgr.systems.wire.bUpdateSuround = false;
-                this.initRedPathForward(true, this.redPathForward);
-                this.initRedPathForward(false, this.redPathReverse);
-                if (this.redPathForward.length === 0 && this.redPathReverse.length === 0){
-                        this.root.hud.signals.notification.dispatch("没找到合法红线", enumNotificationType.error);
+                this.initRedPath(true, this.redPathForward);
+                this.initRedPath(false, this.redPathReverse);
+                this.redPathReverse = this.redPathReverse.reverse();
+                // 打开道路自适应
+                this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
+
+                let red_path;
+                if (this.redPathForward.length){
+                        red_path = this.redPathForward;
+                } else if (this.redPathReverse.length){
+                        red_path = this.redPathReverse;
+                } else {
+                        red_path = null;
                 }
 
-                this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
+                if (this.do_check(red_path, this.greenNodes, 'left')){
+                        return;
+                }
+                if (this.do_check(red_path, this.greenNodes, 'right')){
+                        return;
+                }
+                
+
+                if (!red_path) {
+                        this.root.hud.signals.notification.dispatch("没找到合法红线", enumNotificationType.error);
+                        return;
+                }
+                
         }
 
 }

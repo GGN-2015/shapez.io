@@ -38,6 +38,7 @@ export class HUDWiresOverlay extends BaseHUDPart {
         }
 
         if (this.root.knot) {
+            this.root.knot.redPathForward.length = this.root.knot.redPathReverse.length = 0;
             for (let ori of this.root.knot.seperators) {
                 if (this.root.knot.checkSeperatorIleagle(ori)) {
                     return false;
@@ -64,9 +65,11 @@ export class HUDWiresOverlay extends BaseHUDPart {
                 this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_wires_painter_and_levers) ||
                 (G_IS_DEV && globalConfig.debug.allBuildingsUnlocked)
             ) {
+                this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
                 if (this.initKnot(this.root)){
                     this.root.currentLayer = "wires";
                 }
+                this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
                 
             }
         } else {

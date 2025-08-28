@@ -86,7 +86,7 @@ export class MetaWireBuilding extends MetaBuilding {
         return true;
     }
 
-    getSilhouetteColor() {
+    getSilhouetteColor(variant) {
         return "#61ef6f";
     }
 

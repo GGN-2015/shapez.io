@@ -273,6 +273,10 @@ export class MapChunkView extends MapChunk {
             data.variant,
             entity
         );
+
+        if (entity.components.StaticMapEntity.code === 52 || entity.components.StaticMapEntity.code === 53){
+            overrideColor = "#f74c4c";
+        }
         context.fillStyle =
             overrideColor || metaBuilding.getSilhouetteColor(data.variant, data.rotationVariant);
         if (overlayMatrix) {
