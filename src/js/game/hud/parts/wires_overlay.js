@@ -68,6 +68,7 @@ export class HUDWiresOverlay extends BaseHUDPart {
                 this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
                 if (this.initKnot(this.root)){
                     this.root.currentLayer = "wires";
+                    this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
                 }
                 this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
                 
