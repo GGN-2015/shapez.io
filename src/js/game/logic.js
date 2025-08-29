@@ -192,7 +192,7 @@ export class GameLogic {
                 break;
             let entity = nextEntity;
             // 设置下一个位置上的定向
-            if (nextEntity.components.StaticMapEntity.rotation !== curEntity.components.StaticMapEntity.rotation) {
+            if (nextEntity.components.StaticMapEntity.rotation !== curEntity.components.StaticMapEntity.originalRotation) {
                 // 如果 rot 不同
                 let _building = new MetaBeltBuilding();
                 let oriRot, rotVar;

@@ -899,7 +899,7 @@ export class Knot {
                         this.root.logic.tryDeleteBuilding(de);
                 }
                 let reverseDelta = 0;
-                if (!this.redBlackSameDirection){
+                if (!this.redPathForward){                        
                         reverseDelta = 180;
                 }
                 for (let g of this.greenNodes){
@@ -1158,7 +1158,7 @@ export class Knot {
                         this.greenLineOK = true;
                         return;
                 }
-
+                
                 console.log("==================================== check right =================================");
                 if (this.do_check(red_path, this.greenNodes, 'right')){
                         this.root.systemMgr.systems.wire.bUpdateSuround = false;
