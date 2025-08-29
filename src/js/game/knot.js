@@ -830,7 +830,7 @@ export class Knot {
                 for (let de of toDel){
                         this.root.logic.tryDeleteBuilding(de);
                 }
-                if (this.redPathForward.length) {
+                if (this.redBlackSameDirection) {
                         for (let r of this.redPathForward) {
                                 if (r.isCrossing && r.crosType === "under") {
                                         let _building = new MetaBeltBuilding();
@@ -855,8 +855,7 @@ export class Knot {
                                         this.root.entityMgr.registerEntity(entity);
                                 }
                         }
-                }
-                if (this.redPathReverse.length){
+                } else {
                         for (let r of this.redPathReverse){
                                 if (r.isCrossing && r.crosType === "under") {
                                         let _building = new MetaBeltBuilding();
@@ -900,7 +899,7 @@ export class Knot {
                         this.root.logic.tryDeleteBuilding(de);
                 }
                 let reverseDelta = 0;
-                if (this.redPathReverse.length){
+                if (!this.redBlackSameDirection){
                         reverseDelta = 180;
                 }
                 for (let g of this.greenNodes){
@@ -1148,7 +1147,8 @@ export class Knot {
                         red_path = null;
                 }
 
-                if (this.do_check(red_path, this.greenNodes, 'left')){
+                console.log("==================================== check left =================================");
+                if (this.do_check(red_path, this.greenNodes, 'left')){        
                         this.root.systemMgr.systems.wire.bUpdateSuround = false;
                         this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
                         this.showRedLine(red_path, this.redBlackSameDirection);
@@ -1158,6 +1158,8 @@ export class Knot {
                         this.greenLineOK = true;
                         return;
                 }
+
+                console.log("==================================== check right =================================");
                 if (this.do_check(red_path, this.greenNodes, 'right')){
                         this.root.systemMgr.systems.wire.bUpdateSuround = false;
                         this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
