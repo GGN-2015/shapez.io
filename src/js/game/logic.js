@@ -192,7 +192,7 @@ export class GameLogic {
                 break;
             let entity = nextEntity;
             // 设置下一个位置上的定向
-            if (nextEntity.components.StaticMapEntity.rotation !== curEntity.components.StaticMapEntity.rotation) {
+            if (nextEntity.components.StaticMapEntity.rotation !== curEntity.components.StaticMapEntity.originalRotation) {
                 // 如果 rot 不同
                 let _building = new MetaBeltBuilding();
                 let oriRot, rotVar;
@@ -226,6 +226,17 @@ export class GameLogic {
                 this.freeEntityAreaBeforeBuild(entity);
                 this.root.map.placeStaticEntity(entity);
                 this.root.entityMgr.registerEntity(entity);
+            } else { // 自动闭合的路径未必正确设置了 originalRotation, 设置一下去掉 bug
+                switch (nextEntity.components.StaticMapEntity.code) {
+                    case 1: // 通常 belt
+                        break;
+                    case 2: // 左转 belt
+                        nextEntity.components.StaticMapEntity.originalRotation = (nextEntity.components.StaticMapEntity.rotation + 270) % 360;
+                        break;
+                    case 3: // 右转 belt
+                        nextEntity.components.StaticMapEntity.originalRotation = (nextEntity.components.StaticMapEntity.rotation + 90) % 360;
+                        break;
+                }
             }
 
             curEntity = entity;
