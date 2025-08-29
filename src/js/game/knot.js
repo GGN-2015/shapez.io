@@ -373,7 +373,12 @@ export class Knot {
                         if (initGreen){
                                 initGreen.components.StaticMapEntity.rotation = neighbors.indexOf(nei) * 90;
                                 break;
-                        }
+                        } 
+                }
+
+                if (!initGreen){
+                        this.root.hud.signals.notification.dispatch("没有找到连接两个分离器的绿线", enumNotificationType.error);
+                        return false;
                 }
 
                 let curGreen = initGreen;
@@ -1118,16 +1123,20 @@ export class Knot {
                         this.root.systemMgr.systems.wire.bUpdateSuround = true;
                         //this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
                         this.constructorEbd();
+                        this.root.hud.signals.notification.dispatch("新扭结 crossings: " + this.crossings.length, enumNotificationType.success);
+                        this.root.systemMgr.systems.wire.bUpdateSuround = true;
                         return;
                 }
 
                 // do check
                 this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
+                this.root.systemMgr.systems.wire.bUpdateSuround = false;
                 if (!this.reDirectionGreenLine()) {
+                        this.root.systemMgr.systems.wire.bUpdateSuround = true;
                         return;
                 }
                 
-                this.root.hud.signals.notification.dispatch("绿线合规!", enumNotificationType.success);
+                //this.root.hud.signals.notification.dispatch("绿线合规!", enumNotificationType.success);
                 this.redPathForward.length = this.redPathReverse.length = 0;
                 // 关闭道路自适应
                 this.root.systemMgr.systems.wire.bUpdateSuround = false;
@@ -1145,11 +1154,11 @@ export class Knot {
                         red_path = this.redPathReverse;
                         this.redBlackSameDirection = false;
                 } else {
-                        red_path = null;
+                        red_path = [];
                 }
 
                 console.log("==================================== check left =================================");
-                if (this.do_check(red_path, this.greenNodes, 'left')){        
+                if (red_path.length && this.do_check(red_path, this.greenNodes, 'left')){        
                         this.root.systemMgr.systems.wire.bUpdateSuround = false;
                         this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
                         this.showRedLine(red_path, this.redBlackSameDirection);
@@ -1161,12 +1170,12 @@ export class Knot {
                 }
                 
                 console.log("==================================== check right =================================");
-                if (this.do_check(red_path, this.greenNodes, 'right')){
+                if (red_path.length && this.do_check(red_path, this.greenNodes, 'right')){
                         this.root.systemMgr.systems.wire.bUpdateSuround = false;
                         this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
                         this.showRedLine(red_path, this.redBlackSameDirection);
                         this.reDrawGreenLine();
-                        this.root.systemMgr.systems.wire.bUpdateSuround = true;
+                        //this.root.systemMgr.systems.wire.bUpdateSuround = true;
                         //this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
                         this.greenLineOK = true;
                         return;
