@@ -731,6 +731,7 @@ export class Knot {
                                         }
                                }
                                let nStrand = cross_strand.next();
+                               nStrand.crosType = cross_strand.crosType;
                                console.log(nStrand.node.origin);
                                r = this.get_strand_from_array(check_result_crossings, nStrand);
                                if (!r){
@@ -899,7 +900,7 @@ export class Knot {
                         this.root.logic.tryDeleteBuilding(de);
                 }
                 let reverseDelta = 0;
-                if (!this.redPathForward){                        
+                if (!this.redBlackSameDirection){                        
                         reverseDelta = 180;
                 }
                 for (let g of this.greenNodes){
@@ -1153,7 +1154,7 @@ export class Knot {
                         this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
                         this.showRedLine(red_path, this.redBlackSameDirection);
                         this.reDrawGreenLine();
-                        this.root.systemMgr.systems.wire.bUpdateSuround = true;
+                        //this.root.systemMgr.systems.wire.bUpdateSuround = true;
                         //this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
                         this.greenLineOK = true;
                         return;

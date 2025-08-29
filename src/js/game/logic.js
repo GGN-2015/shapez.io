@@ -229,6 +229,7 @@ export class GameLogic {
             } else { // 自动闭合的路径未必正确设置了 originalRotation, 设置一下去掉 bug
                 switch (nextEntity.components.StaticMapEntity.code) {
                     case 1: // 通常 belt
+                        nextEntity.components.StaticMapEntity.originalRotation = nextEntity.components.StaticMapEntity.rotation;
                         break;
                     case 2: // 左转 belt
                         nextEntity.components.StaticMapEntity.originalRotation = (nextEntity.components.StaticMapEntity.rotation + 270) % 360;
