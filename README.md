@@ -42,7 +42,7 @@ Your goal is to produce shapes by cutting, rotating, merging and painting parts 
 -   Install Java (required for texture packer)
 -   Run `yarn` in the root folder
 -   `cd` into `gulp` folder
--   Run `yarn` and then `yarn gulp` - it should now open in your browser
+-   Run `yarn` and then `NODE_OPTIONS=--openssl-legacy-provider yarn gulp` - it should now open in your browser
 
 **Notice**: This will produce a debug build with several debugging flags enabled. If you want to disable them, modify [`src/js/core/config.js`](src/js/core/config.js).
 

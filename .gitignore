@@ -1,3 +1,7 @@
+# Yarn Cache
+gulp/.yarn/cache/*
+.yarn/cache/*
+
 # Logs
 logs
 *.log
