@@ -1065,10 +1065,12 @@ export class Knot {
                                                 rot = (prevRot + 90) % 360;
                                         }
                                 } else {
-                                        if (curNode.outRotation === prevRot){
-                                                rot = (prevRot + 180) % 360;
+                                        let i = redPath.indexOf(curNode)
+                                        let nextRot = redPath[(i+1) % redPath.length].outRotation;
+                                        if (curNode.outRotation === (nextRot + 270) % 360){
+                                                rot = (curNode.outRotation + 180) % 360;
                                         } else {
-                                                rot = (prevRot + 270) % 360;
+                                                rot = (curNode.outRotation + 270) % 360;
                                         }  
                                 }
                                 
@@ -1113,8 +1115,8 @@ export class Knot {
                         this.deleteRedLineBelow();
                         this.drawGreenLineBelow();
                         this.drawSepratorBelow();
-                        this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
-                        this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
+                        this.root.systemMgr.systems.wire.bUpdateSuround = true;
+                        //this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
                         this.constructorEbd();
                         return;
                 }
@@ -1133,7 +1135,7 @@ export class Knot {
                 this.initRedPath(false, this.redPathReverse);
                 this.redPathReverse = this.redPathReverse.reverse();
                 // 打开道路自适应
-                this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
+                //this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
 
                 let red_path;
                 if (this.redPathForward.length){
@@ -1151,8 +1153,8 @@ export class Knot {
                         this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
                         this.showRedLine(red_path, this.redBlackSameDirection);
                         this.reDrawGreenLine();
-                        this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
-                        this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
+                        this.root.systemMgr.systems.wire.bUpdateSuround = true;
+                        //this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
                         this.greenLineOK = true;
                         return;
                 }
@@ -1161,8 +1163,8 @@ export class Knot {
                         this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
                         this.showRedLine(red_path, this.redBlackSameDirection);
                         this.reDrawGreenLine();
-                        this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
-                        this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
+                        this.root.systemMgr.systems.wire.bUpdateSuround = true;
+                        //this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
                         this.greenLineOK = true;
                         return;
                 }

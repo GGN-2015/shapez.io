@@ -37,14 +37,30 @@ export class HUDWiresOverlay extends BaseHUDPart {
 
         }
 
+        let sepOK = true; 
         if (this.root.knot) {
             this.root.knot.redPathForward.length = this.root.knot.redPathReverse.length = 0;
             for (let ori of this.root.knot.seperators) {
                 if (this.root.knot.checkSeperatorIleagle(ori)) {
-                    return false;
+                    //return false;
+                   sepOK = false;
+            }
+        }
+
+            if (!sepOK) {
+                let sep_entities = [];
+                for (let ent of this.root.entityMgr.entities) {
+                    if (ent.layer === "wires" && (ent.components.StaticMapEntity.code === 39)) { // sep
+                        sep_entities.push(ent);
+                    }
+                }
+
+                for (let de of sep_entities) {
+                    this.root.logic.tryDeleteBuilding(de);
                 }
             }
         }
+        
 
         this.root.hud.signals.notification.dispatch("构建扭结成功", enumNotificationType.success);
         // 打开 wire 路径自适应, 方便绘制绿线
@@ -75,6 +91,7 @@ export class HUDWiresOverlay extends BaseHUDPart {
             }
         } else {
             this.root.currentLayer = "regular";
+            this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
         }
         this.root.signals.editModeChanged.dispatch(this.root.currentLayer);
     }

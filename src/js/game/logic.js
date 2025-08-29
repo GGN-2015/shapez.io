@@ -685,7 +685,7 @@ export class GameLogic {
         } else if (building.id === "wire_tunnel"){  // 设置分割节点
             this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
             let result = this.setSeperator(origin)
-            this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
+            //this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
             return result;
         } else if (building.id === "wire"){  // 设置绿线
             this.root.knot.greenLineOK = false;
