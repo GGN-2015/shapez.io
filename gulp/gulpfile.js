@@ -33,6 +33,8 @@ const envVars = [
 for (let i = 0; i < envVars.length; ++i) {
     if (!process.env[envVars[i]]) {
         console.warn("Unset environment variable, might cause issues:", envVars[i]);
+    }else {
+        console.log(envVars[i], "=", process.env[envVars[i]]);
     }
 }
 
@@ -133,7 +135,7 @@ gulp.task("main.webserver", () => {
                 enable: true,
             },
             directoryListing: false,
-            open: true,
+            open: false,
             port: 3005,
         })
     );
@@ -162,6 +164,7 @@ function serveHTML({ version = "web-dev" }) {
         reloadDebounce: 100,
         reloadOnRestart: true,
         watchEvents: ["add", "change"],
+        open: false
     });
 
     // Watch .scss files, those trigger a css rebuild
@@ -315,3 +318,18 @@ gulp.task(
 
 // Default task (dev, localhost)
 gulp.task("default", gulp.series("serve.web-localhost"));
+
+// 核心：自动触发 default 任务（当用 node 直接执行时）
+if (require.main === module) {
+    // 调用 default 任务
+    gulp.series("default")((err) => {
+        if (err) {
+        console.error("default 任务执行失败:", err.message);
+        process.exit(1); // 失败时退出并返回错误码
+        } else {
+        console.log("default 任务执行完成");
+        // 注意：如果 "serve.web-localhost" 是长期运行的服务（如启动服务器），不需要 exit
+        // process.exit(0); // 仅在任务是一次性操作时使用
+        }
+    });
+}

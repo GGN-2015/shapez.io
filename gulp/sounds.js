@@ -1,5 +1,20 @@
 const path = require("path");
 const audiosprite = require("gulp-audiosprite");
+// 引入必要的模块
+const { execSync } = require('child_process');
+
+// 辅助函数：检查ffmpeg是否可用
+function isFfmpegAvailable() {
+    try {
+        // 执行ffmpeg版本命令，成功则表示存在
+        execSync('ffmpeg -version', { stdio: 'ignore' });
+        return true;
+    } catch (err) {
+        // 命令执行失败（找不到命令或其他错误），表示ffmpeg不存在
+        console.warn('ffmpeg not found - skipping sounds.sfxGenerateSprites task');
+        return false;
+    }
+}
 
 function gulptasksSounds($, gulp, buildFolder) {
     // Gather some basic infos
@@ -99,10 +114,20 @@ function gulptasksSounds($, gulp, buildFolder) {
     });
 
     // Encodes the ui sounds
-    gulp.task("sounds.sfxGenerateSprites", () => {
+    gulp.task("sounds.sfxGenerateSprites", (cb) => { // 1. 接收 cb 回调参数（关键）
+        // 2. ffmpeg 不存在时，直接调用 cb() 结束任务
+        if (!isFfmpegAvailable()) {
+            cb(); // 无参数表示任务「成功跳过」，不触发错误
+            return; // 终止后续逻辑
+        }
+
+        // 3. ffmpeg 存在时，正常执行原流任务逻辑
         return gulp
-            .src([path.join(soundsDir, "sfx", "**", "*.wav"), path.join(soundsDir, "sfx", "**", "*.mp3")])
-            .pipe($.plumber())
+            .src([
+                path.join(soundsDir, "sfx", "**", "*.wav"),
+                path.join(soundsDir, "sfx", "**", "*.mp3")
+            ])
+            .pipe($.plumber()) // 捕获流中的错误，避免任务中断
             .pipe(
                 audiosprite({
                     format: "howler",
@@ -111,7 +136,9 @@ function gulptasksSounds($, gulp, buildFolder) {
                     export: "mp3",
                 })
             )
-            .pipe(gulp.dest(path.join(builtSoundsDir)));
+            .pipe(gulp.dest(path.join(builtSoundsDir)))
+            // 4. 流任务完成后调用 cb()（可选，流结束即任务完成，也可省略）
+            .on('end', cb);
     });
     //
     // something is wrong with sounds.sfxOptimize, skip it.

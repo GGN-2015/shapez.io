@@ -21,6 +21,19 @@ const imageResourcesGlobs = ["../res/**/*.png", "../res/**/*.svg", "../res/**/*.
 const runnableTPSource = "https://libgdx-nightlies.s3.eu-central-1.amazonaws.com/libgdx-runnables/runnable-texturepacker.jar";
 
 function gulptasksImageResources($, gulp, buildFolder) {
+    // 标记Java是否可用（全局状态）
+    let isJavaAvailable = false;
+
+    // 提前检查Java可用性
+    try {
+        execute("java -version");
+        isJavaAvailable = true;
+        console.log("Java is available, will process atlas tasks");
+    } catch (err) {
+        isJavaAvailable = false;
+        console.warn("Java not found or not working - atlas-related tasks will be skipped");
+    }
+
     // Lossless options
     const minifyImagesOptsLossless = () => [
         $.imageminJpegtran({
@@ -70,62 +83,75 @@ function gulptasksImageResources($, gulp, buildFolder) {
         return fname.indexOf("lossless") >= 0;
     }
 
-    /////////////// ATLAS /////////////////////
+    /////////////// ATLAS（依赖Java的任务） /////////////////////
 
+    // 构建 atlas 任务（仅当Java可用时执行）
     gulp.task("imgres.buildAtlas", cb => {
+        // 如果Java不可用，直接跳过
+        if (!isJavaAvailable) {
+            console.warn("Skipping imgres.buildAtlas - Java is required");
+            cb();
+            return;
+        }
+
         const config = JSON.stringify("../res_raw/atlas.json");
         const source = JSON.stringify("../res_raw");
         const dest = JSON.stringify("../res_built/atlas");
 
         try {
-            // First check whether Java is installed
-            execute("java -version");
-            // Now check and try downloading runnable-texturepacker.jar (22MB)
+            // 检查并下载纹理打包工具
             if (!existsSync("./runnable-texturepacker.jar")) {
                 const safeLink = JSON.stringify(runnableTPSource);
                 const commands = [
-                    // linux/macos if installed
                     `wget -O runnable-texturepacker.jar ${safeLink}`,
-                    // linux/macos, latest windows 10
                     `curl -o runnable-texturepacker.jar ${safeLink}`,
-                    // windows 10 / updated windows 7+
                     "powershell.exe -Command (new-object System.Net.WebClient)" +
                         `.DownloadFile(${safeLink.replace(/"/g, "'")}, 'runnable-texturepacker.jar')`,
-                    // windows 7+, vulnerability exploit
                     `certutil.exe -urlcache -split -f ${safeLink} runnable-texturepacker.jar`,
                 ];
 
+                let downloadSuccess = false;
                 while (commands.length) {
                     try {
                         execute(commands.shift());
+                        downloadSuccess = true;
                         break;
                     } catch {
-                        if (!commands.length) {
-                            throw new Error("Failed to download runnable-texturepacker.jar!");
-                        }
+                        // 忽略单个下载命令的失败，尝试下一个
                     }
+                }
+
+                if (!downloadSuccess) {
+                    console.warn("Failed to download runnable-texturepacker.jar - skipping atlas build");
+                    cb();
+                    return;
                 }
             }
 
+            // 执行纹理打包
             execute(`java -jar runnable-texturepacker.jar ${source} ${dest} atlas0 ${config}`);
-        } catch {
-            console.warn("Building atlas failed. Java not found / unsupported version?");
+        } catch (err) {
+            console.warn(" atlas build failed:", err.message);
         }
         cb();
     });
 
-    // Converts .atlas LibGDX files to JSON
+    // 转换 atlas 为 JSON（仅当Java可用时执行，因为依赖buildAtlas的输出）
     gulp.task("imgres.atlasToJson", cb => {
-        atlasToJson.convert("../res_built/atlas");
+        try {
+            atlasToJson.convert("../res_built/atlas");
+        } catch (err) {
+            console.warn(" atlas to JSON conversion failed:", err.message);
+        }
         cb();
     });
 
-    // Copies the atlas to the final destination
+    // 复制 atlas 到目标目录（仅当Java可用时执行）
     gulp.task("imgres.atlas", () => {
         return gulp.src(["../res_built/atlas/*.png"]).pipe(gulp.dest(resourcesDestFolder));
     });
 
-    // Copies the atlas to the final destination after optimizing it (lossy compression)
+    // 优化并复制 atlas（仅当Java可用时执行）
     gulp.task("imgres.atlasOptimized", () => {
         return gulp
             .src(["../res_built/atlas/*.png"])
@@ -139,23 +165,22 @@ function gulptasksImageResources($, gulp, buildFolder) {
             .pipe(gulp.dest(resourcesDestFolder));
     });
 
-    //////////////////// RESOURCES //////////////////////
+    //////////////////// 不依赖Java的资源任务 //////////////////////
 
-    // Copies all resources which are no ui resources
+    // 复制非图像资源
     gulp.task("imgres.copyNonImageResources", () => {
         return gulp.src(nonImageResourcesGlobs).pipe(gulp.dest(resourcesDestFolder));
     });
 
-    // Copies all ui resources
+    // 复制图像资源
     gulp.task("imgres.copyImageResources", () => {
         return gulp
             .src(imageResourcesGlobs)
-
             .pipe($.cached("imgres.copyImageResources"))
             .pipe(gulp.dest(path.join(resourcesDestFolder)));
     });
 
-    // Copies all ui resources and optimizes them
+    // 优化并复制图像资源
     gulp.task("imgres.copyImageResourcesOptimized", () => {
         return gulp
             .src(imageResourcesGlobs)
@@ -169,19 +194,7 @@ function gulptasksImageResources($, gulp, buildFolder) {
             .pipe(gulp.dest(path.join(resourcesDestFolder)));
     });
 
-    // Copies all resources and optimizes them
-    gulp.task(
-        "imgres.allOptimized",
-        gulp.parallel(
-            "imgres.buildAtlas",
-            "imgres.atlasToJson",
-            "imgres.atlasOptimized",
-            "imgres.copyNonImageResources",
-            "imgres.copyImageResourcesOptimized"
-        )
-    );
-
-    // Cleans up unused images which are instead inline into the css
+    // 清理未使用的图像资源
     gulp.task("imgres.cleanupUnusedCssInlineImages", () => {
         return gulp
             .src(
@@ -195,6 +208,20 @@ function gulptasksImageResources($, gulp, buildFolder) {
             )
             .pipe($.if(fname => fname.history[0].indexOf("noinline") < 0, $.clean({ force: true })));
     });
+
+    // 所有优化任务（根据Java可用性动态调整）
+    gulp.task(
+        "imgres.allOptimized",
+        gulp.parallel(
+            // 始终执行非依赖Java的任务
+            "imgres.copyNonImageResources",
+            "imgres.copyImageResourcesOptimized",
+            // 仅当Java可用时才执行以下任务
+            ...(isJavaAvailable
+                ? ["imgres.buildAtlas", "imgres.atlasToJson", "imgres.atlasOptimized"]
+                : [])
+        )
+    );
 }
 
 module.exports = {

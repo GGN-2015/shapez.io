@@ -20,7 +20,7 @@ It is currently released in Early Access on Steam - be sure to check it out:
 <hr>
 This is the source code for shapez, an open source base building game inspired by Factorio.
 Your goal is to produce shapes by cutting, rotating, merging and painting parts of shapes.
-
+`
 -   [Play on Steam](https://get.shapez.io/ghr)
 -   [Online Demo](https://shapez.io)
 -   [Official Discord](https://discord.com/invite/HN7EVzV) <- _Highly recommended to join!_
@@ -38,11 +38,19 @@ Your goal is to produce shapes by cutting, rotating, merging and painting parts 
 ## Building
 
 -   Make sure `ffmpeg` is on your path
--   Install Node.js 16 and Yarn
+-   Install Node.js `18.18.2` and Yarn
 -   Install Java (required for texture packer)
 -   Run `yarn` in the root folder
 -   `cd` into `gulp` folder
 -   Run `yarn` and then `NODE_OPTIONS=--openssl-legacy-provider yarn gulp` - it should now open in your browser
+
+## Run Electron Local
+
+- `yarn start:electron`
+
+## Make Win32 Package
+
+- `yarn package:win-green`
 
 **Notice**: This will produce a debug build with several debugging flags enabled. If you want to disable them, modify [`src/js/core/config.js`](src/js/core/config.js).
 

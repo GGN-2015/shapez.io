@@ -1,5 +1,5 @@
 {
-    "name": "shapez.io",
+    "name": "knot_simplify",
     "version": "1.0.0",
     "main": "index.js",
     "repository": "https://github.com/tobspr-games/shapez.io",
@@ -9,6 +9,8 @@
     "scripts": {
         "dev": "cd gulp && yarn gulp",
         "devStandalone": "cd gulp && yarn gulp serve.standalone-steam",
+        "pack": "electron-builder --dir",
+        "dist": "electron-builder --win --x64",
         "tslint": "cd src/js && tsc",
         "lint": "eslint src/js",
         "prettier-all": "prettier --write src/**/*.* && prettier --write gulp/**/*.*",
@@ -20,7 +22,11 @@
         "publishWeb": "cd gulp && yarn main.deploy.prod",
         "publish": "yarn publishStandalone && yarn publishWeb",
         "syncTranslations": "node sync-translations.js",
-        "buildTypes": "tsc src/js/application.js --declaration --allowJs --emitDeclarationOnly --skipLibCheck --out types.js"
+        "buildTypes": "tsc src/js/application.js --declaration --allowJs --emitDeclarationOnly --skipLibCheck --out types.js",
+        "start:electron": "electron .",
+        "package:win-green": "electron-packager . knot_simplify --platform=win32  --electron-version=37.4.0 --arch=x64 --out=dist --overwrite",
+        "package:mac-green": "electron-packager . knot_simplify --platform=darwin  --electron-version=37.4.0 --arch=x64 --out=dist --overwrite",
+        "package:linux-green": "electron-packager . knot_simplify --platform=linux  --electron-version=37.4.0 --arch=x64 --out=dist --overwrite"
     },
     "dependencies": {
         "@babel/core": "^7.5.4",
@@ -42,7 +48,6 @@
         "crc": "^3.8.0",
         "cssnano-preset-advanced": "^4.0.7",
         "debounce-promise": "^3.1.2",
-        "electron": "^16.2.8",
         "email-validator": "^2.0.4",
         "eslint": "7.1.0",
         "fastdom": "^1.0.8",
@@ -87,6 +92,9 @@
         "babel-plugin-danger-remove-unused-import": "^1.1.2",
         "css-mqpacker": "^7.0.0",
         "cssnano": "^4.1.10",
+        "electron": "^37.4.0",
+        "electron-builder": "^26.0.12",
+        "electron-packager": "^17.1.2",
         "eslint-config-prettier": "6.11.0",
         "eslint-plugin-prettier": "3.1.3",
         "faster.js": "^1.1.0",
@@ -105,5 +113,24 @@
         "strip-json-comments": "^3.0.1",
         "trim": "^0.0.1",
         "yarn": "^1.22.4"
+    },
+    "build": {
+        "appId": "com.ggn_2015.knot_simplify",
+        "productName": "knot_simplify",
+        "directories": {
+            "output": "dist"
+        },
+        "win": {
+            "target": "nsis",
+            "icon": "res/icon.ico"
+        },
+        "nsis": {
+            "oneClick": false,
+            "allowToChangeInstallationDirectory": true
+        },
+        "files": [
+            "index.js",
+            "gulp/**/*"
+        ]
     }
 }

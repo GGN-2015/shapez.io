@@ -6,10 +6,11 @@ const path = require("path");
 
 module.exports = {
     getRevision: function (useLast = false) {
-        const commitHash = execSync("git rev-parse --short " + (useLast ? "HEAD^1" : "HEAD")).toString(
-            "ascii"
-        );
-        return commitHash.replace(/^\s+|\s+$/g, "");
+        // const commitHash = execSync("git rev-parse --short " + (useLast ? "HEAD^1" : "HEAD")).toString(
+        //     "ascii"
+        // );
+        // return commitHash.replace(/^\s+|\s+$/g, "");
+        return "<frozen-version>";
     },
 
     getAllResourceImages() {
@@ -26,11 +27,11 @@ module.exports = {
     },
 
     getTag() {
-        try {
-            return execSync("git describe --tag --exact-match").toString("ascii");
-        } catch (e) {
-            throw new Error("Current git HEAD is not a version tag");
-        }
+        // try {
+        //     return execSync("git describe --tag --exact-match").toString("ascii");
+        // } catch (e) {
+        //     throw new Error("Current git HEAD is not a version tag");
+        // }
     },
 
     getVersion() {

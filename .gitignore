@@ -1,5 +1,6 @@
 # Yarn Cache
 gulp/.yarn/cache/*
+dist/
 .yarn/cache/*
 
 # Logs
