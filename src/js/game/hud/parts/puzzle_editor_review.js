@@ -13,7 +13,6 @@ import { ShapeItem } from "../../items/shape_item";
 import { ShapeDefinition } from "../../shape_definition";
 import { BaseHUDPart } from "../base_hud_part";
 
-const trim = require("trim");
 const logger = createLogger("puzzle-review");
 
 export class HUDPuzzleEditorReview extends BaseHUDPart {

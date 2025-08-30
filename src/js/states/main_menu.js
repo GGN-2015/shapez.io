@@ -24,8 +24,6 @@ import { PlatformWrapperImplElectron } from "../platform/electron/wrapper";
 import { Savegame } from "../savegame/savegame";
 import { T } from "../translations";
 
-const trim = require("trim");
-
 /**
  * @typedef {import("../savegame/savegame_typedefs").SavegameMetadata} SavegameMetadata
  * @typedef {import("../profile/setting_types").EnumSetting} EnumSetting
