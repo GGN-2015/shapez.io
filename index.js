@@ -11,7 +11,7 @@ const serverUrl = 'http://localhost:3005';
 const checkInterval = 2000;
 let checkTimer = null;
 
-// Create temporary waiting page
+// Create temporary waiting page with timer
 const waitingHtml = `
 <!DOCTYPE html>
 <html>
@@ -52,13 +52,35 @@ const waitingHtml = `
             align-items: center;
             flex-direction: column;
         }
+        .timer {
+            margin-top: 15px;
+            font-size: 16px;
+            color: #666;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="spinner"></div>
         <div id="status">Waiting for Server to initialize ....</div>
+        <div class="timer">Waiting time: <span id="waitingTime">0</span> seconds</div>
     </div>
+    <script>
+        // Initialize timer
+        let seconds = 0;
+        const timerElement = document.getElementById('waitingTime');
+
+        // Update timer every second
+        const timerInterval = setInterval(() => {
+            seconds++;
+            timerElement.textContent = seconds;
+        }, 1000);
+
+        // Expose function to stop timer (called from Electron main process)
+        window.stopTimer = function() {
+            clearInterval(timerInterval);
+        }
+    </script>
 </body>
 </html>
 `;
@@ -79,8 +101,9 @@ function handleGulpExit(exitCode) {
 
     // Update UI if window exists
     if (mainWindow && mainWindow.webContents) {
-        // Show error message in waiting page
+        // Stop the timer and update status
         mainWindow.webContents.executeJavaScript(`
+            window.stopTimer();
             document.getElementById('status').textContent = 'Gulp process has exited. Cannot start server.';
             document.getElementById('status').classList.add('error');
             document.querySelector('.spinner').style.display = 'none';
@@ -167,7 +190,9 @@ function createWindow() {
         height: 768,
         webPreferences: {
             nodeIntegration: false,
-            contextIsolation: true
+            contextIsolation: true,
+            // Allow executing JavaScript from main process
+            enableRemoteModule: false
         }
     });
 
@@ -184,6 +209,12 @@ function createWindow() {
         const isAvailable = await checkServerAvailability();
         if (isAvailable) {
             console.log('Server is ready, loading server page');
+
+            // Stop the timer before navigating away
+            mainWindow.webContents.executeJavaScript(`
+                window.stopTimer();
+            `).catch(err => console.error('Failed to stop timer:', err));
+
             mainWindow.loadURL(serverUrl);
             clearInterval(checkTimer);
             checkTimer = null;

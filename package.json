@@ -129,8 +129,7 @@
             "allowToChangeInstallationDirectory": true
         },
         "files": [
-            "index.js",
-            "gulp/**/*"
+            "index.js"
         ]
     }
 }
