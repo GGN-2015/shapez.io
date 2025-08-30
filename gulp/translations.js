@@ -50,7 +50,7 @@ function gulptasksTranslations($, gulp) {
                 [/list]
                     `;
 
-                fs.writeFileSync(destpath, trim(content.replace(/(\n[ \t\r]*)/gi, "\n")), {
+                fs.writeFileSync(destpath, (content.replace(/(\n[ \t\r]*)/gi, "\n").trim()), {
                     encoding: "utf-8",
                 });
             });

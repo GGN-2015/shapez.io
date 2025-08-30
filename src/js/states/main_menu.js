@@ -753,7 +753,7 @@ export class MainMenuState extends GameState {
             label: null,
             placeholder: "",
             defaultValue: game.name || "",
-            validator: val => val.match(regex) && trim(val).length > 0,
+            validator: val => val.match(regex) && (val).trim().length > 0,
         });
         const dialog = new DialogWithForm({
             app: this.app,
@@ -766,7 +766,7 @@ export class MainMenuState extends GameState {
 
         // When confirmed, save the name
         dialog.buttonSignals.ok.add(() => {
-            game.name = trim(nameInput.getValue());
+            game.name = (nameInput.getValue()).trim();
             this.app.savegameMgr.writeAsync();
             this.renderSavegames();
         });
