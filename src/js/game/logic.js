@@ -253,6 +253,7 @@ export class GameLogic {
      */
     increaseDistance(origin, rotation) {
         this.root.hud.signals.notification.dispatch("增距", enumNotificationType.success);
+        
         if (rotation % 180 === 0) {  // 加一列
             let toBuildTiles = [];
             let toDeleteTiles = [];
@@ -555,6 +556,9 @@ export class GameLogic {
                 this.root.entityMgr.registerEntity(entity);
             }
         }
+        if (this.root.knot){
+            this.root.knot.constructorEbd();
+        }
     }
 
     /**
@@ -650,6 +654,9 @@ export class GameLogic {
                 this.root.map.placeStaticEntity(entity);
                 this.root.entityMgr.registerEntity(entity);
             }
+        }
+        if (this.root.knot){
+            this.root.knot.constructorEbd();
         }
     }
 
