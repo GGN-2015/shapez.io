@@ -108,10 +108,15 @@ export class HUDSettingsMenu extends BaseHUDPart {
 
             playtimeElement.innerText = T.global.time.xMinutes.replace("<x>", `${totalMinutesPlayed}`);
 
-            buildingsPlacedElement.innerText = formatBigNumberFull(
-                this.root.entityMgr.getAllWithComponent(StaticMapEntityComponent).length -
-                    this.root.entityMgr.getAllWithComponent(BeltComponent).length
-            );
+            if (this.root.knot) {
+                buildingsPlacedElement.innerText = formatBigNumberFull(
+                    // this.root.entityMgr.getAllWithComponent(StaticMapEntityComponent).length -
+                    //     this.root.entityMgr.getAllWithComponent(BeltComponent).length
+                    this.root.knot.crossings.length
+                );
+            } else {
+                buildingsPlacedElement.innerText = "";
+            }
 
             beltsPlacedElement.innerText = formatBigNumberFull(
                 this.root.entityMgr.getAllWithComponent(BeltComponent).length

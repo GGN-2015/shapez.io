@@ -339,7 +339,7 @@ ingame:
             hour: <shapes> / 小时
     settingsMenu:
         playtime: 游戏时间
-        buildingsPlaced: 设施数量
+        buildingsPlaced: 交点数
         beltsPlaced: 传送带数量
     tutorialHints:
         title: 需要帮助？
