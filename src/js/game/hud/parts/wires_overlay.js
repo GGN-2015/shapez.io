@@ -100,7 +100,7 @@ export class HUDWiresOverlay extends BaseHUDPart {
      * Generates the background pattern for the wires overlay
      */
     generateTilePattern() {
-        const overlayTile = Loader.getSprite("sprites/wires/overlay_tile.png");
+        //const overlayTile = Loader.getSprite("sprites/wires/overlay_tile.png");
         const dims = globalConfig.tileSize * wiresBackgroundDpi;
         const [canvas, context] = makeOffscreenBuffer(dims, dims, {
             smooth: false,
@@ -183,14 +183,14 @@ export class HUDWiresOverlay extends BaseHUDPart {
 
         const scaleFactor = 1 / wiresBackgroundDpi;
         parameters.context.globalCompositeOperation = "overlay";
-        parameters.context.fillStyle = "rgba(50, 200, 150, 1)";
+        parameters.context.fillStyle = "rgba(50, 200, 150, 0.2)";
         parameters.context.fillRect(bounds.x, bounds.y, bounds.w, bounds.h);
         parameters.context.globalCompositeOperation = "source-over";
 
         parameters.context.scale(scaleFactor, scaleFactor);
         parameters.context.fillStyle = hasTileGrid
             ? this.cachedPatternBackground
-            : "rgba(78, 137, 125, 0.75)";
+            : "rgba(78, 137, 125, 0.2)";
         parameters.context.fillRect(
             bounds.x / scaleFactor,
             bounds.y / scaleFactor,
