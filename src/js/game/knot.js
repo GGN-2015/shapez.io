@@ -1108,11 +1108,7 @@ export class Knot {
                 }
         }
 
-        checkGreenLine() {
-                if (this.seperators.length !==2){
-                        this.root.hud.signals.notification.dispatch("请先设置 2 个分离器", enumNotificationType.success);
-                        return;
-                }
+        moveGreenLine(){
                 if (this.greenLineOK ) {
                         this.root.systemMgr.systems.wire.bUpdateSuround = false;
                         this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
@@ -1125,6 +1121,16 @@ export class Knot {
                         this.constructorEbd();
                         this.root.hud.signals.notification.dispatch("新扭结 crossings: " + this.crossings.length, enumNotificationType.success);
                         this.root.systemMgr.systems.wire.bUpdateSuround = true;
+                        return;
+                } else {
+                        this.root.hud.signals.notification.dispatch("请先选择合适位置", enumNotificationType.error);
+                }
+                return;
+        }
+
+        checkGreenLine() {
+                if (this.seperators.length !==2){
+                        this.root.hud.signals.notification.dispatch("请先设置 2 个分离器", enumNotificationType.success);
                         return;
                 }
 

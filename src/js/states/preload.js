@@ -106,8 +106,8 @@ export class PreloadState extends GameState {
             })
             .then(() => this.setStatus("Creating platform wrapper", 3))
 
-            .then(() => this.sendBeacon())
-            .then(() => authorizeViaSSOToken(this.app, this.dialogs))
+            //.then(() => this.sendBeacon())
+            //.then(() => authorizeViaSSOToken(this.app, this.dialogs))
 
             .then(() => this.app.platformWrapper.initialize())
 
@@ -138,11 +138,11 @@ export class PreloadState extends GameState {
             })
 
             .then(() => this.setStatus("Initializing libraries", 12))
-            .then(() => this.app.analytics.initialize())
-            .then(() => this.app.gameAnalytics.initialize())
+            //.then(() => this.app.analytics.initialize())
+            //.then(() => this.app.gameAnalytics.initialize())
 
             .then(() => this.setStatus("Connecting to api", 15))
-            .then(() => this.fetchDiscounts())
+            //.then(() => this.fetchDiscounts())
 
             .then(() => this.setStatus("Initializing settings", 20))
             .then(() => {

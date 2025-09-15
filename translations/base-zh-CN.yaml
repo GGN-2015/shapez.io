@@ -625,8 +625,8 @@ buildings:
             description: 分析<strong>图形</strong>最底层的右上象限并返回其<strong>图形</strong>和<strong>颜色</strong>。
     comparator:
         default:
-            name: 比较器
-            description: 如果输入的两个<strong>信号</strong>一样将输出开（1）信号，可以比较图形，颜色，和开关值。
+            name: 寻找合法位置
+            description: 连续点击循环显示所有的合法位置。
     virtual_processor:
         default:
             name: 模拟切割机
