@@ -124,18 +124,24 @@ export class Knot {
                  //this.greenCrossings = [];
  
                  let reg_entities = [];
-                 let red_entities = [];
+                 let del_entities = [];
                  for (let ent of this.root.entityMgr.entities) {
                          if (ent.layer === "regular") {
                                  reg_entities.push(ent)
                          } else if (ent.layer === "wires" && ent.components.StaticMapEntity.code === 39) { // seprator
-                                 this.seperators.push(ent.components.StaticMapEntity.origin)
+                                let reg_ent = this.root.map.getLayerContentXY(ent.components.StaticMapEntity.origin.x, ent.components.StaticMapEntity.origin.y, "regular");
+                                if (reg_ent && reg_ent.components.StaticMapEntity.code === 1){
+                                        this.seperators.push(ent.components.StaticMapEntity.origin);
+                                } else {
+                                        del_entities.push(ent);
+                                }
+                                 
                          } else if (ent.layer === "wires" && (ent.components.StaticMapEntity.code === 52 || ent.components.StaticMapEntity.code === 53)){ // 红线
-                                 red_entities.push(ent);
+                                 del_entities.push(ent);
                          }
                  }
  
-                 for (let de of red_entities){
+                 for (let de of del_entities){
                          this.root.logic.tryDeleteBuilding(de);
                  }
  
@@ -1123,14 +1129,14 @@ export class Knot {
                         this.root.systemMgr.systems.wire.bUpdateSuround = true;
                         return;
                 } else {
-                        this.root.hud.signals.notification.dispatch("请先选择合适位置", enumNotificationType.error);
+                        this.root.hud.signals.notification.dispatch("请先选择合适红绿线位置", enumNotificationType.error);
                 }
                 return;
         }
 
         checkGreenLine() {
                 if (this.seperators.length !==2){
-                        this.root.hud.signals.notification.dispatch("请先设置 2 个分离器", enumNotificationType.success);
+                        this.root.hud.signals.notification.dispatch("请先设置 2 个分离器", enumNotificationType.error);
                         return;
                 }
 

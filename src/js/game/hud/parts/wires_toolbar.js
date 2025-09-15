@@ -29,8 +29,8 @@ export class HUDWiresToolbar extends HUDBaseToolbar {
                 MetaReaderBuilding,
                 MetaDisplayBuilding,
 
-                MetaComparatorBuilding,
                 MetaTrashBuilding,
+                MetaComparatorBuilding,       
             ],
             secondaryBuildings: [
                 // MetaStorageBuilding,
