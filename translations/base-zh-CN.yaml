@@ -547,9 +547,8 @@ buildings:
         endOfDemo: 试玩版结束
     wire:
         default:
-            name: 电线
-            description: 可用来传输<strong>信号<strong>，信号可以是物品，颜色或者开关值（0 或 1）。
-                不同颜色的<strong>电线</strong>不会互相连接
+            name: 目标移动路径
+            description: 绿色路径是将要移动到的位置
         second:
             name: 电线
             description: 可用来传输<strong>信号<strong>，信号可以是物品，颜色或者开关值（0 或 1）。
@@ -576,8 +575,8 @@ buildings:
             description: 储存多余的物品，直到储满。优先处理左边的输出，并可以用作溢出门。
     wire_tunnel:
         default:
-            name: 交叉电线
-            description: 使两根<strong>电线</strong>交叉而不会连接起来。
+            name: 分离器
+            description: 将扭结分为两段, 其中一段是将要移动的部分.
     constant_signal:
         default:
             name: 恒定信号

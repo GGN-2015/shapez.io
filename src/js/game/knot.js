@@ -22,6 +22,16 @@ export class Node {
 
                this.crosType = "";      // over 表示 black 线在上, under 表示 black 线在下
         }
+
+        clone(){
+                let r = new Node(this.origin);
+                r.color = this.color;
+                r.isCrossing = this.isCrossing;
+                r.outRotation = this.outRotation;
+                r.isCorner = this.isCorner;
+                r.crosType = this.crosType;
+                return r;
+        }
 }
 
 class Strand{   // strand 是指一个 node 加上一个 rotation
@@ -83,6 +93,10 @@ class Strand{   // strand 是指一个 node 加上一个 rotation
                 }
                 return null;
         }
+
+        clone(){
+                return new Strand(this.knot, this.node.clone(), this.rot, this.crosType);
+        }
 }
 
 export class Knot {
@@ -110,7 +124,10 @@ export class Knot {
                  this.crossings = [];
                  this.corners = [];
                  this.seperators = [];
-                 this.greenLineOK = false;
+                 this.readyToMove = false;
+                 this.check_result_array = [];
+                 this.checkResultIndex = 0;
+                 this.hiddenNodes = [];
                  
                  this.redBlackSameDirection = true;
                  /**
@@ -336,7 +353,8 @@ export class Knot {
          * @returns {boolean}
          */
         reDirectionGreenLine() {
-                this.greenNodes = []
+                this.deleteRedLine();
+                this.greenNodes = [];
                 //this.greenCrossings = []
                 let startSep = this.seperators[0];
                 let belowBelt = this.root.map.getLayerContentXY(startSep.x, startSep.y, "regular");
@@ -622,7 +640,13 @@ export class Knot {
                                 } else {
                                         rot = (g.outRotation + 270) % 360;
                                 }
-                                green_crossing_strands.push(new Strand(this, g, rot, ""));
+                                green_crossing_strands.push(new Strand(this, g, rot, g.crosType));
+
+                                if (g.crosType !== ""){
+                                        let strand;
+                                        check_result_crossings.push(strand = new Strand(this, g, (rot+180)%360, g.crosType));
+                                        to_check_set.push(strand);
+                                }
                         }
                 }
 
@@ -759,6 +783,7 @@ export class Knot {
                         return false;
                 }
 
+                // 在 this.greenNodes 中返回 crosType
                 for(let gS of green_crossing_strands){
                         for(let gN of this.greenNodes){
                                 if (gN.origin.equals(gS.node.origin)){
@@ -771,7 +796,19 @@ export class Knot {
                 return good_path;
         }
 
+
+        recoverHiddenLines(){
+                for (let hid_ent of this.hiddenNodes){
+                        let entity = hid_ent.entity;
+                        this.root.logic.freeEntityAreaBeforeBuild(entity);
+                        this.root.map.placeStaticEntity(entity);
+                        this.root.entityMgr.registerEntity(entity);
+                }
+                this.hiddenNodes = [];
+        }
+
         reDrawGreenLine(){
+                // 删除目前显示绿线
                 let green_entities = [];
                 for (let ent of this.root.entityMgr.entities) {
                         if (ent.layer === "wires" && (ent.components.StaticMapEntity.code === 27 || ent.components.StaticMapEntity.code === 28)){ // 绿线
@@ -782,6 +819,9 @@ export class Knot {
                 for (let de of green_entities){
                         this.root.logic.tryDeleteBuilding(de);
                 }
+                // 恢复被切断的下层路径
+                this.recoverHiddenLines();
+
                 // 重绘绿线
                 let prevRot = 0;
                 for (let curNode of this.greenNodes) {
@@ -802,10 +842,6 @@ export class Knot {
                                 
                         }
 
-                        if (curNode.crosType === "over"){
-                                continue;
-                        }
-
                         let entity = _building.createEntity({
                                 root: this.root,
                                 origin: curNode.origin,
@@ -815,8 +851,14 @@ export class Knot {
                                 variant: "default"
                         });
 
+                        if (curNode.crosType === "over"){
+                                this.hiddenNodes.push({entity: entity.clone(), origin: entity.components.StaticMapEntity.origin});
+                                continue;
+                        }
+
                         let belowEnt = this.root.map.getLayerContentXY(entity.components.StaticMapEntity.origin.x, entity.components.StaticMapEntity.origin.y, "regular");
                         if (belowEnt){
+                                this.hiddenNodes.push({entity: belowEnt.clone(), origin: entity.components.StaticMapEntity.origin})
                                 this.root.logic.tryDeleteBuilding(belowEnt);
                         }
 
@@ -956,7 +998,7 @@ export class Knot {
                 }
         }
 
-        drawSepratorBelow(){
+        drawSepratorBelow(red_path){
                 
                 
                 for (let sep of this.seperators){
@@ -974,31 +1016,21 @@ export class Knot {
                         neighbors.push(new Vector(sep.x - 1, sep.y));
 
                         let redOri, greenOri;
-                        if (this.redPathForward.length){
+                        if (red_path.length){
                                 for (let nei of neighbors){
-                                        for (let r of this.redPathForward){
+                                        for (let r of red_path){
                                                 if (r.origin.equals(nei)){
                                                         redOri = nei;
                                                         break;
                                                 }
                                         }
-                                }
-                        } else if (this.redPathReverse.length){
-                                for (let nei of neighbors){
-                                        for (let r of this.redPathReverse){
-                                                if (r.origin.equals(nei)){
-                                                        redOri = nei;
-                                                        break;
-                                                }
-                                        }
-                                       
                                 }
                         } else {
                                 return;
                         }
                         for (let nei of neighbors) {
                                 for (let g of this.greenNodes) {
-                                        if (g.origin.equals(nei)) {
+                                        if (g.origin.x === nei.x && g.origin.y === nei.y) {
                                                 greenOri = nei;
                                                 break;
                                         }
@@ -1054,12 +1086,27 @@ export class Knot {
                 }
 
                 for (let de of sep_entities){
-                        this.root.logic.tryDeleteBuilding(de);
+                        if (!de.destroyed){
+                                this.root.logic.tryDeleteBuilding(de);
+                        }
                 }
 
         }
 
+        deleteRedLine(){
+                let toDel = [];
+                for (let ent of this.root.entityMgr.entities) {
+                        if (ent.layer === "wires" && (ent.components.StaticMapEntity.code === 52 || ent.components.StaticMapEntity.code === 53)) { // 红线
+                                toDel.push(ent);
+                        }
+                }
+                for (let de of toDel){
+                        this.root.logic.tryDeleteBuilding(de);
+                }
+        }
+
         showRedLine(redPath, bForward){
+                this.deleteRedLine();
                 // 绘制红线
                 let prevRot;
                 for (let curNode of redPath) {
@@ -1115,13 +1162,13 @@ export class Knot {
         }
 
         moveGreenLine(){
-                if (this.greenLineOK ) {
+                if (this.readyToMove ) {
                         this.root.systemMgr.systems.wire.bUpdateSuround = false;
                         this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
                         // 已经合规, 第二阶段的 move knot
                         this.deleteRedLineBelow();
                         this.drawGreenLineBelow();
-                        this.drawSepratorBelow();
+                        this.drawSepratorBelow(this.check_result_array[(this.checkResultIndex + this.check_result_array.length -1) % this.check_result_array.length].rPath);
                         this.root.systemMgr.systems.wire.bUpdateSuround = true;
                         //this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
                         this.constructorEbd();
@@ -1134,62 +1181,138 @@ export class Knot {
                 return;
         }
 
+        /**
+         * 
+         * @param {Node[]} nodesArr 
+         */
+        cloneNodesArray(nodesArr){
+                let res = [];
+                for (let n of nodesArr){
+                        res.push(n.clone());
+                }
+                return res;
+        }
+
+        /**
+         * 
+         * @param {Node[]} nodesArr 
+         * @returns {boolean}
+         */
+        isNodesArrayNotExist(nodesArr, r_path){
+                for (let r of this.check_result_array){
+                        if (JSON.stringify(r.gNodes) === JSON.stringify(nodesArr) && r.rPath === r_path){
+                                return false;
+                        }
+                }
+                return true;
+        }
+
+        checkGreenLineDirection(red_path_array, dir) {
+                for (let ent of red_path_array) {
+                        let r_path = ent.path;
+                        let bSameDir = ent.dir;
+
+                        let greenUnknownCrossing = [];
+                        for (let gN of this.greenNodes) {
+                                gN.crosType = "";
+                        }
+
+                        if (r_path.length && this.do_check(r_path, this.greenNodes, dir)) {
+                                for (let gN of this.greenNodes) {
+                                        if (gN.isCrossing && gN.crosType === "") {
+                                                greenUnknownCrossing.push(gN);
+                                        }
+                                }
+
+                                if (greenUnknownCrossing.length) { // 存在未定交点类型
+                                        if (greenUnknownCrossing.length > 10) {
+                                                this.root.hud.signals.notification.dispatch("未定交点过多, 将随机布置", enumNotificationType.warning);
+                                                let newNodesArr = this.cloneNodesArray(this.greenNodes);
+                                                if (this.isNodesArrayNotExist(newNodesArr, r_path)) {
+                                                        this.check_result_array.push({ gNodes: this.cloneNodesArray(this.greenNodes), rPath: r_path, rPathDir: bSameDir });
+                                                }
+                                        } else {
+                                                for (let rand = 0; rand < 2 ** greenUnknownCrossing.length; rand++) {
+                                                        for (let i = 0; i < greenUnknownCrossing.length; i++) {
+                                                                greenUnknownCrossing[i].crosType = (rand >> i) % 2 ? "under" : "over";
+                                                        }
+                                                        if (r_path.length && this.do_check(r_path, this.greenNodes, dir)) {
+                                                                let newNodesArr = this.cloneNodesArray(this.greenNodes);
+                                                                if (this.isNodesArrayNotExist(newNodesArr, r_path)) {
+                                                                        this.check_result_array.push({ gNodes: this.cloneNodesArray(this.greenNodes), rPath: r_path, rPathDir: bSameDir });
+                                                                }
+                                                        }
+                                                }
+                                        }
+                                } else {
+                                        let newNodesArr = this.cloneNodesArray(this.greenNodes);
+                                        if (this.isNodesArrayNotExist(newNodesArr, r_path)) {
+                                                this.check_result_array.push({ gNodes: this.cloneNodesArray(this.greenNodes), rPath: r_path, rPathDir: bSameDir });
+                                        }
+                                }
+                        }
+                }
+        }
+
         checkGreenLine() {
-                if (this.seperators.length !==2){
-                        this.root.hud.signals.notification.dispatch("请先设置 2 个分离器", enumNotificationType.error);
-                        return;
+                if (!this.check_result_array.length) {
+                        if (this.seperators.length !== 2) {
+                                this.root.hud.signals.notification.dispatch("请先设置 2 个分离器", enumNotificationType.error);
+                                return;
+                        }
+
+                        // do check
+                        this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
+                        this.root.systemMgr.systems.wire.bUpdateSuround = false;
+                        if (!this.reDirectionGreenLine()) {
+                                this.root.systemMgr.systems.wire.bUpdateSuround = true;
+                                return;
+                        }
+
+                        //this.root.hud.signals.notification.dispatch("绿线合规!", enumNotificationType.success);
+                        this.redPathForward.length = this.redPathReverse.length = 0;
+                        // 关闭道路自适应
+                        this.root.systemMgr.systems.wire.bUpdateSuround = false;
+                        this.initRedPath(true, this.redPathForward);
+                        this.initRedPath(false, this.redPathReverse);
+                        this.redPathReverse = this.redPathReverse.reverse();
+                        // 打开道路自适应
+                        //this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
+
+                        this.check_result_array = [];
+
+                        let red_path_array = [];
+                        let red_path = [];
+                        if (this.redPathForward.length) {
+                                red_path = this.redPathForward;
+                                red_path_array.push({ path: red_path, dir: true });
+                                this.redBlackSameDirection = true;
+                        }
+                        if (this.redPathReverse.length) {
+                                red_path = this.redPathReverse;
+                                red_path_array.push({ path: red_path, dir: false });
+                                this.redBlackSameDirection = false;
+                        }
+
+                        console.log("==================================== check left =================================");
+                        this.checkGreenLineDirection(red_path_array, "left");
+                        console.log("==================================== check right =================================");
+                        this.checkGreenLineDirection(red_path_array, "right");
                 }
 
-                // do check
-                this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
-                this.root.systemMgr.systems.wire.bUpdateSuround = false;
-                if (!this.reDirectionGreenLine()) {
-                        this.root.systemMgr.systems.wire.bUpdateSuround = true;
-                        return;
-                }
-                
-                //this.root.hud.signals.notification.dispatch("绿线合规!", enumNotificationType.success);
-                this.redPathForward.length = this.redPathReverse.length = 0;
-                // 关闭道路自适应
-                this.root.systemMgr.systems.wire.bUpdateSuround = false;
-                this.initRedPath(true, this.redPathForward);
-                this.initRedPath(false, this.redPathReverse);
-                this.redPathReverse = this.redPathReverse.reverse();
-                // 打开道路自适应
-                //this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
-
-                let red_path;
-                if (this.redPathForward.length){
-                        red_path = this.redPathForward;
-                        this.redBlackSameDirection = true;
-                } else if (this.redPathReverse.length){
-                        red_path = this.redPathReverse;
-                        this.redBlackSameDirection = false;
-                } else {
-                        red_path = [];
-                }
-
-                console.log("==================================== check left =================================");
-                if (red_path.length && this.do_check(red_path, this.greenNodes, 'left')){        
+                if (this.check_result_array.length){
                         this.root.systemMgr.systems.wire.bUpdateSuround = false;
                         this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
-                        this.showRedLine(red_path, this.redBlackSameDirection);
+                        this.showRedLine(this.check_result_array[this.checkResultIndex].rPath, this.check_result_array[this.checkResultIndex].rPathDir);
+                        this.greenNodes = this.check_result_array[this.checkResultIndex].gNodes;
+                        this.redBlackSameDirection = this.check_result_array[this.checkResultIndex].rPathDir;
                         this.reDrawGreenLine();
                         //this.root.systemMgr.systems.wire.bUpdateSuround = true;
                         //this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
-                        this.greenLineOK = true;
-                        return;
-                }
-                
-                console.log("==================================== check right =================================");
-                if (red_path.length && this.do_check(red_path, this.greenNodes, 'right')){
-                        this.root.systemMgr.systems.wire.bUpdateSuround = false;
-                        this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
-                        this.showRedLine(red_path, this.redBlackSameDirection);
-                        this.reDrawGreenLine();
-                        //this.root.systemMgr.systems.wire.bUpdateSuround = true;
-                        //this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
-                        this.greenLineOK = true;
+                        this.readyToMove = true;
+
+                        this.root.hud.signals.notification.dispatch("发现移动位置 " + (this.checkResultIndex+1) + "/" + this.check_result_array.length, enumNotificationType.success);
+                        this.checkResultIndex = (this.checkResultIndex + 1) % this.check_result_array.length;
                         return;
                 }
                 

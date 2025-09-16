@@ -707,7 +707,7 @@ export class GameLogic {
             //this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
             return result;
         } else if (building.id === "wire"){  // 设置绿线
-            this.root.knot.greenLineOK = false;
+            this.root.knot.readyToMove = false;
             return false;
         }
         return false;
@@ -836,7 +836,9 @@ export class GameLogic {
             return false;
         }
         if (building.components.StaticMapEntity.code === 39) {// "wire_tunnel"
-            this.root.knot.seperators.splice(this.root.knot.seperators.indexOf(building.components.StaticMapEntity.origin), 1);
+            if (this.root.knot) {
+                this.root.knot.seperators.splice(this.root.knot.seperators.indexOf(building.components.StaticMapEntity.origin), 1);
+            }
         }
         this.root.map.removeStaticEntity(building);
         this.root.entityMgr.destroyEntity(building);

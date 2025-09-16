@@ -90,6 +90,9 @@ export class HUDWiresOverlay extends BaseHUDPart {
                 
             }
         } else {
+            if (this.root.knot){
+                this.root.knot.recoverHiddenLines();
+            }
             this.root.currentLayer = "regular";
             this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
         }
