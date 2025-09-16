@@ -160,7 +160,7 @@ export class Knot {
                  }
  
                  for (let de of del_entities){
-                         if (this)
+                         if (this && !de.destroyed)
                          this.root.logic.tryDeleteBuilding(de);
                  }
  
@@ -1103,7 +1103,9 @@ export class Knot {
                         }
                 }
                 for (let de of toDel){
-                        this.root.logic.tryDeleteBuilding(de);
+                        if (!de.destroyed){
+                                this.root.logic.tryDeleteBuilding(de);
+                        }
                 }
         }
 
