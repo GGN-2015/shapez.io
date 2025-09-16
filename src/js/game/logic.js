@@ -845,7 +845,10 @@ export class GameLogic {
         this.root.entityMgr.processDestroyList();
 
         if (building.components.StaticMapEntity.code === 39){ // 删除分离器需要重构扭结
-            this.root.knot.constructorEbd();
+            if (this.root.knot){
+                this.root.knot.constructorEbd();
+                //console.log(this.root.knot.nodes.length)
+            }
         }
         return true;
     }

@@ -146,8 +146,9 @@ export class Knot {
                          if (ent.layer === "regular") {
                                  reg_entities.push(ent)
                          } else if (ent.layer === "wires" && ent.components.StaticMapEntity.code === 39) { // seprator
-                                let reg_ent = this.root.map.getLayerContentXY(ent.components.StaticMapEntity.origin.x, ent.components.StaticMapEntity.origin.y, "regular");
-                                if (reg_ent && reg_ent.components.StaticMapEntity.code === 1){
+                                if (!this.checkSeperatorIleagle(ent.components.StaticMapEntity.origin)){
+                                // let reg_ent = this.root.map.getLayerContentXY(ent.components.StaticMapEntity.origin.x, ent.components.StaticMapEntity.origin.y, "regular");
+                                // if (reg_ent && reg_ent.components.StaticMapEntity.code === 1){
                                         this.seperators.push(ent.components.StaticMapEntity.origin);
                                 } else {
                                         del_entities.push(ent);
@@ -159,6 +160,7 @@ export class Knot {
                  }
  
                  for (let de of del_entities){
+                         if (this)
                          this.root.logic.tryDeleteBuilding(de);
                  }
  
@@ -536,7 +538,7 @@ export class Knot {
                         this.root.hud.signals.notification.dispatch("不能离 corner 太近 (可以设置在 corner 上)", enumNotificationType.error);
                         return true;
                 }
-                if (this.root.knot.seperators.length > 2) {
+                if (this.seperators.length > 2) {
                         this.root.hud.signals.notification.dispatch("只能设置两个分割点", enumNotificationType.error);
                         return true;
                 }
