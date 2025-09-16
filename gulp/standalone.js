@@ -128,7 +128,7 @@ function gulptasksStandalone($, gulp) {
                 arch,
                 platform,
                 asar: asar,
-                executableName: "shapezio",
+                executableName: "KnotSimplify",
                 icon: path.join(electronBaseDir, "favicon"),
                 name: "shapez",
                 out: tempDestDir,
@@ -286,7 +286,9 @@ function gulptasksStandalone($, gulp) {
             taskPrefix + ".build-from-windows",
             gulp.series(
                 taskPrefix + ".prepare",
-                gulp.parallel(taskPrefix + ".package.win64", taskPrefix + ".package.linux64")
+                // 没必要同时编译两个平台吧
+                // gulp.parallel(taskPrefix + ".package.win64", taskPrefix + ".package.linux64")
+                gulp.parallel(taskPrefix + ".package.win64")
             )
         );
         gulp.task(

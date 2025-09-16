@@ -89,7 +89,7 @@ function gulptasksSounds($, gulp, buildFolder) {
     });
 
     // Encodes the game music in high quality for the standalone
-    gulp.task("sounds.musicHQ", () => {
+    gulp.task("sounds.musicHQ", async () => {
         return gulp
             .src([path.join(soundsDir, "music", "**", "*.wav"), path.join(soundsDir, "music", "**", "*.mp3")])
             .pipe($.plumber())

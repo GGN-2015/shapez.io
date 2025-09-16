@@ -855,6 +855,10 @@ export class Knot {
 
                         if (curNode.crosType === "over"){
                                 this.hiddenNodes.push({entity: entity.clone(), origin: entity.components.StaticMapEntity.origin});
+                                let gEnt = this.root.map.getLayerContentXY(entity.components.StaticMapEntity.origin.x, entity.components.StaticMapEntity.origin.y, "wires");
+                                if (gEnt){
+                                        this.root.logic.tryDeleteBuilding(gEnt); 
+                                }
                                 continue;
                         }
 
