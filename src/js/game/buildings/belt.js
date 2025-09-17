@@ -203,26 +203,29 @@ export class MetaBeltBuilding extends MetaBuilding {
         if (ejectors.length + acceptors.length >= 3) {
             if (ejectors.length === 2 && acceptors.length === 2) {
                 let content = root.map.getLayerContentXY(tile.x, tile.y, "regular");
-                if (content) { // 确实是交点
+                if (content) {
+                    // 确实是交点
                     // 此时的处理逻辑与本身的 rotation 无关, 而基于地图的原始交点
                     //console.log("crossing at ", tile.x, tile.y);
                     // if (content.components.StaticMapEntity.originalRotation) {
                     //     let dir = content.components.Belt.direction;
                     //     console.log(dir)
                     // }
-                    if (content.components.StaticMapEntity.rotation  % 180 === 0) { // 上下 --> 左右
+                    if (content.components.StaticMapEntity.rotation % 180 === 0) {
+                        // 上下 --> 左右
                         if (hasLeftEjector) {
-                            rotation = 90
+                            rotation = 90;
                         } else {
-                            rotation = 270
+                            rotation = 270;
                         }
-                    } else { // 左右 --> 上下
+                    } else {
+                        // 左右 --> 上下
                         if (hasBottomEjector) {
-                            rotation = 0
+                            rotation = 0;
                         } else {
-                            rotation = 180
+                            rotation = 180;
                         }
-                    };
+                    }
                     return {
                         rotation,
                         rotationVariant: 0,

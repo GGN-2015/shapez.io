@@ -2,7 +2,6 @@ import { Vector } from "../core/vector";
 import { KnotSimplifier } from "./knotSimplifier";
 import { GameRoot } from "./root";
 import { Node } from "./knotUtils";
-import { Strand } from "./knotUtils";
 
 export class Knot {
     /**
@@ -233,7 +232,7 @@ export class Knot {
 
     /**
      *
-     * @param { import("../savegame/savegame_typedefs").Entity } entity
+     * @param { import("./entity").Entity } entity
      * @param { String } color
      * @param { number } inRot
      * @param { boolean } isCrossing

@@ -29,8 +29,19 @@ export class KnotSimplifier {
          */
         this.readyToMove;
 
+        /**
+         * @type {{ gNodes: any; rPath: any; rPathDir: any;}[]}
+         */
         this.check_result_array;
+
+        /**
+         * @type {number}
+         */
         this.checkResultIndex;
+
+        /**
+         * @type { import("./entity").Entity[]}
+         */
         this.hiddenNodes;
 
         this.redBlackSameDirection;
@@ -51,8 +62,10 @@ export class KnotSimplifier {
         this.greenNodes = [];
         this.seperators = [];
         this.readyToMove = false;
+
         this.check_result_array = [];
         this.checkResultIndex = 0;
+
         this.hiddenNodes = [];
         this.redBlackSameDirection = true;
         this.redPathForward = [];
@@ -145,7 +158,7 @@ export class KnotSimplifier {
     /**
      *
      * @param {boolean} bForward
-     * @param {any[]} redPath
+     * @param {Node[]} redPath
      */
     initRedPath(bForward, redPath) {
         let startOrigin;
@@ -532,7 +545,7 @@ export class KnotSimplifier {
                 }
                 let nStrand = cross_strand.next();
                 nStrand.crosType = cross_strand.crosType;
-                console.log(nStrand.node.origin);
+                //console.log(nStrand.node.origin);
                 r = this.get_strand_from_array(check_result_crossings, nStrand);
                 if (!r) {
                     nStrand.crosType = cross_strand.crosType;
@@ -562,8 +575,7 @@ export class KnotSimplifier {
     }
 
     recoverHiddenLines() {
-        for (let hid_ent of this.hiddenNodes) {
-            let entity = hid_ent.entity;
+        for (let entity of this.hiddenNodes) {
             this.root.logic.freeEntityAreaBeforeBuild(entity);
             this.root.map.placeStaticEntity(entity);
             this.root.entityMgr.registerEntity(entity);
@@ -619,10 +631,7 @@ export class KnotSimplifier {
             });
 
             if (curNode.crosType === "over") {
-                this.hiddenNodes.push({
-                    entity: entity.clone(),
-                    origin: entity.components.StaticMapEntity.origin,
-                });
+                this.hiddenNodes.push(entity.clone());
                 let gEnt = this.root.map.getLayerContentXY(
                     entity.components.StaticMapEntity.origin.x,
                     entity.components.StaticMapEntity.origin.y,
@@ -640,10 +649,7 @@ export class KnotSimplifier {
                 "regular"
             );
             if (belowEnt) {
-                this.hiddenNodes.push({
-                    entity: belowEnt.clone(),
-                    origin: entity.components.StaticMapEntity.origin,
-                });
+                this.hiddenNodes.push(belowEnt.clone());
                 this.root.logic.tryDeleteBuilding(belowEnt);
             }
 
@@ -806,6 +812,9 @@ export class KnotSimplifier {
         }
     }
 
+    /**
+     * @param {Node[]} red_path
+     */
     drawSepratorBelow(red_path) {
         for (let sep of this.seperators) {
             let sep_node;
@@ -897,10 +906,14 @@ export class KnotSimplifier {
         }
     }
 
+    /**
+     * @param {Node[]} redPath
+     * @param {boolean} bForward
+     */
     showRedLine(redPath, bForward) {
         this.deleteRedLine();
         // 绘制红线
-        let prevRot;
+        let prevRot = -1; // 在循环中会被第一次设置为合理值
         for (let curNode of redPath) {
             let _building = new MetaWireBuilding();
 
@@ -984,6 +997,7 @@ export class KnotSimplifier {
     /**
      *
      * @param {Node[]} nodesArr
+     * @returns {Node[]}
      */
     cloneNodesArray(nodesArr) {
         let res = [];
@@ -1113,9 +1127,9 @@ export class KnotSimplifier {
                 this.redBlackSameDirection = false;
             }
 
-            console.log("==================================== check left =================================");
+            //console.log("==================================== check left =================================");
             this.checkGreenLineDirection(red_path_array, "left");
-            console.log("==================================== check right =================================");
+            //console.log("==================================== check right =================================");
             this.checkGreenLineDirection(red_path_array, "right");
         }
 
