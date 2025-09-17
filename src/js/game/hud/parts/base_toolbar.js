@@ -251,13 +251,13 @@ export class HUDBaseToolbar extends BaseHUDPart {
             return;
         }
 
-        if (metaBuilding.id === "comparator"){
-            this.root.knot.moveGreenLine();
+        if (metaBuilding.id === "comparator") {
+            this.root.knotSimplifier.moveGreenLine();
             return;
         }
-        
-        if (metaBuilding.id === "trash"){
-            this.root.knot.checkGreenLine();
+
+        if (metaBuilding.id === "trash") {
+            this.root.knotSimplifier.checkGreenLine();
             return;
         }
 

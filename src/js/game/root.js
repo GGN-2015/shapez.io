@@ -30,6 +30,7 @@ import { KeyActionMapper } from "./key_action_mapper";
 import { Vector } from "../core/vector";
 import { GameMode } from "./game_mode";
 import { Knot } from "./knot";
+import { KnotSimplifier } from "./knotSimplifier";
 /* typehints:end */
 
 const logger = createLogger("game/root");
@@ -50,6 +51,9 @@ export class GameRoot {
     constructor(app) {
         /** @type {Knot} */
         this.knot = null;
+
+        /** @type {KnotSimplifier} */
+        this.knotSimplifier = null;
 
         this.app = app;
 

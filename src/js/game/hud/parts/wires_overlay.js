@@ -27,30 +27,34 @@ export class HUDWiresOverlay extends BaseHUDPart {
     }
 
     /**
-     * 
-    */
+     *
+     */
     initKnot(root) {
         this.root.knot = new Knot(this.root);
-        if (!this.root.knot.corners.length) {// 可以没有 crossing, 但至少要有 corner 
-            this.root.hud.signals.notification.dispatch(this.root.knot.unLeagleMessage, enumNotificationType.error);
-            return false
-
+        if (!this.root.knot.corners.length) {
+            // 可以没有 crossing, 但至少要有 corner
+            this.root.hud.signals.notification.dispatch(
+                this.root.knot.unLeagleMessage,
+                enumNotificationType.error
+            );
+            return false;
         }
 
-        let sepOK = true; 
+        let sepOK = true;
         if (this.root.knot) {
-            this.root.knot.redPathForward.length = this.root.knot.redPathReverse.length = 0;
-            for (let ori of this.root.knot.seperators) {
-                if (this.root.knot.checkSeperatorIleagle(ori)) {
+            this.root.knotSimplifier.redPathForward.length = this.root.knotSimplifier.redPathReverse.length = 0;
+            for (let ori of this.root.knotSimplifier.seperators) {
+                if (this.root.knotSimplifier.checkSeperatorIleagle(ori)) {
                     //return false;
-                   sepOK = false;
+                    sepOK = false;
+                }
             }
-        }
 
             if (!sepOK) {
                 let sep_entities = [];
                 for (let ent of this.root.entityMgr.entities) {
-                    if (ent.layer === "wires" && (ent.components.StaticMapEntity.code === 39)) { // sep
+                    if (ent.layer === "wires" && ent.components.StaticMapEntity.code === 39) {
+                        // sep
                         sep_entities.push(ent);
                     }
                 }
@@ -60,13 +64,11 @@ export class HUDWiresOverlay extends BaseHUDPart {
                 }
             }
         }
-        
 
         this.root.hud.signals.notification.dispatch("构建扭结成功", enumNotificationType.success);
         // 打开 wire 路径自适应, 方便绘制绿线
         this.root.systemMgr.systems.wire.bUpdateSuround = true;
         return true;
-
     }
 
     /**
@@ -81,17 +83,16 @@ export class HUDWiresOverlay extends BaseHUDPart {
                 this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_wires_painter_and_levers) ||
                 (G_IS_DEV && globalConfig.debug.allBuildingsUnlocked)
             ) {
-                this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
-                if (this.initKnot(this.root)){
+                if (this.initKnot(this.root)) {
                     this.root.currentLayer = "wires";
                     this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
+                    this.root.systemMgr.systems.wires.bUpdateSurrounding = true;
                 }
-                this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
-                
             }
         } else {
-            if (this.root.knot){
-                this.root.knot.recoverHiddenLines();
+            if (this.root.knot) {
+                this.root.knotSimplifier.recoverHiddenLines();
+                this.root.knotSimplifier.rebuild();
             }
             this.root.currentLayer = "regular";
             this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
@@ -191,9 +192,7 @@ export class HUDWiresOverlay extends BaseHUDPart {
         parameters.context.globalCompositeOperation = "source-over";
 
         parameters.context.scale(scaleFactor, scaleFactor);
-        parameters.context.fillStyle = hasTileGrid
-            ? this.cachedPatternBackground
-            : "rgba(78, 137, 125, 0.2)";
+        parameters.context.fillStyle = hasTileGrid ? this.cachedPatternBackground : "rgba(78, 137, 125, 0.2)";
         parameters.context.fillRect(
             bounds.x / scaleFactor,
             bounds.y / scaleFactor,

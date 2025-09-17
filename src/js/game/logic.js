@@ -575,7 +575,8 @@ export class GameLogic {
             }
         }
         if (this.root.knot) {
-            this.root.knot.constructorEbd();
+            this.root.knot.rebuild();
+            this.root.knotSimplifier.rebuild();
         }
     }
 
@@ -697,7 +698,8 @@ export class GameLogic {
             }
         }
         if (this.root.knot) {
-            this.root.knot.constructorEbd();
+            this.root.knot.rebuild();
+            this.root.knotSimplifier.rebuild();
         }
     }
 
@@ -707,12 +709,12 @@ export class GameLogic {
      * @returns {boolean}
      */
     setSeperator(origin) {
-        if (this.root.knot.seperators.length === 2) {
+        if (this.root.knotSimplifier.seperators.length === 2) {
             this.root.hud.signals.notification.dispatch("只能设置两个分割点", enumNotificationType.error);
             return true;
         }
-        if (this.root.knot.checkSeperatorIleagle(origin)) return true;
-        this.root.knot.seperators.push(origin);
+        if (this.root.knotSimplifier.checkSeperatorIleagle(origin)) return true;
+        this.root.knotSimplifier.seperators.push(origin);
         return false;
     }
 
@@ -751,7 +753,7 @@ export class GameLogic {
             return result;
         } else if (building.id === "wire") {
             // 设置绿线
-            this.root.knot.readyToMove = false;
+            this.root.knotSimplifier.readyToMove = false;
             return false;
         }
         return false;
@@ -890,8 +892,8 @@ export class GameLogic {
         if (building.components.StaticMapEntity.code === 39) {
             // "wire_tunnel"
             if (this.root.knot) {
-                this.root.knot.seperators.splice(
-                    this.root.knot.seperators.indexOf(building.components.StaticMapEntity.origin),
+                this.root.knotSimplifier.seperators.splice(
+                    this.root.knotSimplifier.seperators.indexOf(building.components.StaticMapEntity.origin),
                     1
                 );
             }
@@ -903,7 +905,7 @@ export class GameLogic {
         if (building.components.StaticMapEntity.code === 39) {
             // 删除分离器需要重构扭结
             if (this.root.knot) {
-                this.root.knot.constructorEbd();
+                this.root.knotSimplifier.rebuild();
                 //console.log(this.root.knot.nodes.length)
             }
         }
