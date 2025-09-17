@@ -167,27 +167,27 @@ export class BaseMap extends BasicSerializableObject {
     }
 
     /**
-     * 
-     * @param {Entity} entity 
+     *
+     * @param {Entity} entity
      * @returns {boolean}
      */
-    checkNeighborsNull(entity, layer){
+    checkNeighborsNull(entity, layer) {
         let sMapEntity = entity.components.StaticMapEntity;
         // if (sMapEntity.code !== 1){
         //     return true;
         // }
-        if (sMapEntity.rotation % 180 === 0){
-            if (this.getLayerContentXY(sMapEntity.origin.x - 1, sMapEntity.origin.y, layer)){
+        if (sMapEntity.rotation % 180 === 0) {
+            if (this.getLayerContentXY(sMapEntity.origin.x - 1, sMapEntity.origin.y, layer)) {
                 return false;
             }
-            if (this.getLayerContentXY(sMapEntity.origin.x + 1, sMapEntity.origin.y, layer)){
+            if (this.getLayerContentXY(sMapEntity.origin.x + 1, sMapEntity.origin.y, layer)) {
                 return false;
             }
         } else {
-            if (this.getLayerContentXY(sMapEntity.origin.x, sMapEntity.origin.y - 1, layer)){
+            if (this.getLayerContentXY(sMapEntity.origin.x, sMapEntity.origin.y - 1, layer)) {
                 return false;
             }
-            if (this.getLayerContentXY(sMapEntity.origin.x, sMapEntity.origin.y + 1, layer)){
+            if (this.getLayerContentXY(sMapEntity.origin.x, sMapEntity.origin.y + 1, layer)) {
                 return false;
             }
         }
@@ -196,20 +196,20 @@ export class BaseMap extends BasicSerializableObject {
 
     /**
      * 判断对角线上 4 个临接位置全空, 检查合法性
-     * @param {Vector} origin 
+     * @param {Vector} origin
      * @returns {boolean}
      */
     checkDiagonalEntities(origin, layer) {
-        if (this.getLayerContentXY(origin.x - 1, origin.y - 1, layer)){
+        if (this.getLayerContentXY(origin.x - 1, origin.y - 1, layer)) {
             return false;
         }
-        if (this.getLayerContentXY(origin.x - 1, origin.y + 1, layer)){
+        if (this.getLayerContentXY(origin.x - 1, origin.y + 1, layer)) {
             return false;
         }
-        if (this.getLayerContentXY(origin.x + 1, origin.y - 1, layer)){
+        if (this.getLayerContentXY(origin.x + 1, origin.y - 1, layer)) {
             return false;
         }
-        if (this.getLayerContentXY(origin.x + 1, origin.y + 1, layer)){
+        if (this.getLayerContentXY(origin.x + 1, origin.y + 1, layer)) {
             return false;
         }
         return true;
@@ -218,29 +218,28 @@ export class BaseMap extends BasicSerializableObject {
      * 获取地图上一个 belt 的出口下一个位置
      * @param {Entity} entity
      * @returns {Vector}
-    */
-     getNextOrigin(entity){  
+     */
+    getNextOrigin(entity) {
         let sMapEntity = entity.components.StaticMapEntity;
-        if (!sMapEntity)
-            return null;
+        if (!sMapEntity) return null;
         let outRot;
-        switch (sMapEntity.code){
+        switch (sMapEntity.code) {
             case 1: // 通常 belt
                 outRot = sMapEntity.rotation;
                 break;
             case 2: // 左转 belt
-                outRot = (sMapEntity.rotation  + 270) % 360;
+                outRot = (sMapEntity.rotation + 270) % 360;
                 break;
             case 3: // 右转 belt
-                outRot = (sMapEntity.rotation  + 90) % 360;
+                outRot = (sMapEntity.rotation + 90) % 360;
                 break;
         }
-        
+
         let nextEntity = new Vector();
-        switch (outRot){
+        switch (outRot) {
             case 0: // 上
                 nextEntity.x = sMapEntity.origin.x;
-                nextEntity.y = sMapEntity.origin.y -1;
+                nextEntity.y = sMapEntity.origin.y - 1;
                 break;
             case 90: // 右
                 nextEntity.x = sMapEntity.origin.x + 1;
@@ -260,12 +259,12 @@ export class BaseMap extends BasicSerializableObject {
 
     /**
      * 判断这个位置上的 belt 是否是一个 crossing, 依据它是否有 4 个临接 belt (忽略定向)
-     * @param {Vector} ori 
-     * @returns {boolean} 
+     * @param {Vector} ori
+     * @returns {boolean}
      */
     isCrossingEntity(ori) {
-        const { ejectors, acceptors } = this.root.logic.getEjectorsAndAcceptorsAtTile(ori);  
-        if (ejectors.length + acceptors.length === 4) {  
+        const { ejectors, acceptors } = this.root.logic.getEjectorsAndAcceptorsAtTile(ori);
+        if (ejectors.length + acceptors.length === 4) {
             return true;
         } else {
             return false;
@@ -274,12 +273,15 @@ export class BaseMap extends BasicSerializableObject {
 
     /**
      * 判断这个位置上的 belt 是否是一个 corner
-     * @param {Vector} ori 
-     * @returns {boolean} 
+     * @param {Vector} ori
+     * @returns {boolean}
      */
-     isCornerEntity(ori) {
-        const entity = this.getLayerContentXY(ori.x, ori.y, "regular"); 
-        if (entity && (entity.components.StaticMapEntity.code === 2 || entity.components.StaticMapEntity.code === 3)) {  
+    isCornerEntity(ori) {
+        const entity = this.getLayerContentXY(ori.x, ori.y, "regular");
+        if (
+            entity &&
+            (entity.components.StaticMapEntity.code === 2 || entity.components.StaticMapEntity.code === 3)
+        ) {
             return true;
         } else {
             return false;

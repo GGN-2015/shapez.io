@@ -130,7 +130,7 @@ function gulptasksStandalone($, gulp) {
                 asar: asar,
                 executableName: "KnotSimplify",
                 icon: path.join(electronBaseDir, "favicon"),
-                name: "shapez",
+                name: "KnotSimplify",
                 out: tempDestDir,
                 overwrite: true,
                 appBundleId: "tobspr.shapezio." + variant,

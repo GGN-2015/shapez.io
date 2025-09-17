@@ -106,23 +106,22 @@ export class GameLogic {
         return true;
     }
 
-
     /**
      * 定向整理
-     * @param {Vector} origin 
-     * @param {number} rotation 
-     * @returns 
+     * @param {Vector} origin
+     * @param {number} rotation
+     * @returns
      */
     orientationRebuild(origin, rotation) {
-
         let initEntity = this.root.map.getLayerContentXY(origin.x, origin.y, "regular");
-        if (!initEntity)
-            return;
+        if (!initEntity) return;
 
         let sMapEntity = initEntity.components.StaticMapEntity;
-        if (sMapEntity.code != 1)    // 是 corner, 不处理
+        if (sMapEntity.code != 1)
+            // 是 corner, 不处理
             return;
-        if ((sMapEntity.rotation - rotation + 180) % 180 !== 0) { // 与目标定向成垂直关系, 不处理
+        if ((sMapEntity.rotation - rotation + 180) % 180 !== 0) {
+            // 与目标定向成垂直关系, 不处理
             return;
         }
         if (this.root.map.isCrossingEntity(sMapEntity.origin)) {
@@ -131,31 +130,38 @@ export class GameLogic {
 
         this.root.hud.signals.notification.dispatch("定向整理", enumNotificationType.success);
 
-        // 确实与目标定向相同或相反            
+        // 确实与目标定向相同或相反
         sMapEntity.rotation = sMapEntity.originalRotation = rotation;
         let curEntity = initEntity;
         let nextOrigin = null;
         let nextEntity = null;
 
-        while (true) {
+        for (;;) {
             //console.log (curEntity);
             nextOrigin = this.root.map.getNextOrigin(curEntity);
             //console.log(nextOrigin)
             nextEntity = this.root.map.getLayerContentXY(nextOrigin.x, nextOrigin.y, "regular");
-            if (!nextEntity)
-                break;
+            if (!nextEntity) break;
 
             if (this.root.map.isCrossingEntity(nextOrigin)) {
                 //console.log("crossing!")
                 //console.log(nextEntity.components.StaticMapEntity.rotation, curEntity.components.StaticMapEntity.rotation)
-                if ((nextEntity.components.StaticMapEntity.rotation - curEntity.components.StaticMapEntity.rotation + 180) % 180 === 0) { // 如果上上方弧段
+                if (
+                    (nextEntity.components.StaticMapEntity.rotation -
+                        curEntity.components.StaticMapEntity.rotation +
+                        180) %
+                        180 ===
+                    0
+                ) {
+                    // 如果上上方弧段
                     //&& nextEntity.components.StaticMapEntity.rotation !== curEntity.components.StaticMapEntity.rotation
                     //console.log("===================上方弧段=============================")
                     //console.log(nextEntity.components.StaticMapEntity.rotation, curEntity.components.StaticMapEntity.rotation)
                     //nextEntity = this.root.map.getLayerContentXY(nextOrigin.x, nextOrigin.y, "regular");
 
                     // 这里试试不生成新的 entity 好像也可以, 虽然不是特别保险
-                    nextEntity.components.StaticMapEntity.rotation = curEntity.components.StaticMapEntity.rotation;
+                    nextEntity.components.StaticMapEntity.rotation =
+                        curEntity.components.StaticMapEntity.rotation;
                     //nextEntity.components.StaticMapEntity.originalRotation = curEntity.components.StaticMapEntity.originalRotation;
                     // let _building = new MetaBeltBuilding();
                     // let oriRot, rotVar;
@@ -172,7 +178,6 @@ export class GameLogic {
 
                     // });
 
-
                     // this.freeEntityAreaBeforeBuild(entity);
                     // this.root.map.placeStaticEntity(entity);
                     // this.root.entityMgr.registerEntity(entity);
@@ -188,11 +193,13 @@ export class GameLogic {
                 nextOrigin.y = 2 * nextOrigin.y - curOrigine.y;
                 nextEntity = this.root.map.getLayerContentXY(nextOrigin.x, nextOrigin.y, "regular");
             }
-            if (nextEntity === initEntity)
-                break;
+            if (nextEntity === initEntity) break;
             let entity = nextEntity;
             // 设置下一个位置上的定向
-            if (nextEntity.components.StaticMapEntity.rotation !== curEntity.components.StaticMapEntity.originalRotation) {
+            if (
+                nextEntity.components.StaticMapEntity.rotation !==
+                curEntity.components.StaticMapEntity.originalRotation
+            ) {
                 // 如果 rot 不同
                 let _building = new MetaBeltBuilding();
                 let oriRot, rotVar;
@@ -219,23 +226,26 @@ export class GameLogic {
                     rotation: curEntity.components.StaticMapEntity.originalRotation,
                     originalRotation: oriRot,
                     rotationVariant: rotVar,
-                    variant: "default"
+                    variant: "default",
                 });
-
 
                 this.freeEntityAreaBeforeBuild(entity);
                 this.root.map.placeStaticEntity(entity);
                 this.root.entityMgr.registerEntity(entity);
-            } else { // 自动闭合的路径未必正确设置了 originalRotation, 设置一下去掉 bug
+            } else {
+                // 自动闭合的路径未必正确设置了 originalRotation, 设置一下去掉 bug
                 switch (nextEntity.components.StaticMapEntity.code) {
                     case 1: // 通常 belt
-                        nextEntity.components.StaticMapEntity.originalRotation = nextEntity.components.StaticMapEntity.rotation;
+                        nextEntity.components.StaticMapEntity.originalRotation =
+                            nextEntity.components.StaticMapEntity.rotation;
                         break;
                     case 2: // 左转 belt
-                        nextEntity.components.StaticMapEntity.originalRotation = (nextEntity.components.StaticMapEntity.rotation + 270) % 360;
+                        nextEntity.components.StaticMapEntity.originalRotation =
+                            (nextEntity.components.StaticMapEntity.rotation + 270) % 360;
                         break;
                     case 3: // 右转 belt
-                        nextEntity.components.StaticMapEntity.originalRotation = (nextEntity.components.StaticMapEntity.rotation + 90) % 360;
+                        nextEntity.components.StaticMapEntity.originalRotation =
+                            (nextEntity.components.StaticMapEntity.rotation + 90) % 360;
                         break;
                 }
             }
@@ -244,23 +254,24 @@ export class GameLogic {
         }
     }
 
-
     /**
      * 增距
-     * @param {Vector} origin 
-     * @param {number} rotation 
-     * @returns 
+     * @param {Vector} origin
+     * @param {number} rotation
+     * @returns
      */
     increaseDistance(origin, rotation) {
         this.root.hud.signals.notification.dispatch("增距", enumNotificationType.success);
-        
-        if (rotation % 180 === 0) {  // 加一列
+
+        if (rotation % 180 === 0) {
+            // 加一列
             let toBuildTiles = [];
             let toDeleteTiles = [];
-            let max_y = -4096;  // 先写死成这样吧, 大概够用
+            let max_y = -4096; // 先写死成这样吧, 大概够用
             let min_y = 4096;
-            for (let entity of this.root.entityMgr.entities) { // 非破坏性遍历, 不要一边遍历一边删除, 会死的很惨
-                if (entity.layer !== "regular"){
+            for (let entity of this.root.entityMgr.entities) {
+                // 非破坏性遍历, 不要一边遍历一边删除, 会死的很惨
+                if (entity.layer !== "regular") {
                     continue;
                 }
                 if (entity.components.StaticMapEntity.origin.x >= origin.x) {
@@ -288,14 +299,14 @@ export class GameLogic {
                     toDeleteTiles.push(entity);
                 }
             }
-            // 此处应参考 game\hud\parts\mass_selector.js L99 大批量操作, 
+            // 此处应参考 game\hud\parts\mass_selector.js L99 大批量操作,
             // 然而并未感到明显性能提升, 其他地方暂时先不改吧
             this.root.logic.performBulkOperation(() => {
                 for (let de of toDeleteTiles) {
                     this.tryDeleteBuilding(de);
                 }
             });
-            
+
             // 参考 game\blueprint.js L157
             this.performBulkOperation(() => {
                 return this.performImmutableOperation(() => {
@@ -325,18 +336,18 @@ export class GameLogic {
                         break;
                     case 2: // 左转 belt
                         if (left_entity.components.StaticMapEntity.rotation == 270) {
-                            rot = oriRot = 270
+                            rot = oriRot = 270;
                         } else if (left_entity.components.StaticMapEntity.rotation == 180) {
-                            rot = oriRot = 90
+                            rot = oriRot = 90;
                         } else {
                             continue;
                         }
                         break;
                     case 3: // 右转 belt
                         if (left_entity.components.StaticMapEntity.rotation == 0) {
-                            rot = oriRot = 90
+                            rot = oriRot = 90;
                         } else if (left_entity.components.StaticMapEntity.rotation == 270) {
-                            rot = oriRot = 270
+                            rot = oriRot = 270;
                         } else {
                             continue;
                         }
@@ -350,7 +361,7 @@ export class GameLogic {
                     rotation: rot,
                     originalRotation: oriRot,
                     rotationVariant: 0,
-                    variant: "default"
+                    variant: "default",
                 });
 
                 this.freeEntityAreaBeforeBuild(entity);
@@ -361,7 +372,8 @@ export class GameLogic {
                 // 检查右边缘切口
                 let rot;
                 let oriRot;
-                if (this.root.map.getLayerContentXY(origin.x, y, "regular")) {  // 左切口已经 handle, 不再处理
+                if (this.root.map.getLayerContentXY(origin.x, y, "regular")) {
+                    // 左切口已经 handle, 不再处理
                     continue;
                 }
                 let right_entity = this.root.map.getLayerContentXY(origin.x + 1, y, "regular");
@@ -379,18 +391,18 @@ export class GameLogic {
                         break;
                     case 2: // 左转 belt
                         if (right_entity.components.StaticMapEntity.rotation === 0) {
-                            rot = oriRot = 270
+                            rot = oriRot = 270;
                         } else if (right_entity.components.StaticMapEntity.rotation === 90) {
-                            rot = oriRot = 90
+                            rot = oriRot = 90;
                         } else {
                             continue;
                         }
                         break;
                     case 3: // 右转 belt
                         if (right_entity.components.StaticMapEntity.rotation === 90) {
-                            rot = oriRot = 90
+                            rot = oriRot = 90;
                         } else if (right_entity.components.StaticMapEntity.rotation === 180) {
-                            rot = oriRot = 270
+                            rot = oriRot = 270;
                         } else {
                             continue;
                         }
@@ -404,20 +416,22 @@ export class GameLogic {
                     rotation: rot,
                     originalRotation: oriRot,
                     rotationVariant: 0,
-                    variant: "default"
+                    variant: "default",
                 });
 
                 this.freeEntityAreaBeforeBuild(entity);
                 this.root.map.placeStaticEntity(entity);
                 this.root.entityMgr.registerEntity(entity);
             }
-        } else {    // 加一行
+        } else {
+            // 加一行
             let toBuildTiles = [];
             let toDeleteTiles = [];
-            let max_x = -4096;  // 先写死成这样吧, 大概够用
+            let max_x = -4096; // 先写死成这样吧, 大概够用
             let min_x = 4096;
-            for (let entity of this.root.entityMgr.entities) { // 非破坏性遍历, 不要一边遍历一边删除, 会死的很惨
-                if (entity.layer !== "regular"){
+            for (let entity of this.root.entityMgr.entities) {
+                // 非破坏性遍历, 不要一边遍历一边删除, 会死的很惨
+                if (entity.layer !== "regular") {
                     continue;
                 }
                 if (entity.components.StaticMapEntity.origin.y >= origin.y) {
@@ -433,11 +447,14 @@ export class GameLogic {
                     let _building = new MetaBeltBuilding();
                     let new_entity = _building.createEntity({
                         root: this.root,
-                        origin: new Vector(entity.components.StaticMapEntity.origin.x, entity.components.StaticMapEntity.origin.y + 1),
+                        origin: new Vector(
+                            entity.components.StaticMapEntity.origin.x,
+                            entity.components.StaticMapEntity.origin.y + 1
+                        ),
                         rotation: entity.components.StaticMapEntity.rotation,
                         originalRotation: entity.components.StaticMapEntity.originalRotation,
                         rotationVariant: entity.components.StaticMapEntity.getRotationVariant(),
-                        variant: entity.components.StaticMapEntity.getVariant()
+                        variant: entity.components.StaticMapEntity.getVariant(),
                     });
                     toBuildTiles.push(new_entity);
                     toDeleteTiles.push(entity);
@@ -469,18 +486,18 @@ export class GameLogic {
                         break;
                     case 2: // 左转 belt
                         if (top_entity.components.StaticMapEntity.rotation === 0) {
-                            rot = oriRot = 0
+                            rot = oriRot = 0;
                         } else if (top_entity.components.StaticMapEntity.rotation === 270) {
-                            rot = oriRot = 180
+                            rot = oriRot = 180;
                         } else {
                             continue;
                         }
                         break;
                     case 3: // 右转 belt
                         if (top_entity.components.StaticMapEntity.rotation == 0) {
-                            rot = oriRot = 0
+                            rot = oriRot = 0;
                         } else if (top_entity.components.StaticMapEntity.rotation == 90) {
-                            rot = oriRot = 180
+                            rot = oriRot = 180;
                         } else {
                             continue;
                         }
@@ -494,7 +511,7 @@ export class GameLogic {
                     rotation: rot,
                     originalRotation: oriRot,
                     rotationVariant: 0,
-                    variant: "default"
+                    variant: "default",
                 });
 
                 this.freeEntityAreaBeforeBuild(entity);
@@ -505,7 +522,8 @@ export class GameLogic {
                 // 检查下边缘切口
                 let rot;
                 let oriRot;
-                if (this.root.map.getLayerContentXY(x, origin.y, "regular")) {  // 上切口已经 handle, 不再处理
+                if (this.root.map.getLayerContentXY(x, origin.y, "regular")) {
+                    // 上切口已经 handle, 不再处理
                     continue;
                 }
                 let bottom_entity = this.root.map.getLayerContentXY(x, origin.y + 1, "regular");
@@ -523,18 +541,18 @@ export class GameLogic {
                         break;
                     case 2: // 左转 belt
                         if (bottom_entity.components.StaticMapEntity.rotation === 90) {
-                            rot = oriRot = 0
+                            rot = oriRot = 0;
                         } else if (bottom_entity.components.StaticMapEntity.rotation === 180) {
-                            rot = oriRot = 180
+                            rot = oriRot = 180;
                         } else {
                             continue;
                         }
                         break;
                     case 3: // 右转 belt
                         if (bottom_entity.components.StaticMapEntity.rotation === 270) {
-                            rot = oriRot = 0
+                            rot = oriRot = 0;
                         } else if (bottom_entity.components.StaticMapEntity.rotation === 180) {
-                            rot = oriRot = 180
+                            rot = oriRot = 180;
                         } else {
                             continue;
                         }
@@ -548,7 +566,7 @@ export class GameLogic {
                     rotation: rot,
                     originalRotation: oriRot,
                     rotationVariant: 0,
-                    variant: "default"
+                    variant: "default",
                 });
 
                 this.freeEntityAreaBeforeBuild(entity);
@@ -556,48 +574,60 @@ export class GameLogic {
                 this.root.entityMgr.registerEntity(entity);
             }
         }
-        if (this.root.knot){
+        if (this.root.knot) {
             this.root.knot.constructorEbd();
         }
     }
 
     /**
      * 减距
-     * @param {Vector} origin 
-     * @param {number} rotation 
-     * @returns 
+     * @param {Vector} origin
+     * @param {number} rotation
+     * @returns
      */
     decreaseDistance(origin, rotation) {
         this.root.hud.signals.notification.dispatch("减距", enumNotificationType.success);
-        if (rotation % 180 === 0) {  // 减一列
+        if (rotation % 180 === 0) {
+            // 减一列
             let toBuildTiles = [];
             let toDeleteTiles = [];
 
-            for (let entity of this.root.entityMgr.entities) { // 第一次循环检查这两列是否可满足要求
-                if (entity.layer !== "regular"){
+            for (let entity of this.root.entityMgr.entities) {
+                // 第一次循环检查这两列是否可满足要求
+                if (entity.layer !== "regular") {
                     continue;
                 }
-                if (entity.components.StaticMapEntity.origin.x === origin.x || entity.components.StaticMapEntity.origin.x === origin.x + 1) {
-                    if (entity.components.StaticMapEntity.code !== 1 || entity.components.StaticMapEntity.rotation % 180 === 0) {
+                if (
+                    entity.components.StaticMapEntity.origin.x === origin.x ||
+                    entity.components.StaticMapEntity.origin.x === origin.x + 1
+                ) {
+                    if (
+                        entity.components.StaticMapEntity.code !== 1 ||
+                        entity.components.StaticMapEntity.rotation % 180 === 0
+                    ) {
                         //不能切掉这一列
                         return;
                     }
                 }
             }
 
-            for (let entity of this.root.entityMgr.entities) { // 第二次遍历, 准备左移
-                if (entity.layer !== "regular"){
+            for (let entity of this.root.entityMgr.entities) {
+                // 第二次遍历, 准备左移
+                if (entity.layer !== "regular") {
                     continue;
                 }
                 if (entity.components.StaticMapEntity.origin.x > origin.x) {
                     let _building = new MetaBeltBuilding();
                     let new_entity = _building.createEntity({
                         root: this.root,
-                        origin: new Vector(entity.components.StaticMapEntity.origin.x - 1, entity.components.StaticMapEntity.origin.y),
+                        origin: new Vector(
+                            entity.components.StaticMapEntity.origin.x - 1,
+                            entity.components.StaticMapEntity.origin.y
+                        ),
                         rotation: entity.components.StaticMapEntity.rotation,
                         originalRotation: entity.components.StaticMapEntity.originalRotation,
                         rotationVariant: entity.components.StaticMapEntity.getRotationVariant(),
-                        variant: entity.components.StaticMapEntity.getVariant()
+                        variant: entity.components.StaticMapEntity.getVariant(),
                     });
                     toBuildTiles.push(new_entity);
                     toDeleteTiles.push(entity);
@@ -611,36 +641,47 @@ export class GameLogic {
                 this.root.map.placeStaticEntity(entity);
                 this.root.entityMgr.registerEntity(entity);
             }
-
-        } else {    // 减一行
+        } else {
+            // 减一行
             let toBuildTiles = [];
             let toDeleteTiles = [];
 
-            for (let entity of this.root.entityMgr.entities) { // 第一次循环检查这两列是否可满足要求
-                if (entity.layer !== "regular"){
+            for (let entity of this.root.entityMgr.entities) {
+                // 第一次循环检查这两列是否可满足要求
+                if (entity.layer !== "regular") {
                     continue;
                 }
-                if (entity.components.StaticMapEntity.origin.y === origin.y || entity.components.StaticMapEntity.origin.y === origin.y + 1) {
-                    if (entity.components.StaticMapEntity.code !== 1 || entity.components.StaticMapEntity.rotation % 180 !== 0) {
+                if (
+                    entity.components.StaticMapEntity.origin.y === origin.y ||
+                    entity.components.StaticMapEntity.origin.y === origin.y + 1
+                ) {
+                    if (
+                        entity.components.StaticMapEntity.code !== 1 ||
+                        entity.components.StaticMapEntity.rotation % 180 !== 0
+                    ) {
                         //不能切掉这一行
                         return;
                     }
                 }
             }
 
-            for (let entity of this.root.entityMgr.entities) { // 第二次遍历, 准备上移
-                if (entity.layer !== "regular"){
+            for (let entity of this.root.entityMgr.entities) {
+                // 第二次遍历, 准备上移
+                if (entity.layer !== "regular") {
                     continue;
                 }
                 if (entity.components.StaticMapEntity.origin.y > origin.y) {
                     let _building = new MetaBeltBuilding();
                     let new_entity = _building.createEntity({
                         root: this.root,
-                        origin: new Vector(entity.components.StaticMapEntity.origin.x, entity.components.StaticMapEntity.origin.y - 1),
+                        origin: new Vector(
+                            entity.components.StaticMapEntity.origin.x,
+                            entity.components.StaticMapEntity.origin.y - 1
+                        ),
                         rotation: entity.components.StaticMapEntity.rotation,
                         originalRotation: entity.components.StaticMapEntity.originalRotation,
                         rotationVariant: entity.components.StaticMapEntity.getRotationVariant(),
-                        variant: entity.components.StaticMapEntity.getVariant()
+                        variant: entity.components.StaticMapEntity.getVariant(),
                     });
                     toBuildTiles.push(new_entity);
                     toDeleteTiles.push(entity);
@@ -655,14 +696,14 @@ export class GameLogic {
                 this.root.entityMgr.registerEntity(entity);
             }
         }
-        if (this.root.knot){
+        if (this.root.knot) {
             this.root.knot.constructorEbd();
         }
     }
 
     /**
      * 设置切分点
-     * @param {Vector} origin 
+     * @param {Vector} origin
      * @returns {boolean}
      */
     setSeperator(origin) {
@@ -670,8 +711,7 @@ export class GameLogic {
             this.root.hud.signals.notification.dispatch("只能设置两个分割点", enumNotificationType.error);
             return true;
         }
-        if (this.root.knot.checkSeperatorIleagle(origin))
-            return true;
+        if (this.root.knot.checkSeperatorIleagle(origin)) return true;
         this.root.knot.seperators.push(origin);
         return false;
     }
@@ -680,7 +720,8 @@ export class GameLogic {
     // 或许写到别的地方更好, 或许应该新开一个 class...
     // anyway, 先跑起来再说
     tryPlaceBuildingHook({ origin, rotation, rotationVariant, originalRotation, variant, building }) {
-        if (building.id === "miner") { // 开采器, 用来实现定向整理
+        if (building.id === "miner") {
+            // 开采器, 用来实现定向整理
             //console.log("定向整理")
             // 设置不进行周围自动处理
             this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
@@ -688,25 +729,28 @@ export class GameLogic {
             // 恢复周围自动处理
             this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
             return true; // true for handled
-
-        } else if (building.id === "reader") {  // 增距工具
+        } else if (building.id === "reader") {
+            // 增距工具
             //console.log("增距工具")
             this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
             this.increaseDistance(origin, rotation);
             this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
             return true;
-        } else if (building.id === "display") {  // 减距工具
+        } else if (building.id === "display") {
+            // 减距工具
             //console.log("减距工具")
             this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
             this.decreaseDistance(origin, rotation);
             this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
             return true;
-        } else if (building.id === "wire_tunnel"){  // 设置分割节点
+        } else if (building.id === "wire_tunnel") {
+            // 设置分割节点
             this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
-            let result = this.setSeperator(origin)
+            let result = this.setSeperator(origin);
             //this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
             return result;
-        } else if (building.id === "wire"){  // 设置绿线
+        } else if (building.id === "wire") {
+            // 设置绿线
             this.root.knot.readyToMove = false;
             return false;
         }
@@ -725,8 +769,16 @@ export class GameLogic {
      * @returns {Entity}
      */
     tryPlaceBuilding({ origin, rotation, rotationVariant, originalRotation, variant, building }) {
-
-        if (this.tryPlaceBuildingHook({ origin, rotation, rotationVariant, originalRotation, variant, building })) {
+        if (
+            this.tryPlaceBuildingHook({
+                origin,
+                rotation,
+                rotationVariant,
+                originalRotation,
+                variant,
+                building,
+            })
+        ) {
             // 已经 hook 过, 不再执行实际放置
             return null;
         }
@@ -835,17 +887,22 @@ export class GameLogic {
         if (!this.canDeleteBuilding(building)) {
             return false;
         }
-        if (building.components.StaticMapEntity.code === 39) {// "wire_tunnel"
+        if (building.components.StaticMapEntity.code === 39) {
+            // "wire_tunnel"
             if (this.root.knot) {
-                this.root.knot.seperators.splice(this.root.knot.seperators.indexOf(building.components.StaticMapEntity.origin), 1);
+                this.root.knot.seperators.splice(
+                    this.root.knot.seperators.indexOf(building.components.StaticMapEntity.origin),
+                    1
+                );
             }
         }
         this.root.map.removeStaticEntity(building);
         this.root.entityMgr.destroyEntity(building);
         this.root.entityMgr.processDestroyList();
 
-        if (building.components.StaticMapEntity.code === 39){ // 删除分离器需要重构扭结
-            if (this.root.knot){
+        if (building.components.StaticMapEntity.code === 39) {
+            // 删除分离器需要重构扭结
+            if (this.root.knot) {
                 this.root.knot.constructorEbd();
                 //console.log(this.root.knot.nodes.length)
             }
