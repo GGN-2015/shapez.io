@@ -17,31 +17,31 @@ export class KnotSimplifier {
         /**
          * @type {Node[]} greenNodes
          */
-        this.greenNodes = []; // 绿线上的节点
+        this.greenNodes; // 绿线上的节点
 
         /**
          * @type {Vector[]}
          */
-        this.seperators = [];
+        this.seperators;
 
         /**
          * @type {boolean}
          */
-        this.readyToMove = false;
+        this.readyToMove;
 
-        this.check_result_array = [];
-        this.checkResultIndex = 0;
-        this.hiddenNodes = [];
+        this.check_result_array;
+        this.checkResultIndex;
+        this.hiddenNodes;
 
-        this.redBlackSameDirection = true;
+        this.redBlackSameDirection;
         /**
          * @type {Node[]} redPathForward
          */
-        this.redPathForward = [];
+        this.redPathForward;
         /**
          * @type {Node[]} redPathReverse
          */
-        this.redPathReverse = [];
+        this.redPathReverse;
         //this.greenCrossings = [];
 
         this.rebuild();
@@ -167,14 +167,14 @@ export class KnotSimplifier {
                 break;
             }
             for (let no of redPath) {
-                if (no.origin.x === curNode.origin.x && no.origin.y === curNode.origin.y) {
+                if (no.origin.equals(curNode.origin)) {
                     // 红线有自交,
                     redPath.length = 0;
                     return;
                 }
             }
             for (let no of this.greenNodes) {
-                if (no.origin.x === curNode.origin.x && no.origin.y === curNode.origin.y) {
+                if (no.origin.equals(curNode.origin)) {
                     // 与绿线相交,
                     redPath.length = 0;
                     return;
@@ -372,11 +372,7 @@ export class KnotSimplifier {
      */
     get_strand_from_array(check_result_crossings, strand) {
         for (let s of check_result_crossings) {
-            if (
-                s.node.origin.x === strand.node.origin.x &&
-                s.node.origin.y === strand.node.origin.y &&
-                s.rot === strand.rot
-            ) {
+            if (s.node.origin.equals(strand.node.origin) && s.rot === strand.rot) {
                 return s;
             }
         }
@@ -840,7 +836,7 @@ export class KnotSimplifier {
             }
             for (let nei of neighbors) {
                 for (let g of this.greenNodes) {
-                    if (g.origin.x === nei.x && g.origin.y === nei.y) {
+                    if (g.origin.equals(nei)) {
                         greenOri = nei;
                         break;
                     }

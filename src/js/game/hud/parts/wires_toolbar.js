@@ -24,13 +24,13 @@ export class HUDWiresToolbar extends HUDBaseToolbar {
                 //MetaLogicGateBuilding,
                 //MetaVirtualProcessorBuilding,
                 //MetaAnalyzerBuilding,
-                
+
                 //MetaTransistorBuilding,
                 MetaReaderBuilding,
                 MetaDisplayBuilding,
 
                 MetaTrashBuilding,
-                MetaComparatorBuilding,       
+                MetaComparatorBuilding,
             ],
             secondaryBuildings: [
                 // MetaStorageBuilding,

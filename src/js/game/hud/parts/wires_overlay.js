@@ -83,6 +83,8 @@ export class HUDWiresOverlay extends BaseHUDPart {
                 this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_wires_painter_and_levers) ||
                 (G_IS_DEV && globalConfig.debug.allBuildingsUnlocked)
             ) {
+                // 防止 knot.rebuild 过程中自适应
+                this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
                 if (this.initKnot(this.root)) {
                     this.root.currentLayer = "wires";
                     this.root.systemMgr.systems.belt.bUpdateSurrounding = false;

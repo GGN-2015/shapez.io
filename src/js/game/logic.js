@@ -709,6 +709,11 @@ export class GameLogic {
      * @returns {boolean}
      */
     setSeperator(origin) {
+        let entity = this.root.map.getLayerContentXY(origin.x, origin.y, "wires");
+        if (entity && entity.components.StaticMapEntity.code === 39) {
+            this.root.hud.signals.notification.dispatch("不能重复设置分割点", enumNotificationType.error);
+            return true;
+        }
         if (this.root.knotSimplifier.seperators.length === 2) {
             this.root.hud.signals.notification.dispatch("只能设置两个分割点", enumNotificationType.error);
             return true;

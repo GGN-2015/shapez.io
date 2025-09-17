@@ -10,23 +10,23 @@ export class Knot {
      * @param {GameRoot} root
      */
     constructor(root) {
-        this.unLeagleMessage = "";
         this.root = root;
+        this.unLeagleMessage;
 
         /**
          * @type {Node[]} nodes
          */
-        this.nodes = []; // 按扭结序的各坐标点, 构造后可直接遍历, 相当于沿扭结 travel
+        this.nodes; // 按扭结序的各坐标点, 构造后可直接遍历, 相当于沿扭结 travel
 
         /**
          * @type {import("./entity").Entity[]}
          */
-        this.crossings = [];
+        this.crossings;
 
         /**
          * @type {import("./entity").Entity[]}
          */
-        this.corners = [];
+        this.corners;
 
         if (!this.root.knotSimplifier) {
             this.root.knotSimplifier = new KnotSimplifier(this.root);
@@ -36,6 +36,7 @@ export class Knot {
     }
 
     rebuild() {
+        this.unLeagleMessage = "";
         this.nodes = [];
         this.crossings = [];
         this.corners = [];
