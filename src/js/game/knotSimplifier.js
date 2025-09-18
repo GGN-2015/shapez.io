@@ -392,6 +392,30 @@ export class KnotSimplifier {
         return null;
     }
 
+    do_pickup(red_path) {
+        let type = "";
+
+        for (let r of red_path) {
+            if (r.isCrossing) {
+                if (type === "") {
+                    type = r.crosType;
+                } else {
+                    if (r.crosType !== type) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        for (let g of this.greenNodes) {
+            if (g.isCrossing) {
+                g.crosType = type;
+            }
+        }
+
+        return true;
+    }
+
     /**
      *
      * @param {Node[]} red_path
@@ -400,6 +424,15 @@ export class KnotSimplifier {
      * @returns {boolean}
      */
     do_check(red_path, green_path, direction) {
+        if (this.root.knot.crossings.length > 200) {
+            if (this.do_pickup(red_path)) {
+                this.root.hud.signals.notification.dispatch(
+                    "交点数过多, 优先 pickup 化简",
+                    enumNotificationType.warning
+                );
+                return true;
+            }
+        }
         let red_boundary_crossings = [];
         let to_check_set = [];
         let check_result_crossings = [];
@@ -451,8 +484,11 @@ export class KnotSimplifier {
             check_result_crossings.push(strand);
         }
 
+        let nnnn = 0;
         while (to_check_set.length) {
             let cross_strand = to_check_set.pop();
+            console.log("already: " + nnnn + ", left: " + to_check_set.length);
+            nnnn++;
             for (;;) {
                 let r = this.get_strand_from_array(check_result_crossings, cross_strand.opposite());
                 if (r && r.crosType !== "" && r.crosType !== cross_strand.crosType) {
@@ -1054,7 +1090,8 @@ export class KnotSimplifier {
                             });
                         }
                     } else {
-                        for (let rand = 0; rand < 2 ** greenUnknownCrossing.length; rand++) {
+                        console.log("未定交点数: " + greenUnknownCrossing.length);
+                        for (let rand = 0; rand < 1 << greenUnknownCrossing.length; rand++) {
                             for (let i = 0; i < greenUnknownCrossing.length; i++) {
                                 greenUnknownCrossing[i].crosType = (rand >> i) % 2 ? "under" : "over";
                             }
@@ -1127,9 +1164,9 @@ export class KnotSimplifier {
                 this.redBlackSameDirection = false;
             }
 
-            //console.log("==================================== check left =================================");
+            console.log("==================================== check left =================================");
             this.checkGreenLineDirection(red_path_array, "left");
-            //console.log("==================================== check right =================================");
+            console.log("==================================== check right =================================");
             this.checkGreenLineDirection(red_path_array, "right");
         }
 

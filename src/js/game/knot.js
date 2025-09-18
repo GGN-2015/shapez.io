@@ -267,6 +267,7 @@ export class Knot {
             }
         }
         for (let c of crossings) {
+            console.log(crossings.indexOf(c) + "/" + crossings.length);
             let pd = [-1, -1, -1, -1];
             if (c.crosType === "over") {
                 let under_c;
