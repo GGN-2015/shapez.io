@@ -222,12 +222,89 @@ export class Knot {
 
     /**
      *
+     * @param {Node} cros
+     * @returns {Node}
+     */
+    getNextCrossingNode(cros) {
+        let c = cros;
+        for (;;) {
+            c = this.nodes[(this.nodes.indexOf(c) + 1) % this.root.knot.nodes.length];
+            if (c.isCrossing) {
+                return c;
+            }
+        }
+    }
+
+    /**
+     *
+     * @param {Node} cros
+     * @returns {Node}
+     */
+    getPrevCrossingNode(cros) {
+        for (let c of this.nodes) {
+            if (c.isCrossing && this.getNextCrossingNode(c) === cros) {
+                return c;
+            }
+        }
+        return null;
+    }
+
+    /**
+     *
      * @returns {String}
      */
     getPDcode() {
+        let res = "";
+        let crossings = [];
         if (!this.nodes.length) {
-            return "";
+            return res;
         }
+
+        // 用每个 cros node 表示它的 out strand
+        for (let n of this.nodes) {
+            if (n.isCrossing) {
+                crossings.push(n);
+            }
+        }
+        for (let c of crossings) {
+            let pd = [-1, -1, -1, -1];
+            if (c.crosType === "over") {
+                let under_c;
+                for (under_c of this.nodes) {
+                    if (under_c.origin.equals(c.origin) && under_c !== c) {
+                        break;
+                    }
+                }
+                if (c.outRotation === (under_c.outRotation + 90) % 360) {
+                    pd[0] = crossings.indexOf(this.getPrevCrossingNode(under_c));
+                    pd[2] = crossings.indexOf(under_c);
+                    pd[1] = crossings.indexOf(c);
+                    pd[3] = crossings.indexOf(this.getPrevCrossingNode(c));
+                } else {
+                    pd[0] = crossings.indexOf(this.getPrevCrossingNode(under_c));
+                    pd[2] = crossings.indexOf(under_c);
+                    pd[3] = crossings.indexOf(c);
+                    pd[1] = crossings.indexOf(this.getPrevCrossingNode(c));
+                }
+                if (res === "") {
+                    res += "[";
+                } else {
+                    res += ", ";
+                }
+                res += "(" + pd[0] + ", " + pd[1] + ", " + pd[2] + ", " + pd[3] + ")";
+            }
+            // else if (c.crosType === "under") {
+            //     pd[0] = crossings.indexOf(this.getPrevCrossingNode(c));
+            //     pd[3] = crossings.indexOf(c);
+            // } else {
+            //     console.warn("未明确的交点类型!");
+            //     return "";
+            // }
+        }
+        if (res !== "") {
+            res += "]";
+        }
+        return res;
     }
 
     /**
@@ -282,7 +359,7 @@ export class Knot {
      */
     getBeltNodeIndex(origin) {
         for (let n of this.nodes) {
-            if (n.origin.x === origin.x && n.origin.y === origin.y) {
+            if (n.origin.equals(origin)) {
                 return this.nodes.indexOf(n);
             }
         }

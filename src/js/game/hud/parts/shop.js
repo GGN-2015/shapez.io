@@ -6,6 +6,9 @@ import { T } from "../../../translations";
 import { KeyActionMapper, KEYMAPPINGS } from "../../key_action_mapper";
 import { BaseHUDPart } from "../base_hud_part";
 import { DynamicDomAttach } from "../dynamic_dom_attach";
+import { enumNotificationType } from "./notifications";
+
+const copy = require("clipboard-copy");
 
 export class HUDShop extends BaseHUDPart {
     createElements(parent) {
@@ -225,6 +228,14 @@ export class HUDShop extends BaseHUDPart {
     }
 
     show() {
+        if (this.root.knot) {
+            //console.log("pd code: " + this.root.knot.getPDcode());
+            copy(this.root.knot.getPDcode());
+            this.root.hud.signals.notification.dispatch("PD code 已复制", enumNotificationType.success);
+        } else {
+            this.root.hud.signals.notification.dispatch("未构建扭结", enumNotificationType.error);
+        }
+        return;
         this.visible = true;
         this.root.app.inputMgr.makeSureAttachedAndOnTop(this.inputReciever);
         this.rerenderFull();
