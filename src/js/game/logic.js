@@ -741,14 +741,18 @@ export class GameLogic {
             //console.log("增距工具")
             this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
             this.increaseDistance(origin, rotation);
-            this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
+            if (this.root.currentLayer === "regular") {
+                this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
+            }
             return true;
         } else if (building.id === "display") {
             // 减距工具
             //console.log("减距工具")
             this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
             this.decreaseDistance(origin, rotation);
-            this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
+            if (this.root.currentLayer === "regular") {
+                this.root.systemMgr.systems.belt.bUpdateSurrounding = true;
+            }
             return true;
         } else if (building.id === "wire_tunnel") {
             // 设置分割节点

@@ -424,7 +424,7 @@ export class KnotSimplifier {
      * @returns {boolean}
      */
     do_check(red_path, green_path, direction) {
-        if (this.root.knot.crossings.length > 200) {
+        if (this.root.knot.crossings.length > 100) {
             if (this.do_pickup(red_path)) {
                 this.root.hud.signals.notification.dispatch(
                     "交点数过多, 优先 pickup 化简",
@@ -1193,6 +1193,7 @@ export class KnotSimplifier {
         }
 
         this.root.hud.signals.notification.dispatch("没找到合法红线", enumNotificationType.error);
+        this.root.systemMgr.systems.wire.bUpdateSuround = true;
         return;
     }
 }
