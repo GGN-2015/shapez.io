@@ -267,8 +267,8 @@ export class GameLogic {
             // 加一列
             let toBuildTiles = [];
             let toDeleteTiles = [];
-            let max_y = -4096; // 先写死成这样吧, 大概够用
-            let min_y = 4096;
+            let max_y = -Infinity;
+            let min_y = Infinity;
             for (let entity of this.root.entityMgr.entities) {
                 // 非破坏性遍历, 不要一边遍历一边删除, 会死的很惨
                 if (entity.layer !== "regular") {

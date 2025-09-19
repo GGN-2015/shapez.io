@@ -72,7 +72,7 @@ export const globalConfig = {
     // Map
     mapChunkSize: 16,
     chunkAggregateSize: 4,
-    mapChunkOverviewMinZoom: 0.9,
+    mapChunkOverviewMinZoom: 0.3,
     mapChunkWorldSize: null, // COMPUTED
 
     maxBeltShapeBundleSize: 20,
