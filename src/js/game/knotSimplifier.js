@@ -1,3 +1,5 @@
+// @ts-ignore
+import KnotWorker from "../webworkers/knotSimplifier.worker";
 import { Vector } from "../core/vector";
 import { enumNotificationType } from "./hud/parts/notifications";
 import { GameRoot } from "./root";
@@ -392,8 +394,8 @@ export class KnotSimplifier {
         return null;
     }
 
-    do_pickup(red_path) {
-        let type = "";
+    do_pickup(red_path, defaultType) {
+        let type = defaultType;
 
         for (let r of red_path) {
             if (r.isCrossing) {
@@ -414,204 +416,6 @@ export class KnotSimplifier {
         }
 
         return true;
-    }
-
-    /**
-     *
-     * @param {Node[]} red_path
-     * @param {Node[]} green_path
-     * @param {String} direction
-     * @returns {boolean}
-     */
-    do_check(red_path, green_path, direction) {
-        //this.root.gameMode.additionalHudParts.keybindingOverlay.consoleStr = "cccccccc";
-        let msg_label = document.getElementById("keybinding message");
-        //msg_label.innerHTML = "cccccccccc";
-        if (this.root.knot.crossings.length > 100) {
-            if (this.do_pickup(red_path)) {
-                this.root.hud.signals.notification.dispatch(
-                    "交点数过多, 优先 pickup 化简",
-                    enumNotificationType.warning
-                );
-                return true;
-            }
-        }
-        let red_boundary_crossings = [];
-        let to_check_set = [];
-        let check_result_crossings = [];
-        let green_crossing_strands = [];
-
-        let good_path = true;
-
-        for (let g of this.greenNodes) {
-            if (g.isCrossing) {
-                let rot;
-                if (direction == "left") {
-                    rot = (g.outRotation + 90) % 360;
-                } else {
-                    rot = (g.outRotation + 270) % 360;
-                }
-                green_crossing_strands.push(new Strand(this.root.knot, g, rot, g.crosType));
-
-                if (g.crosType !== "") {
-                    let strand;
-                    check_result_crossings.push(
-                        (strand = new Strand(this.root.knot, g, (rot + 180) % 360, g.crosType))
-                    );
-                    to_check_set.push(strand);
-                }
-            }
-        }
-
-        for (let r of red_path) {
-            if (r.isCrossing) {
-                red_boundary_crossings.push(r);
-            }
-        }
-
-        for (let c of red_boundary_crossings) {
-            let rDir;
-            if (this.redBlackSameDirection) {
-                rDir = c.outRotation;
-            } else {
-                rDir = (c.outRotation + 180) % 360;
-            }
-            let strand;
-            if (direction === "left") {
-                // 检查从左侧进入圆盘红色边界
-                to_check_set.push((strand = new Strand(this.root.knot, c, (rDir + 90) % 360, c.crosType)));
-            } else {
-                // 检查从右侧进入圆盘红色边界
-                to_check_set.push((strand = new Strand(this.root.knot, c, (rDir + 270) % 360, c.crosType)));
-            }
-            check_result_crossings.push(strand);
-        }
-
-        let nnnn = 0;
-        while (to_check_set.length) {
-            let cross_strand = to_check_set.pop();
-            msg_label.innerHTML = "already: " + nnnn + ", left: " + to_check_set.length;
-            console.log("already: " + nnnn + ", left: " + to_check_set.length);
-            nnnn++;
-            for (;;) {
-                let r = this.get_strand_from_array(check_result_crossings, cross_strand.opposite());
-                if (r && r.crosType !== "" && r.crosType !== cross_strand.crosType) {
-                    good_path = false;
-                    break;
-                }
-                r = this.get_strand_from_array(green_crossing_strands, cross_strand);
-                if (r) {
-                    r.crosType = cross_strand.crosType;
-                    break;
-                }
-                r = cross_strand.opposite();
-                r.crosType = cross_strand.crosType;
-                if (!this.get_strand_from_array(check_result_crossings, r)) {
-                    check_result_crossings.push(r);
-                }
-                r = this.get_strand_from_array(to_check_set, cross_strand.opposite());
-                if (r) {
-                    to_check_set.splice(to_check_set.indexOf(r), 1);
-                }
-
-                let b = false;
-                for (let c of red_boundary_crossings) {
-                    if (c.origin.equals(cross_strand.opposite().node.origin)) {
-                        b = true;
-                        if (c.crosType !== cross_strand.crosType) {
-                            good_path = false;
-                        }
-                        break;
-                    }
-                }
-                if (b) {
-                    break;
-                }
-
-                if (
-                    cross_strand.opposite().node.origin.equals(this.seperators[0]) ||
-                    cross_strand.opposite().node.origin.equals(this.seperators[1])
-                ) {
-                    break;
-                }
-
-                let oppo = cross_strand.opposite();
-                oppo.crosType = cross_strand.crosType;
-                if (oppo.node.isCrossing) {
-                    // 下一个是内部交点
-                    let sideStrand1 = new Strand(this.root.knot, oppo.node, (oppo.rot + 90) % 360, "");
-                    let sideStrand2 = new Strand(this.root.knot, oppo.node, (oppo.rot + 270) % 360, "");
-                    if (oppo.node.crosType === "over" && oppo.crosType === "under") {
-                        r = this.get_strand_from_array(check_result_crossings, sideStrand1);
-                        if (r && r.crosType === "over") {
-                            good_path = false;
-                            break;
-                        } else if (!r) {
-                            sideStrand1.crosType = "under";
-                            check_result_crossings.push(sideStrand1);
-                            to_check_set.push(sideStrand1);
-                        }
-                        r = this.get_strand_from_array(check_result_crossings, sideStrand2);
-                        if (r && r.crosType === "over") {
-                            good_path = false;
-                            break;
-                        } else if (!r) {
-                            sideStrand2.crosType = "under";
-                            check_result_crossings.push(sideStrand2);
-                            to_check_set.push(sideStrand2);
-                        }
-                    }
-
-                    if (oppo.node.crosType === "under" && oppo.crosType === "over") {
-                        r = this.get_strand_from_array(check_result_crossings, sideStrand1);
-                        if (r && r.crosType === "under") {
-                            good_path = false;
-                            break;
-                        } else if (!r) {
-                            sideStrand1.crosType = "over";
-                            check_result_crossings.push(sideStrand1);
-                            to_check_set.push(sideStrand1);
-                        }
-                        r = this.get_strand_from_array(check_result_crossings, sideStrand2);
-                        if (r && r.crosType === "under") {
-                            good_path = false;
-                            break;
-                        } else if (!r) {
-                            sideStrand2.crosType = "over";
-                            check_result_crossings.push(sideStrand2);
-                            to_check_set.push(sideStrand2);
-                        }
-                    }
-                }
-                let nStrand = cross_strand.next();
-                nStrand.crosType = cross_strand.crosType;
-                //console.log(nStrand.node.origin);
-                r = this.get_strand_from_array(check_result_crossings, nStrand);
-                if (!r) {
-                    nStrand.crosType = cross_strand.crosType;
-                    check_result_crossings.push(nStrand);
-                }
-                cross_strand = nStrand;
-            }
-            if (!good_path) {
-                break;
-            }
-        }
-        if (!good_path) {
-            return false;
-        }
-
-        // 在 this.greenNodes 中返回 crosType
-        for (let gS of green_crossing_strands) {
-            for (let gN of this.greenNodes) {
-                if (gN.origin.equals(gS.node.origin)) {
-                    gN.crosType = gS.crosType;
-                    break;
-                }
-            }
-        }
-
-        return good_path;
     }
 
     recoverHiddenLines() {
@@ -874,7 +678,7 @@ export class KnotSimplifier {
             if (red_path.length) {
                 for (let nei of neighbors) {
                     for (let r of red_path) {
-                        if (r.origin.equals(nei)) {
+                        if (r.origin.x === nei.x && r.origin.y === nei.y) {
                             redOri = nei;
                             break;
                         }
@@ -885,7 +689,7 @@ export class KnotSimplifier {
             }
             for (let nei of neighbors) {
                 for (let g of this.greenNodes) {
-                    if (g.origin.equals(nei)) {
+                    if (g.origin.x === nei.x && g.origin.y === nei.y) {
                         greenOri = nei;
                         break;
                     }
@@ -1061,70 +865,6 @@ export class KnotSimplifier {
         return true;
     }
 
-    checkGreenLineDirection(red_path_array, dir) {
-        for (let ent of red_path_array) {
-            let r_path = ent.path;
-            let bSameDir = ent.dir;
-
-            let greenUnknownCrossing = [];
-            for (let gN of this.greenNodes) {
-                gN.crosType = "";
-            }
-
-            if (r_path.length && this.do_check(r_path, this.greenNodes, dir)) {
-                for (let gN of this.greenNodes) {
-                    if (gN.isCrossing && gN.crosType === "") {
-                        greenUnknownCrossing.push(gN);
-                    }
-                }
-
-                if (greenUnknownCrossing.length) {
-                    // 存在未定交点类型
-                    if (greenUnknownCrossing.length > 10) {
-                        this.root.hud.signals.notification.dispatch(
-                            "未定交点过多, 将随机布置",
-                            enumNotificationType.warning
-                        );
-                        let newNodesArr = this.cloneNodesArray(this.greenNodes);
-                        if (this.isNodesArrayNotExist(newNodesArr, r_path)) {
-                            this.check_result_array.push({
-                                gNodes: this.cloneNodesArray(this.greenNodes),
-                                rPath: r_path,
-                                rPathDir: bSameDir,
-                            });
-                        }
-                    } else {
-                        console.log("未定交点数: " + greenUnknownCrossing.length);
-                        for (let rand = 0; rand < 1 << greenUnknownCrossing.length; rand++) {
-                            for (let i = 0; i < greenUnknownCrossing.length; i++) {
-                                greenUnknownCrossing[i].crosType = (rand >> i) % 2 ? "under" : "over";
-                            }
-                            if (r_path.length && this.do_check(r_path, this.greenNodes, dir)) {
-                                let newNodesArr = this.cloneNodesArray(this.greenNodes);
-                                if (this.isNodesArrayNotExist(newNodesArr, r_path)) {
-                                    this.check_result_array.push({
-                                        gNodes: this.cloneNodesArray(this.greenNodes),
-                                        rPath: r_path,
-                                        rPathDir: bSameDir,
-                                    });
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    let newNodesArr = this.cloneNodesArray(this.greenNodes);
-                    if (this.isNodesArrayNotExist(newNodesArr, r_path)) {
-                        this.check_result_array.push({
-                            gNodes: this.cloneNodesArray(this.greenNodes),
-                            rPath: r_path,
-                            rPathDir: bSameDir,
-                        });
-                    }
-                }
-            }
-        }
-    }
-
     checkGreenLine() {
         if (!this.check_result_array.length) {
             if (this.seperators.length !== 2) {
@@ -1160,20 +900,91 @@ export class KnotSimplifier {
             if (this.redPathForward.length) {
                 red_path = this.redPathForward;
                 red_path_array.push({ path: red_path, dir: true });
-                this.redBlackSameDirection = true;
+                //this.redBlackSameDirection = true;
             }
             if (this.redPathReverse.length) {
                 red_path = this.redPathReverse;
                 red_path_array.push({ path: red_path, dir: false });
-                this.redBlackSameDirection = false;
+                //this.redBlackSameDirection = false;
             }
 
-            console.log("==================================== check left =================================");
-            this.checkGreenLineDirection(red_path_array, "left");
-            console.log("==================================== check right =================================");
-            this.checkGreenLineDirection(red_path_array, "right");
+            if (
+                this.root.knot.crossings.length > 100 &&
+                !this.root.app.settings.getAllSettings().enableColorBlindHelper
+            ) {
+                this.root.hud.signals.notification.dispatch(
+                    '交点数过多, 只计算 pickup 化简, 如需要请在设置中开启 "精确搜索"',
+                    enumNotificationType.warning
+                );
+                for (let ent of red_path_array) {
+                    let r_path = ent.path;
+                    let bSameDir = ent.dir;
+                    if (r_path.length && this.do_pickup(red_path, "over")) {
+                        let newNodesArr = this.cloneNodesArray(this.greenNodes);
+                        if (this.isNodesArrayNotExist(newNodesArr, r_path)) {
+                            this.check_result_array.push({
+                                gNodes: this.cloneNodesArray(this.greenNodes),
+                                rPath: r_path,
+                                rPathDir: bSameDir,
+                            });
+                        }
+                    }
+                    if (r_path.length && this.do_pickup(red_path, "under")) {
+                        let newNodesArr = this.cloneNodesArray(this.greenNodes);
+                        if (this.isNodesArrayNotExist(newNodesArr, r_path)) {
+                            this.check_result_array.push({
+                                gNodes: this.cloneNodesArray(this.greenNodes),
+                                rPath: r_path,
+                                rPathDir: bSameDir,
+                            });
+                        }
+                    }
+                }
+            } else {
+                // console.log("============================== check left =================================");
+                // this.checkGreenLineDirection(red_path_array, "left");
+                // console.log("============================= check right =================================");
+                // this.checkGreenLineDirection(red_path_array, "right");
+
+                this.root.app.gPaused = true;
+                const worker = new KnotWorker();
+                let msg_label = document.getElementById("keybinding message");
+                msg_label.setAttribute(
+                    "style",
+                    'font-family: "GameFont", sans-serif;font-size: calc(26px * var(--ui-scale)); background-color: black'
+                );
+                worker.postMessage({
+                    type: "start",
+                    nodes: this.root.knot.nodes,
+                    greenNodes: this.greenNodes,
+                    seperators: this.seperators,
+                    redBlackSameDirection: this.redBlackSameDirection,
+                    red_path_array: red_path_array,
+                });
+                worker.onmessage = e => {
+                    if (e.data.type === "update") {
+                        msg_label.innerHTML = e.data.str;
+                    } else if (e.data.type === "res") {
+                        //copy(e.data.str);
+                        //this.root.hud.signals.notification.dispatch("PD code 已复制", enumNotificationType.success);
+                        console.log(e.data.check_result_array);
+                        this.check_result_array = e.data.check_result_array;
+                        this.root.app.gPaused = false;
+                        worker.terminate();
+
+                        this.greenLineResult();
+                        return;
+                    }
+                };
+                return;
+            }
         }
 
+        this.greenLineResult();
+        return;
+    }
+
+    greenLineResult() {
         if (this.check_result_array.length) {
             this.root.systemMgr.systems.wire.bUpdateSuround = false;
             this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
@@ -1198,6 +1009,5 @@ export class KnotSimplifier {
 
         this.root.hud.signals.notification.dispatch("没找到合法红线", enumNotificationType.error);
         this.root.systemMgr.systems.wire.bUpdateSuround = true;
-        return;
     }
 }

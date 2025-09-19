@@ -11,7 +11,7 @@ self.addEventListener("message", event => {
     // @ts-ignore
     nodes = event.data.nodes;
     getPDcodeWorker(nodes);
-    self.postMessage("子线程返回消息");
+    //self.postMessage("子线程返回消息");
 });
 
 /**
@@ -60,7 +60,7 @@ function getPDcodeWorker(nodes) {
     for (let c of crossings) {
         //msg_label.innerHTML = crossings.indexOf(c) + "/" + crossings.length;
         self.postMessage({ type: "update", str: crossings.indexOf(c) + "/" + crossings.length });
-        //console.log(crossings.indexOf(c) + "/" + crossings.length);
+        console.log(crossings.indexOf(c) + "/" + crossings.length);
         let pd = [-1, -1, -1, -1];
 
         if (c.crosType === "over") {

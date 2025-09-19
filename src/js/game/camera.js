@@ -94,7 +94,7 @@ export class Camera extends BasicSerializableObject {
         this.bindKeys();
         if (G_IS_DEV) {
             window.addEventListener("keydown", ev => {
-                if (ev.key === "i") {
+                if (ev.key === "i" && !this.root.app.gPaused) {
                     this.zoomLevel = 3;
                 }
             });

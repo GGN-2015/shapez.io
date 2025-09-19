@@ -864,8 +864,8 @@ settings:
             title: 关闭剪切/删除警告
             description: 如果打开，将不再在剪切或者删除 100+ 实体时显示警告信息。
         enableColorBlindHelper:
-            title: 色盲模式
-            description: 提供多种工具，帮助色盲玩家可正常进行游戏。
+            title: 精确搜索
+            description: 搜索所有可能的移动位置 (交点数较多时很慢).
         rotationByBuilding:
             title: 记忆设施方向
             description: 每一类设施都会记住各自上一次的旋转方向。如果您经常在不同设施类型之间切换，这个设置会让游戏操控更加便捷。

@@ -259,6 +259,10 @@ export class Knot {
         //this.root.hud.parts.settingsMenu.show();
         const worker = new KnotWorker();
         let msg_label = document.getElementById("keybinding message");
+        msg_label.setAttribute(
+            "style",
+            'font-family: "GameFont", sans-serif;font-size: calc(26px * var(--ui-scale));'
+        );
         worker.postMessage({
             nodes: this.nodes,
         });
