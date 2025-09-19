@@ -5,6 +5,10 @@ import { KnotSimplifier } from "./knotSimplifier";
 import { GameRoot } from "./root";
 import { Node } from "./knotUtils";
 import { enumNotificationType } from "./hud/parts/notifications";
+import { DialogWithForm } from "../core/modal_dialog_elements";
+import { fillInLinkIntoTranslation } from "../core/utils";
+import { THIRDPARTY_URLS } from "../core/config";
+import { FormElementInput } from "../core/modal_dialog_forms";
 
 const copy = require("clipboard-copy");
 
@@ -274,6 +278,21 @@ export class Knot {
                 this.root.hud.signals.notification.dispatch("PD code 已复制", enumNotificationType.success);
                 this.root.app.gPaused = false;
                 worker.terminate();
+                const markerNameInput = new FormElementInput({
+                    id: "markerName",
+                    label: null,
+                    placeholder: "",
+                    defaultValue: e.data.str,
+                    validator: val => val.length > 0,
+                });
+                const dialog = new DialogWithForm({
+                    app: this.root.app,
+                    title: "PD code",
+                    desc: fillInLinkIntoTranslation("", THIRDPARTY_URLS.shapeViewer),
+                    formElements: [markerNameInput],
+                    buttons: ["ok:good"],
+                });
+                this.root.hud.parts.dialogs.internalShowDialog(dialog);
             }
         };
     }
