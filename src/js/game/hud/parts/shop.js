@@ -230,8 +230,8 @@ export class HUDShop extends BaseHUDPart {
     show() {
         if (this.root.knot) {
             //console.log("pd code: " + this.root.knot.getPDcode());
-            copy(this.root.knot.getPDcode());
-            this.root.hud.signals.notification.dispatch("PD code 已复制", enumNotificationType.success);
+            this.root.knot.getPDcode();
+            //this.root.hud.signals.notification.dispatch("PD code 已复制", enumNotificationType.success);
         } else {
             this.root.hud.signals.notification.dispatch("未构建扭结", enumNotificationType.error);
         }

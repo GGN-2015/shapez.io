@@ -507,6 +507,9 @@ export class Camera extends BasicSerializableObject {
      * @param {WheelEvent} event
      */
     onMouseWheel(event) {
+        if (this.root.app.gPaused) {
+            return true;
+        }
         if (event.cancelable) {
             event.preventDefault();
             // event.stopPropagation();

@@ -199,6 +199,9 @@ export class InputDistributor {
      * @param {KeyboardEvent | MouseEvent} event
      */
     handleKeyMouseDown(event) {
+        if (this.app.gPaused) {
+            return;
+        }
         const keyCode = event instanceof MouseEvent ? event.button + 1 : event.keyCode;
         if (
             keyCode === 4 || // MB4

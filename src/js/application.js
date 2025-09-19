@@ -131,6 +131,8 @@ export class Application {
         // Track if the app is paused (cordova)
         this.applicationPaused = false;
 
+        this.gPaused = false;
+
         /** @type {TypedTrackedState<boolean>} */
         this.trackedIsRenderable = new TrackedState(this.onAppRenderableStateChanged, this);
 

@@ -125,6 +125,7 @@ export class HUDKeybindingOverlay extends BaseHUDPart {
      * @param {HTMLElement} parent
      */
     createElements(parent) {
+        //this.consoleStr = "";
         const mapper = this.root.keyMapper;
         const k = KEYMAPPINGS;
 
@@ -268,6 +269,12 @@ export class HUDKeybindingOverlay extends BaseHUDPart {
                 condition: () =>
                     this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_wires_painter_and_levers),
             },
+
+            {
+                label: "",
+                keys: [null],
+                condition: () => true,
+            },
         ];
 
         if (!this.root.app.settings.getAllSettings().alwaysMultiplace) {
@@ -289,6 +296,9 @@ export class HUDKeybindingOverlay extends BaseHUDPart {
                 const key = handle.keys[k];
 
                 switch (key) {
+                    case null:
+                        html += `<code id="keybinding message"></code>`;
+                        break;
                     case KEYCODE_LMB:
                         html += `<code class="keybinding leftMouse"></code>`;
                         break;

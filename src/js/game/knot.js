@@ -1,7 +1,12 @@
+// @ts-ignore
+import KnotWorker from "../webworkers/knot.worker";
 import { Vector } from "../core/vector";
 import { KnotSimplifier } from "./knotSimplifier";
 import { GameRoot } from "./root";
 import { Node } from "./knotUtils";
+import { enumNotificationType } from "./hud/parts/notifications";
+
+const copy = require("clipboard-copy");
 
 export class Knot {
     /**
@@ -228,7 +233,7 @@ export class Knot {
     getNextCrossingNode(cros) {
         let c = cros;
         for (;;) {
-            c = this.nodes[(this.nodes.indexOf(c) + 1) % this.root.knot.nodes.length];
+            c = this.nodes[(this.nodes.indexOf(c) + 1) % this.nodes.length];
             if (c.isCrossing) {
                 return c;
             }
@@ -249,63 +254,24 @@ export class Knot {
         return null;
     }
 
-    /**
-     *
-     * @returns {String}
-     */
     getPDcode() {
-        let res = "";
-        let crossings = [];
-        if (!this.nodes.length) {
-            return res;
-        }
-
-        // 用每个 cros node 表示它的 out strand
-        for (let n of this.nodes) {
-            if (n.isCrossing) {
-                crossings.push(n);
+        this.root.app.gPaused = true;
+        //this.root.hud.parts.settingsMenu.show();
+        const worker = new KnotWorker();
+        let msg_label = document.getElementById("keybinding message");
+        worker.postMessage({
+            nodes: this.nodes,
+        });
+        worker.onmessage = e => {
+            if (e.data.type === "update") {
+                msg_label.innerHTML = e.data.str;
+            } else if (e.data.type === "res") {
+                copy(e.data.str);
+                this.root.hud.signals.notification.dispatch("PD code 已复制", enumNotificationType.success);
+                this.root.app.gPaused = false;
+                worker.terminate();
             }
-        }
-        for (let c of crossings) {
-            console.log(crossings.indexOf(c) + "/" + crossings.length);
-            let pd = [-1, -1, -1, -1];
-            if (c.crosType === "over") {
-                let under_c;
-                for (under_c of this.nodes) {
-                    if (under_c.origin.equals(c.origin) && under_c !== c) {
-                        break;
-                    }
-                }
-                if (c.outRotation === (under_c.outRotation + 90) % 360) {
-                    pd[0] = crossings.indexOf(this.getPrevCrossingNode(under_c));
-                    pd[2] = crossings.indexOf(under_c);
-                    pd[1] = crossings.indexOf(c);
-                    pd[3] = crossings.indexOf(this.getPrevCrossingNode(c));
-                } else {
-                    pd[0] = crossings.indexOf(this.getPrevCrossingNode(under_c));
-                    pd[2] = crossings.indexOf(under_c);
-                    pd[3] = crossings.indexOf(c);
-                    pd[1] = crossings.indexOf(this.getPrevCrossingNode(c));
-                }
-                if (res === "") {
-                    res += "[";
-                } else {
-                    res += ", ";
-                }
-                res += "(" + pd[0] + ", " + pd[1] + ", " + pd[2] + ", " + pd[3] + ")";
-            }
-            // else if (c.crosType === "under") {
-            //     pd[0] = crossings.indexOf(this.getPrevCrossingNode(c));
-            //     pd[3] = crossings.indexOf(c);
-            // } else {
-            //     console.warn("未明确的交点类型!");
-            //     return "";
-            // }
-        }
-        if (res !== "") {
-            res += "]";
-        }
-        return res;
+        };
     }
 
     /**

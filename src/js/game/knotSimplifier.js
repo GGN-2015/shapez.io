@@ -424,6 +424,9 @@ export class KnotSimplifier {
      * @returns {boolean}
      */
     do_check(red_path, green_path, direction) {
+        //this.root.gameMode.additionalHudParts.keybindingOverlay.consoleStr = "cccccccc";
+        let msg_label = document.getElementById("keybinding message");
+        //msg_label.innerHTML = "cccccccccc";
         if (this.root.knot.crossings.length > 100) {
             if (this.do_pickup(red_path)) {
                 this.root.hud.signals.notification.dispatch(
@@ -487,6 +490,7 @@ export class KnotSimplifier {
         let nnnn = 0;
         while (to_check_set.length) {
             let cross_strand = to_check_set.pop();
+            msg_label.innerHTML = "already: " + nnnn + ", left: " + to_check_set.length;
             console.log("already: " + nnnn + ", left: " + to_check_set.length);
             nnnn++;
             for (;;) {
