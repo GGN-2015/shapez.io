@@ -280,6 +280,7 @@ export class HUDWaypoints extends BaseHUDPart {
      * @param {Waypoint=} param0.waypoint Waypoint to be edited. If omitted, create new
      */
     requestSaveMarker({ worldPos = null, waypoint = null }) {
+        return;
         // Construct dialog with input field
         const markerNameInput = new FormElementInput({
             id: "markerName",
