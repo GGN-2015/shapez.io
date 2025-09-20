@@ -392,9 +392,9 @@ export class HUDBuildingPlacer extends HUDBuildingPlacerLogic {
         staticComp.origin = mouseTile;
 
         // Draw ejectors
-        if (canBuild) {
-            this.drawMatchingAcceptorsAndEjectors(parameters);
-        }
+        // if (canBuild) {
+        //     this.drawMatchingAcceptorsAndEjectors(parameters);
+        // }
     }
 
     /**
