@@ -70,9 +70,9 @@ export class PlatformWrapperImplElectron extends PlatformWrapperImplBrowser {
     }
 
     initializeDlcStatus() {
-        if (G_WEGAME_VERSION) {
+        //if (G_WEGAME_VERSION) {
             return Promise.resolve();
-        }
+        //}
 
         logger.log("Checking DLC ownership ...");
         // @todo: Don't hardcode the app id

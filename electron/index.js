@@ -4,7 +4,7 @@ const { app, BrowserWindow, Menu, MenuItem, ipcMain, shell, dialog, session } = 
 const path = require("path");
 const url = require("url");
 const fs = require("fs");
-const steam = require("./steam");
+//const steam = require("./steam");
 const asyncLock = require("async-lock");
 const windowStateKeeper = require("electron-window-state");
 
@@ -381,9 +381,9 @@ ipcMain.handle("get-mods", async () => {
     return mods;
 });
 
-steam.init(isDev);
+//steam.init(isDev);
 
 // Only allow achievements and puzzle DLC if no mods are loaded
 if (mods.length === 0) {
-    steam.listen();
+    //steam.listen();
 }

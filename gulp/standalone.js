@@ -1,3 +1,4 @@
+/* eslint-disable no-inner-declarations */
 require("colors");
 const packager = require("electron-packager");
 const pj = require("../electron/package.json");
