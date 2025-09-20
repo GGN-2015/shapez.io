@@ -30,6 +30,7 @@ export class MetaWireTunnelBuilding extends MetaBuilding {
      * @param {GameRoot} root
      */
     getIsUnlocked(root) {
+        return !root.camera.getIsMapOverlayActive();
         return root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_wires_painter_and_levers);
     }
 

@@ -7,6 +7,7 @@ import { MetaWireBuilding } from "./buildings/wire";
 import { MetaBeltBuilding } from "./buildings/belt";
 import { Node } from "./knotUtils";
 import { Strand } from "./knotUtils";
+import { gMetaBuildingRegistry } from "../core/global_registries";
 
 export class KnotSimplifier {
     /**
@@ -455,7 +456,8 @@ export class KnotSimplifier {
         // 重绘绿线
         let prevRot = 0;
         for (let curNode of this.greenNodes) {
-            let _building = new MetaWireBuilding();
+            let _building = gMetaBuildingRegistry.findByClass(MetaWireBuilding);
+            //let _building = new MetaWireBuilding();
 
             let rotVar;
             let rot;
@@ -536,7 +538,8 @@ export class KnotSimplifier {
         if (this.redBlackSameDirection) {
             for (let r of this.redPathForward) {
                 if (r.isCrossing && r.crosType === "under") {
-                    let _building = new MetaBeltBuilding();
+                    //let _building = new MetaBeltBuilding();
+                    let _building = gMetaBuildingRegistry.findByClass(MetaBeltBuilding);
                     let rot;
                     let e;
                     if (r.outRotation % 180 == 0) {
@@ -561,7 +564,8 @@ export class KnotSimplifier {
         } else {
             for (let r of this.redPathReverse) {
                 if (r.isCrossing && r.crosType === "under") {
-                    let _building = new MetaBeltBuilding();
+                    //let _building = new MetaBeltBuilding();
+                    let _building = gMetaBuildingRegistry.findByClass(MetaBeltBuilding);
                     let rot;
                     let e;
                     if (r.outRotation % 180 == 0) {
@@ -615,7 +619,8 @@ export class KnotSimplifier {
             if (g.crosType === "over") {
                 continue;
             }
-            let _building = new MetaBeltBuilding();
+            //let _building = new MetaBeltBuilding();
+            let _building = gMetaBuildingRegistry.findByClass(MetaBeltBuilding);
             let rot = (g.outRotation + reverseDelta) % 360;
             let oriRot = (g.outRotation + reverseDelta) % 360;
             let rotVar = 0;
@@ -727,7 +732,8 @@ export class KnotSimplifier {
                 rotVar = 0;
             }
 
-            let _building = new MetaBeltBuilding();
+            //let _building = new MetaBeltBuilding();
+            let _building = gMetaBuildingRegistry.findByClass(MetaBeltBuilding);
             entity = _building.createEntity({
                 root: this.root,
                 origin: sep,
@@ -765,8 +771,8 @@ export class KnotSimplifier {
         // 绘制红线
         let prevRot = -1; // 在循环中会被第一次设置为合理值
         for (let curNode of redPath) {
-            let _building = new MetaWireBuilding();
-
+            //let _building = new MetaWireBuilding();
+            let _building = gMetaBuildingRegistry.findByClass(MetaWireBuilding);
             let rotVar;
             let rot;
             if (curNode.isCorner) {

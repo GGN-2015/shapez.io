@@ -35,6 +35,7 @@ export class MetaReaderBuilding extends MetaBuilding {
      * @param {GameRoot} root
      */
     getIsUnlocked(root) {
+        return !root.camera.getIsMapOverlayActive();
         return root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_belt_reader);
     }
 

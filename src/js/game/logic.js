@@ -1,4 +1,5 @@
 import { globalConfig } from "../core/config";
+import { gMetaBuildingRegistry } from "../core/global_registries";
 import { createLogger } from "../core/logging";
 import { STOP_PROPAGATION } from "../core/signal";
 import { round2Digits } from "../core/utils";
@@ -201,7 +202,8 @@ export class GameLogic {
                 curEntity.components.StaticMapEntity.originalRotation
             ) {
                 // 如果 rot 不同
-                let _building = new MetaBeltBuilding();
+                //let _building = new MetaBeltBuilding();
+                let _building = gMetaBuildingRegistry.findByClass(MetaBeltBuilding);
                 let oriRot, rotVar;
                 switch (nextEntity.components.StaticMapEntity.code) {
                     case 1: // 通常 belt
@@ -354,7 +356,8 @@ export class GameLogic {
                         break;
                 }
 
-                let _building = new MetaBeltBuilding();
+                //let _building = new MetaBeltBuilding();
+                let _building = gMetaBuildingRegistry.findByClass(MetaBeltBuilding);
                 let entity = _building.createEntity({
                     root: this.root,
                     origin: new Vector(origin.x, y),
@@ -409,7 +412,8 @@ export class GameLogic {
                         break;
                 }
 
-                let _building = new MetaBeltBuilding();
+                //let _building = new MetaBeltBuilding();
+                let _building = gMetaBuildingRegistry.findByClass(MetaBeltBuilding);
                 let entity = _building.createEntity({
                     root: this.root,
                     origin: new Vector(origin.x, y),
@@ -444,7 +448,8 @@ export class GameLogic {
                             min_x = entity.components.StaticMapEntity.origin.x;
                         }
                     }
-                    let _building = new MetaBeltBuilding();
+                    //let _building = new MetaBeltBuilding();
+                    let _building = gMetaBuildingRegistry.findByClass(MetaBeltBuilding);
                     let new_entity = _building.createEntity({
                         root: this.root,
                         origin: new Vector(
@@ -504,7 +509,8 @@ export class GameLogic {
                         break;
                 }
 
-                let _building = new MetaBeltBuilding();
+                //let _building = new MetaBeltBuilding();
+                let _building = gMetaBuildingRegistry.findByClass(MetaBeltBuilding);
                 let entity = _building.createEntity({
                     root: this.root,
                     origin: new Vector(x, origin.y),
@@ -559,7 +565,8 @@ export class GameLogic {
                         break;
                 }
 
-                let _building = new MetaBeltBuilding();
+                //let _building = new MetaBeltBuilding();
+                let _building = gMetaBuildingRegistry.findByClass(MetaBeltBuilding);
                 let entity = _building.createEntity({
                     root: this.root,
                     origin: new Vector(x, origin.y),
@@ -618,7 +625,8 @@ export class GameLogic {
                     continue;
                 }
                 if (entity.components.StaticMapEntity.origin.x > origin.x) {
-                    let _building = new MetaBeltBuilding();
+                    //let _building = new MetaBeltBuilding();
+                    let _building = gMetaBuildingRegistry.findByClass(MetaBeltBuilding);
                     let new_entity = _building.createEntity({
                         root: this.root,
                         origin: new Vector(
@@ -672,7 +680,8 @@ export class GameLogic {
                     continue;
                 }
                 if (entity.components.StaticMapEntity.origin.y > origin.y) {
-                    let _building = new MetaBeltBuilding();
+                    //let _building = new MetaBeltBuilding();
+                    let _building = gMetaBuildingRegistry.findByClass(MetaBeltBuilding);
                     let new_entity = _building.createEntity({
                         root: this.root,
                         origin: new Vector(
