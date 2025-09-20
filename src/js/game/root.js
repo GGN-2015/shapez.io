@@ -52,6 +52,9 @@ export class GameRoot {
         /** @type {Knot} */
         this.knot = null;
 
+        /**@type {boolean} */
+        this.isPlayMode = false;
+
         /** @type {KnotSimplifier} */
         this.knotSimplifier = null;
 

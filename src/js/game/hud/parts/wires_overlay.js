@@ -78,6 +78,10 @@ export class HUDWiresOverlay extends BaseHUDPart {
         if (!this.root.gameMode.getSupportsWires()) {
             return;
         }
+        if (this.root.isPlayMode) {
+            this.root.hud.signals.notification.dispatch("化简模式禁止切换图层", enumNotificationType.error);
+            return;
+        }
         if (this.root.currentLayer === "regular") {
             if (
                 this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_wires_painter_and_levers) ||
@@ -86,6 +90,7 @@ export class HUDWiresOverlay extends BaseHUDPart {
                 // 防止 knot.rebuild 过程中自适应
                 this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
                 if (this.initKnot(this.root)) {
+                    this.root.isPlayMode = true;
                     this.root.currentLayer = "wires";
                     this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
                     this.root.systemMgr.systems.wire.bUpdateSuround = true;

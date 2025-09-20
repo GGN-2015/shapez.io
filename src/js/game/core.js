@@ -363,6 +363,8 @@ export class GameCore {
         if (!this.root.gameIsFresh) {
             // Also dispatch game restored hook on restored savegames
             this.root.signals.gameRestored.dispatch();
+
+            this.root.hud.parts["wiresOverlay"].switchLayers();
         }
 
         this.root.gameInitialized = true;
