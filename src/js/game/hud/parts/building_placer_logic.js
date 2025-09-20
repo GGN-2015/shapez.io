@@ -191,9 +191,8 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
     get isDirectionLockActive() {
         const metaBuilding = this.currentMetaBuilding.get();
         return (
-            metaBuilding &&
-            metaBuilding.getHasDirectionLockAvailable(this.currentVariant.get()) &&
-            this.root.keyMapper.getBinding(KEYMAPPINGS.placementModifiers.lockBeltDirection).pressed
+            metaBuilding && metaBuilding.getHasDirectionLockAvailable(this.currentVariant.get()) //&&
+            //this.root.keyMapper.getBinding(KEYMAPPINGS.placementModifiers.lockBeltDirection).pressed
         );
     }
 
