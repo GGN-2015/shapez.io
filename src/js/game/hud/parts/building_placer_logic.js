@@ -422,12 +422,12 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
      * @param {any} args
      */
     checkForDirectionLockSwitch({ keyCode }) {
-        if (
-            keyCode ===
-            this.root.keyMapper.getBinding(KEYMAPPINGS.placementModifiers.lockBeltDirection).keyCode
-        ) {
-            this.abortDragging();
-        }
+        // if (
+        //     keyCode ===
+        //     this.root.keyMapper.getBinding(KEYMAPPINGS.placementModifiers.lockBeltDirection).keyCode
+        // ) {
+        //     this.abortDragging();
+        // }
     }
 
     /**
