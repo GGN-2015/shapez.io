@@ -272,11 +272,11 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
         }
 
         // Make sure we have nothing selected while in overview mode
-        if (this.root.camera.getIsMapOverlayActive()) {
-            if (this.currentMetaBuilding.get()) {
-                this.currentMetaBuilding.set(null);
-            }
-        }
+        // if (this.root.camera.getIsMapOverlayActive()) {
+        //     if (this.currentMetaBuilding.get()) {
+        //         this.currentMetaBuilding.set(null);
+        //     }
+        // }
     }
 
     /**
