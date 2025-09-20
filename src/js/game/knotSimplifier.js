@@ -279,10 +279,7 @@ export class KnotSimplifier {
             if (nextGreen.components.StaticMapEntity.code === 27) {
                 // 通常绿线
                 nextGreen.components.StaticMapEntity.rotation = outRot;
-                if (
-                    !this.root.map.checkNeighborsNull(nextGreen, "wires") ||
-                    !this.root.map.checkNeighborsNull(nextGreen, "regular")
-                ) {
+                if (!this.root.map.checkNeighborsNull(nextGreen, "wires")) {
                     this.root.hud.signals.notification.dispatch(
                         "绿线 lines 过密",
                         enumNotificationType.error
@@ -316,6 +313,12 @@ export class KnotSimplifier {
                         );
                         return false;
                     }
+                } else if (!this.root.map.checkNeighborsNull(nextGreen, "regular")) {
+                    this.root.hud.signals.notification.dispatch(
+                        "绿线 lines 距离扭结过近",
+                        enumNotificationType.error
+                    );
+                    return false;
                 }
 
                 if (!this.root.map.checkNeighborsNull(nextGreen, "regular")) {

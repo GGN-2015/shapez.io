@@ -300,7 +300,7 @@ gulp.task(
     gulp.series(
         "utils.cleanBuildOutputFolder",
         "bundle.standalone-steam.from-windows",
-        "bundle.standalone-steam-china.from-windows"
+        //"bundle.standalone-steam-china.from-windows"
     )
 );
 gulp.task(

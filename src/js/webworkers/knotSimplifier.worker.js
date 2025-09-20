@@ -227,7 +227,7 @@ function do_check(red_path, green_path, direction) {
             }
             let nStrand = cross_strand.next();
             nStrand.crosType = cross_strand.crosType;
-            //console.log(nStrand.node.origin);
+            console.log(nStrand.node.origin);
             r = get_strand_from_array(check_result_crossings, nStrand);
             if (!r) {
                 nStrand.crosType = cross_strand.crosType;
