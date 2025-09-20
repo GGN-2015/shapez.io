@@ -3,7 +3,13 @@ import { Strand } from "../game/knotUtils";
 import { Vector } from "../core/vector";
 
 let greenNodes;
+
+/** @type {Node[]} */
 let knotNodes;
+/** @type {Node[]} */
+let keyNodes;
+/** @type {{strand: Strand, next: Strand, opposite: Strand}[]} */
+let keyRelations;
 let redBlackSameDirection;
 let seperators;
 
@@ -24,18 +30,21 @@ self.addEventListener("message", e => {
         check_result_array = [];
         knotNodes = [];
         // @ts-ignore
-        // knotNodes = e.data.nodes;
-        for (let node of e.data.nodes) {
-            // 为了让 node 有 .origin.equals 方法, 每个重新复制一遍
-            let n = new Node(node.origin);
-            n.color = node.color;
-            n.crosType = node.crosType;
-            n.isCorner = node.isCorner;
-            n.isCrossing = node.isCrossing;
-            n.outRotation = node.outRotation;
-            knotNodes.push(n);
-        }
+        knotNodes = e.data.nodes;
+        // for (let node of e.data.nodes) {
+        //     // 为了让 node 有 .origin.equals 方法, 每个重新复制一遍
+        //     let n = new Node(node.origin);
+        //     n.color = node.color;
+        //     n.crosType = node.crosType;
+        //     n.isCorner = node.isCorner;
+        //     n.isCrossing = node.isCrossing;
+        //     n.outRotation = node.outRotation;
+        //     knotNodes.push(n);
+        // }
         console.log("knotSimplifier.worker start!");
+
+        trimKnot();
+
         console.log("============================== check left =================================");
         checkGreenLineDirection(red_path_array, "left");
         console.log("============================= check right =================================");
@@ -45,6 +54,86 @@ self.addEventListener("message", e => {
     }
 });
 
+/**
+ *
+ * @param {Node} node
+ * @param {Node[]} arr
+ * @returns {boolean}
+ */
+function isNodeInArray(node, arr) {
+    for (let n of arr) {
+        if (n.origin.x === node.origin.x && n.origin.y === node.origin.y) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function trimKnot() {
+    console.log("trimKnot start");
+    keyNodes = [];
+    keyRelations = [];
+
+    for (let node of knotNodes) {
+        // 只保留: 1. 交点; 2, 绿色交点下方; 3, seprator
+        if (
+            node.crosType !== "" ||
+            isNodeInArray(node, greenNodes) ||
+            (node.origin.x === seperators[0].x && node.origin.y === seperators[0].y) ||
+            (node.origin.x === seperators[1].x && node.origin.y === seperators[1].y)
+        ) {
+            keyNodes.push(node);
+        }
+    }
+
+    for (let key of keyNodes) {
+        let initStrand = new Strand(knotNodes, key, key.outRotation, key.crosType);
+        let outStrand = initStrand;
+        for (;;) {
+            outStrand = outStrand.next();
+            if (isNodeInArray(outStrand.node, keyNodes)) {
+                break;
+            }
+        }
+        keyRelations.push({ strand: initStrand, next: outStrand, opposite: outStrand.opposite().next() });
+        let reverseStrand = initStrand.opposite().next();
+        outStrand = reverseStrand;
+        for (;;) {
+            outStrand = outStrand.next();
+            if (isNodeInArray(outStrand.node, keyNodes)) {
+                break;
+            }
+        }
+        keyRelations.push({ strand: reverseStrand, next: outStrand, opposite: outStrand.opposite().next() });
+    }
+    for (let r of keyRelations) {
+        console.log(
+            "(" +
+                r.strand.node.origin.x +
+                "," +
+                r.strand.node.origin.y +
+                "," +
+                r.strand.rot +
+                ")" +
+                " | " +
+                "(" +
+                r.next.node.origin.x +
+                "," +
+                r.next.node.origin.y +
+                "," +
+                r.next.rot +
+                ")" +
+                " | " +
+                "(" +
+                r.opposite.node.origin.x +
+                "," +
+                r.opposite.node.origin.y +
+                "," +
+                r.opposite.rot +
+                ")"
+        );
+    }
+}
 /**
  *
  * @param {Strand[]} check_result_crossings
@@ -59,6 +148,42 @@ function get_strand_from_array(check_result_crossings, strand) {
             s.rot === strand.rot
         ) {
             return s;
+        }
+    }
+    return null;
+}
+
+/**
+ *
+ * @param {Strand} strand
+ * @returns {Strand}
+ */
+function keyStrandOpposite(strand) {
+    for (let o of keyRelations) {
+        if (
+            o.strand.node.origin.x === strand.node.origin.x &&
+            o.strand.node.origin.y === strand.node.origin.y &&
+            o.strand.rot === strand.rot
+        ) {
+            return o.opposite;
+        }
+    }
+    return null;
+}
+
+/**
+ *
+ * @param {Strand} strand
+ * @returns {Strand}
+ */
+function keyStrandNext(strand) {
+    for (let o of keyRelations) {
+        if (
+            o.strand.node.origin.x === strand.node.origin.x &&
+            o.strand.node.origin.y === strand.node.origin.y &&
+            o.strand.rot === strand.rot
+        ) {
+            return o.next;
         }
     }
     return null;
@@ -131,7 +256,7 @@ function do_check(red_path, green_path, direction) {
         self.postMessage({ type: "update", str: "already: " + nnnn + ", left: " + to_check_set.length });
         nnnn++;
         for (;;) {
-            let r = get_strand_from_array(check_result_crossings, cross_strand.opposite());
+            let r = get_strand_from_array(check_result_crossings, keyStrandOpposite(cross_strand));
             if (r && r.crosType !== "" && r.crosType !== cross_strand.crosType) {
                 good_path = false;
                 break;
@@ -141,12 +266,12 @@ function do_check(red_path, green_path, direction) {
                 r.crosType = cross_strand.crosType;
                 break;
             }
-            r = cross_strand.opposite();
+            r = keyStrandOpposite(cross_strand);
             r.crosType = cross_strand.crosType;
             if (!get_strand_from_array(check_result_crossings, r)) {
                 check_result_crossings.push(r);
             }
-            r = get_strand_from_array(to_check_set, cross_strand.opposite());
+            r = get_strand_from_array(to_check_set, keyStrandOpposite(cross_strand));
             if (r) {
                 to_check_set.splice(to_check_set.indexOf(r), 1);
             }
@@ -154,8 +279,8 @@ function do_check(red_path, green_path, direction) {
             let b = false;
             for (let c of red_boundary_crossings) {
                 if (
-                    c.origin.x === cross_strand.opposite().node.origin.x &&
-                    c.origin.y === cross_strand.opposite().node.origin.y
+                    c.origin.x === keyStrandOpposite(cross_strand).node.origin.x &&
+                    c.origin.y === keyStrandOpposite(cross_strand).node.origin.y
                 ) {
                     b = true;
                     if (c.crosType !== cross_strand.crosType) {
@@ -168,16 +293,15 @@ function do_check(red_path, green_path, direction) {
                 break;
             }
 
+            let kkk = keyStrandOpposite(cross_strand);
             if (
-                (cross_strand.opposite().node.origin.x === seperators[0].x &&
-                    cross_strand.opposite().node.origin.y === seperators[0].y) ||
-                (cross_strand.opposite().node.origin.x === seperators[1].x &&
-                    cross_strand.opposite().node.origin.y === seperators[1].y)
+                (kkk.node.origin.x === seperators[0].x && kkk.node.origin.y === seperators[0].y) ||
+                (kkk.node.origin.x === seperators[1].x && kkk.node.origin.y === seperators[1].y)
             ) {
                 break;
             }
 
-            let oppo = cross_strand.opposite();
+            let oppo = keyStrandOpposite(cross_strand);
             oppo.crosType = cross_strand.crosType;
             if (oppo.node.isCrossing) {
                 // 下一个是内部交点
@@ -225,7 +349,7 @@ function do_check(red_path, green_path, direction) {
                     }
                 }
             }
-            let nStrand = cross_strand.next();
+            let nStrand = keyStrandNext(cross_strand);
             nStrand.crosType = cross_strand.crosType;
             console.log(nStrand.node.origin);
             r = get_strand_from_array(check_result_crossings, nStrand);
