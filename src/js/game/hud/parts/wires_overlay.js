@@ -78,7 +78,7 @@ export class HUDWiresOverlay extends BaseHUDPart {
         if (!this.root.gameMode.getSupportsWires()) {
             return;
         }
-        if (this.root.isPlayMode) {
+        if (this.root.hubGoals.level < 13 && this.root.currentLayer === "wires") {
             this.root.hud.signals.notification.dispatch("化简模式禁止切换图层", enumNotificationType.error);
             return;
         }
