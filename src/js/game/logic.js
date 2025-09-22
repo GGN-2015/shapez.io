@@ -805,10 +805,12 @@ export class GameLogic {
 
         const serializer = new SavegameSerializer();
         const savegame = JSON.parse(LZString.decompressFromBase64(stages[i].toString()));
+
         this.root.entityMgr.deserialize(savegame.entityMgr);
         this.root.camera.deserialize(savegame.camera);
         this.root.map.deserialize(savegame.map);
         serializer.internal.deserializeEntityArray(this.root, savegame.entities);
+        this.root.systemMgr.systems.belt.deserializePaths(savegame.beltPaths);
 
         // console.log(LZString.compressToBase64(JSON.stringify(savegame.getCurrentDump())));
         // console.log(JSON.parse(LZString.decompressFromBase64(stage1.toString())));
