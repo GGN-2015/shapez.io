@@ -1,9 +1,10 @@
-import { globalConfig } from "../core/config";
+import { globalConfig, THIRDPARTY_URLS } from "../core/config";
 import { gMetaBuildingRegistry } from "../core/global_registries";
 import { createLogger } from "../core/logging";
 import { STOP_PROPAGATION } from "../core/signal";
 import { round2Digits } from "../core/utils";
 import { enumDirection, enumDirectionToVector, enumInvertedDirections, Vector } from "../core/vector";
+import { SavegameSerializer } from "../savegame/savegame_serializer";
 import { MetaBeltBuilding } from "./buildings/belt";
 import { getBuildingDataFromCode } from "./building_codes";
 import { Component } from "./component";
@@ -15,8 +16,9 @@ import { MetaBuilding } from "./meta_building";
 import { GameRoot } from "./root";
 import { BeltSystem } from "./systems/belt";
 import { WireNetwork } from "./systems/wire";
-
+const LZString = require("lz-string");
 const logger = createLogger("ingame/logic");
+import { stages } from "./stages";
 
 /**
  * Typing helper
@@ -775,6 +777,51 @@ export class GameLogic {
             return false;
         }
         return false;
+    }
+
+    loadState(i) {
+        this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
+        if (i >= stages.length) {
+            return;
+        }
+        //////////
+        let toDel = [];
+        for (let ent of this.root.entityMgr.entities) {
+            toDel.push(ent);
+        }
+
+        for (let de of toDel) {
+            this.root.logic.tryDeleteBuilding(de);
+        }
+        ///////////
+        // const savegame = this.root.app.savegameMgr.getSavegameById(
+        //     "c9e2a07e617b1b45369923eb927138f61c061bcf"
+        // );
+        // savegame
+        //     .readAsync()
+        //     //.then(() => this.checkForModDifferences(savegame))
+        //     .then(() => {
+        //this.root.savegame = savegame;
+
+        const serializer = new SavegameSerializer();
+        const savegame = JSON.parse(LZString.decompressFromBase64(stages[i].toString()));
+        this.root.entityMgr.deserialize(savegame.entityMgr);
+        this.root.camera.deserialize(savegame.camera);
+        this.root.map.deserialize(savegame.map);
+        serializer.internal.deserializeEntityArray(this.root, savegame.entities);
+
+        // console.log(LZString.compressToBase64(JSON.stringify(savegame.getCurrentDump())));
+        // console.log(JSON.parse(LZString.decompressFromBase64(stage1.toString())));
+        //console.log(LZString.decompressFromBase64(stages.toString()));
+        //console.log(stage1);
+        this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
+        if (this.root.hud.parts["wiresOverlay"].initKnot(this.root)) {
+            //this.root.isPlayMode = true;
+            this.root.currentLayer = "wires";
+            this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
+            this.root.systemMgr.systems.wire.bUpdateSuround = true;
+        }
+        // });
     }
 
     /**

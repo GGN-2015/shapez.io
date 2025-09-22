@@ -924,7 +924,6 @@ export class MainMenuState extends GameState {
         this.app.adProvider.showVideoAd().then(() => {
             this.app.gameAnalytics.noteMinor("menu.play");
             const savegame = this.app.savegameMgr.createNewSavegame();
-
             this.moveToState("InGameState", {
                 savegame,
             });

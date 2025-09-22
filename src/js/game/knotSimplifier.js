@@ -843,6 +843,9 @@ export class KnotSimplifier {
                 enumNotificationType.success
             );
             this.root.systemMgr.systems.wire.bUpdateSuround = true;
+            if (!this.root.knot.crossings.length) {
+                this.root.hubGoals.onGoalCompleted();
+            }
             return;
         } else {
             this.root.hud.signals.notification.dispatch("请先选择合适红绿线位置", enumNotificationType.error);

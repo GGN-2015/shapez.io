@@ -661,20 +661,17 @@ buildings:
 storyRewards:
     reward_cutter_and_trash:
         title: 切割图形
-        desc: 恭喜！您解锁了<strong>切割机</strong>，不管如何放置，它只会从上到下切开<strong>图形</strong>！
-            <br>注意一定要用处理掉切割后废弃的<strong>图形</strong>，不然它会<strong>阻塞</strong>传送带，
-            <br>使用<strong>垃圾桶</strong>，它会清除所有放进去的图形！
+        desc: 恭喜！您解开了第一个扭结.
     reward_rotater:
         title: 旋转
-        desc: 恭喜！您解锁了<strong>旋转机</strong>。它会顺时针将输入的<strong>图形旋转90度</strong>。
+        desc: 配合增距和减距工具, 可以使布线更从容.
     reward_painter:
         title: 上色
         desc:
-            恭喜！您解锁了<strong>上色器</strong>。开采一些颜色（就像您开采图形一样），将其在上色器中与图形结合来将图形上色！
-            <br>注意：如果您不幸患有色盲，可以在设置中启用<strong>色盲模式</strong>
+            保持耐心, 如果没有观察到化简位置, 先整理形状也是不错的选择.
     reward_mixer:
         title: 混合颜色
-        desc: 恭喜！您解锁了<strong>混色器</strong>。它使用<strong>叠加混色法</strong>将两种颜色混合起来。
+        desc: 请继续!
     reward_stacker:
         title: 堆叠
         desc: 恭喜！您解锁了<strong>堆叠机</strong>。它会将将输入的<strong>图形</strong>在同一层内组合在一起。
@@ -684,7 +681,7 @@ storyRewards:
         desc: 您已经解锁了<strong>平衡器</strong>的变体<strong>分离器</strong>，它会把输入的东西一分为二！
     reward_tunnel:
         title: 隧道
-        desc: 恭喜！您解锁了<strong>隧道</strong>。它可放置在<strong>传送带</strong>或<strong>设施</strong>下方以运送物品。
+        desc: 下面将尝试化简一些更多交点数的扭结.
     reward_rotater_ccw:
         title: 逆时针旋转
         desc:
@@ -728,7 +725,7 @@ storyRewards:
         desc: 恭喜您！
     reward_balancer:
         title: 平衡器
-        desc: 恭喜！您解锁了多功能<strong>平衡器</strong>，它能够<strong>分割和合并</strong>多个传送带的资源，可以用来建造更大的工厂！
+        desc: 发现那些平凡的位置, 总是优先去化简它们.
     reward_merger:
         title: 合并器（小型）
         desc: 恭喜！您解锁了<strong>平衡器</strong>的变体<strong>合并器</strong>，它能合并两个输入到同一个传送带上！

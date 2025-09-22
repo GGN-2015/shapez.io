@@ -30,7 +30,7 @@ const WEB_DEMO_LEVELS = app => {
         {
             shape: "----CuCu", //
             required: 20,
-            reward: enumHubGoalRewards.no_reward,
+            reward: enumHubGoalRewards.reward_balancer,
         },
 
         // 3
@@ -38,14 +38,14 @@ const WEB_DEMO_LEVELS = app => {
         {
             shape: "RuRuRuRu", // miners t1
             required: 30,
-            reward: enumHubGoalRewards.reward_balancer,
+            reward: enumHubGoalRewards.reward_rotater,
         },
 
         // 4
         {
             shape: "RuRu----", // processors t2
             required: 30,
-            reward: enumHubGoalRewards.reward_rotater,
+            reward: enumHubGoalRewards.reward_tunnel,
         },
 
         // 5
@@ -53,7 +53,7 @@ const WEB_DEMO_LEVELS = app => {
         {
             shape: "Cu----Cu", // belts t2
             required: 75,
-            reward: enumHubGoalRewards.reward_tunnel,
+            reward: enumHubGoalRewards.reward_painter,
         },
 
         // 6
@@ -61,17 +61,32 @@ const WEB_DEMO_LEVELS = app => {
         {
             shape: "Cu------", // miners t2
             required: 50,
-            reward: enumHubGoalRewards.reward_painter,
+            reward: enumHubGoalRewards.reward_rotater_ccw,
         },
 
         // 7
         {
             shape: "CrCrCrCr", // unused
             required: 85,
-            reward: enumHubGoalRewards.reward_rotater_ccw,
+            reward: enumHubGoalRewards.reward_mixer,
         },
 
         // 8
+        {
+            shape: "RbRb----", // painter t2
+            required: 100,
+            reward: enumHubGoalRewards.reward_mixer,
+        },
+        {
+            shape: "RbRb----", // painter t2
+            required: 100,
+            reward: enumHubGoalRewards.reward_mixer,
+        },
+        {
+            shape: "RbRb----", // painter t2
+            required: 100,
+            reward: enumHubGoalRewards.reward_mixer,
+        },
         {
             shape: "RbRb----", // painter t2
             required: 100,

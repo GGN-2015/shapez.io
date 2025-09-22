@@ -110,18 +110,18 @@ export class HubGoals extends BasicSerializableObject {
         this.computeNextGoal();
 
         // Allow quickly switching goals in dev mode
-        // if (G_IS_DEV) {
-        //     window.addEventListener("keydown", ev => {
-        //         if (ev.key === "p") {
-        //             // root is not guaranteed to exist within ~0.5s after loading in
-        //             if (this.root && this.root.app && this.root.app.gameAnalytics) {
-        //                 if (!this.isEndOfDemoReached()) {
-        //                     this.onGoalCompleted();
-        //                 }
-        //             }
-        //         }
-        //     });
-        // }
+        if (G_IS_DEV) {
+            window.addEventListener("keydown", ev => {
+                if (ev.key === "h") {
+                    // root is not guaranteed to exist within ~0.5s after loading in
+                    if (this.root && this.root.app && this.root.app.gameAnalytics) {
+                        if (!this.isEndOfDemoReached()) {
+                            this.onGoalCompleted();
+                        }
+                    }
+                }
+            });
+        }
     }
 
     /**
@@ -274,7 +274,7 @@ export class HubGoals extends BasicSerializableObject {
         ++this.level;
         this.computeNextGoal();
 
-        //this.root.signals.storyGoalCompleted.dispatch(this.level - 1, reward);
+        this.root.signals.storyGoalCompleted.dispatch(this.level - 1, reward);
     }
 
     /**

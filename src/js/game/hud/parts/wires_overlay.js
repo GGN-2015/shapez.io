@@ -90,7 +90,7 @@ export class HUDWiresOverlay extends BaseHUDPart {
                 // 防止 knot.rebuild 过程中自适应
                 this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
                 if (this.initKnot(this.root)) {
-                    this.root.isPlayMode = true;
+                    //this.root.isPlayMode = true;
                     this.root.currentLayer = "wires";
                     this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
                     this.root.systemMgr.systems.wire.bUpdateSuround = true;
