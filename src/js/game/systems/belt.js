@@ -98,13 +98,14 @@ export class BeltSystem extends GameSystem {
             this.beltPaths.push(path);
         }
 
-        if (this.beltPaths.length === 0) {
-            // Old savegames might not have paths yet
-            logger.warn("Recomputing belt paths (most likely the savegame is old or empty)");
-            this.recomputeAllBeltPaths();
-        } else {
-            logger.warn("Restored", this.beltPaths.length, "belt paths");
-        }
+        this.recomputeAllBeltPaths();
+        // if (this.beltPaths.length === 0) {
+        //     // Old savegames might not have paths yet
+        //     logger.warn("Recomputing belt paths (most likely the savegame is old or empty)");
+        //     this.recomputeAllBeltPaths();
+        // } else {
+        //     logger.warn("Restored", this.beltPaths.length, "belt paths");
+        // }
 
         if (G_IS_DEV && globalConfig.debug.checkBeltPaths) {
             this.debug_verifyBeltPaths();
