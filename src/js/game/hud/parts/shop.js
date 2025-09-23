@@ -228,12 +228,12 @@ export class HUDShop extends BaseHUDPart {
     }
 
     show() {
-        if (this.root.knot) {
+        if (this.root.knot && this.root.currentLayer === "wires") {
             //console.log("pd code: " + this.root.knot.getPDcode());
             this.root.knot.getPDcode();
             //this.root.hud.signals.notification.dispatch("PD code 已复制", enumNotificationType.success);
         } else {
-            this.root.hud.signals.notification.dispatch("未构建扭结", enumNotificationType.error);
+            this.root.hud.signals.notification.dispatch("请先构建扭结", enumNotificationType.error);
         }
         return;
         this.visible = true;

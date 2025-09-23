@@ -288,7 +288,7 @@ export class Knot {
                 const dialog = new DialogWithForm({
                     app: this.root.app,
                     title: "PD code",
-                    desc: fillInLinkIntoTranslation("", THIRDPARTY_URLS.shapeViewer),
+                    desc: fillInLinkIntoTranslation("按 ctrl + C 复制", THIRDPARTY_URLS.shapeViewer),
                     formElements: [markerNameInput],
                     buttons: ["ok:good"],
                 });

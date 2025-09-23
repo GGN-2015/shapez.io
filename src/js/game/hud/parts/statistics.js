@@ -6,6 +6,7 @@ import { BaseHUDPart } from "../base_hud_part";
 import { DynamicDomAttach } from "../dynamic_dom_attach";
 import { enumDisplayMode, HUDShapeStatisticsHandle, statisticsUnitsSeconds } from "./statistics_handle";
 import { T } from "../../../translations";
+import { enumNotificationType } from "./notifications";
 
 /**
  * Capitalizes the first letter
@@ -156,6 +157,14 @@ export class HUDStatistics extends BaseHUDPart {
     }
 
     show() {
+        if (this.root.knot && this.root.currentLayer === "wires") {
+            //console.log("pd code: " + this.root.knot.getPDcode());
+            this.root.knot.getPDcode();
+            //this.root.hud.signals.notification.dispatch("PD code 已复制", enumNotificationType.success);
+        } else {
+            this.root.hud.signals.notification.dispatch("请先构建扭结", enumNotificationType.error);
+        }
+        return;
         this.visible = true;
         this.root.app.inputMgr.makeSureAttachedAndOnTop(this.inputReciever);
         this.rerenderFull();
