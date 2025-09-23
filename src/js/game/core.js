@@ -190,7 +190,11 @@ export class GameCore {
         // this.root.map.placeStaticEntity(hub);
         // this.root.entityMgr.registerEntity(hub);
         this.root.camera.center = new Vector(-5, 2).multiplyScalar(globalConfig.tileSize);
-        this.root.logic.loadState(0);
+        if (!this.app.bEditMode) {
+            this.root.logic.loadState(0);
+        } else {
+            this.root.hubGoals.level = 13;
+        }
     }
 
     /**

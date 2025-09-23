@@ -124,10 +124,11 @@ export class MainMenuState extends GameState {
                 ${showExitAppButton ? `<button class="exitAppButton" aria-label="Exit App"></button>` : ""}
             </div>
 
-
+            <!--
             <video autoplay muted loop class="fullscreenBackgroundVideo">
                 <source src="${cachebust("res/bg_render.webm")}" type="video/webm">
             </video>
+            -->
 
             <div class="logo">
                 <img src="${cachebust("res/" + getLogoSprite())}" alt="shapez.io Logo"
@@ -141,6 +142,7 @@ export class MainMenuState extends GameState {
                 <div class="mainContainer">
                     <div class="buttons"></div>
                     <div class="savegamesMount"></div>
+                    <!--
                     ${
                         hasSteamBridge && (G_IS_STANDALONE || !WEB_STEAM_SSO_AUTHENTICATED)
                             ? `<div class="steamSso">
@@ -166,11 +168,13 @@ export class MainMenuState extends GameState {
                         `
                             : ""
                     }
+                    -->
 
 
 
                 </div>
 
+                <!--
                 <div class="sideContainer">
                     ${showDemoAdvertisement ? `<div class="standaloneBanner">${bannerHtml}</div>` : ""}
 
@@ -246,6 +250,7 @@ export class MainMenuState extends GameState {
                 }
 
                 </div>
+                -->
 
 
             </div>
@@ -268,6 +273,7 @@ export class MainMenuState extends GameState {
 
                 <div class="footer ${showExternalLinks ? "" : "noLinks"} ">
 
+                    <!-- 
                     <div class="socialLinks">
                     ${
                         showExternalLinks && !G_IS_STEAM_DEMO
@@ -328,13 +334,17 @@ export class MainMenuState extends GameState {
 
 
                     </div>
+                    -->
 
+                    <!--
                     <div class="footerGrow">
                         ${showExternalLinks ? `<a class="changelog">${T.changelog.title}</a>` : ""}
-
+                        
                         ${showExternalLinks ? `<a class="helpTranslate">${T.mainMenu.helpTranslate}</a>` : ""}
 
                     </div>
+                    -->
+                    <!--
                         <div class="author"><a class="producerLink" href="https://tobspr.io" target="_blank" title="tobspr Games" rel="follow">
                         <img src="${cachebust("res/logo-tobspr-games.svg")}" alt="tobspr Games"
                         height="${25 * 0.8 * this.app.getEffectiveUiScale()}"
@@ -342,6 +352,7 @@ export class MainMenuState extends GameState {
                         >
 
                     </a></div>
+                    -->
 
                 </div>
 
@@ -452,13 +463,13 @@ export class MainMenuState extends GameState {
         }
 
         // Initialize video
-        this.videoElement = this.htmlElement.querySelector("video");
-        this.videoElement.playbackRate = 0.9;
-        this.videoElement.addEventListener("canplay", () => {
-            if (this.videoElement) {
-                this.videoElement.classList.add("loaded");
-            }
-        });
+        // this.videoElement = this.htmlElement.querySelector("video");
+        // this.videoElement.playbackRate = 0.9;
+        // this.videoElement.addEventListener("canplay", () => {
+        //     if (this.videoElement) {
+        //         this.videoElement.classList.add("loaded");
+        //     }
+        // });
 
         const clickHandling = {
             ".settingsButton": this.onSettingsButtonClicked,
@@ -911,7 +922,7 @@ export class MainMenuState extends GameState {
         );
     }
 
-    onPlayButtonClicked() {
+    onPlayButtonClickedEbd() {
         if (
             this.app.savegameMgr.getSavegamesMetaData().length > 0 &&
             !this.app.restrictionMgr.getHasUnlimitedSavegames()
@@ -929,6 +940,10 @@ export class MainMenuState extends GameState {
             });
         });
     }
+    onPlayButtonClicked() {
+        this.app.bEditMode = false;
+        this.onPlayButtonClickedEbd();
+    }
 
     onWegameRatingClicked() {
         this.dialogs.showInfo(
@@ -942,11 +957,13 @@ export class MainMenuState extends GameState {
         );
     }
 
-    onModsClicked() {
-        this.app.gameAnalytics.noteMinor("menu.mods");
-        this.moveToState("ModsState", {
-            backToStateId: "MainMenuState",
-        });
+    onModsClicked(origin) {
+        // this.app.gameAnalytics.noteMinor("menu.mods");
+        // this.moveToState("ModsState", {
+        //     backToStateId: "MainMenuState",
+        // });
+        this.app.bEditMode = true;
+        this.onPlayButtonClickedEbd();
     }
 
     onContinueButtonClicked() {

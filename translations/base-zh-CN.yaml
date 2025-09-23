@@ -1147,7 +1147,7 @@ backendErrors:
     too-many-likes-already: 您的谜题已经得到了许多玩家的赞赏。如果您仍然希望删除它，请联系 support@shapez.io！
     no-permission: 您没有执行此操作的权限。
 mods:
-    title: 游戏模组（Mods）
+    title: 编辑模式
     author: 作者
     version: 版本
     openFolder: 打开游戏模组（Mods）文件夹

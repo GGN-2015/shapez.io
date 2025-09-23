@@ -85,6 +85,8 @@ export class Application {
 
         this.unloaded = false;
 
+        this.bEditMode = false;
+
         // Global stuff
         this.settings = new ApplicationSettings(this);
         this.ticker = new AnimationFrame();
