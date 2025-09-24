@@ -221,12 +221,12 @@ export class HUDKeybindingOverlay extends BaseHUDPart {
                 condition: () => !this.blueprintPlacementActive && this.lastBlueprintAvailable,
             },
 
-            {
-                // Belt planner
-                label: T.ingame.keybindingsOverlay.lockBeltDirection,
-                keys: [k.placementModifiers.lockBeltDirection],
-                condition: () => this.buildingPlacementSupportsBeltPlanner && !this.beltPlannerActive,
-            },
+            // {
+            //     // Belt planner
+            //     label: T.ingame.keybindingsOverlay.lockBeltDirection,
+            //     keys: [k.placementModifiers.lockBeltDirection],
+            //     condition: () => this.buildingPlacementSupportsBeltPlanner && !this.beltPlannerActive,
+            // },
 
             {
                 // [SELECTION] Destroy

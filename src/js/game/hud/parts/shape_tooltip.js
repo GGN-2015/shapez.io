@@ -29,9 +29,9 @@ export class HUDShapeTooltip extends BaseHUDPart {
     isActive() {
         const hudParts = this.root.hud.parts;
 
-        const active =
-            this.root.app.settings.getSetting("shapeTooltipAlwaysOn") ||
-            this.root.keyMapper.getBinding(KEYMAPPINGS.ingame.showShapeTooltip).pressed;
+        const active = false;
+        // this.root.app.settings.getSetting("shapeTooltipAlwaysOn") ||
+        // this.root.keyMapper.getBinding(KEYMAPPINGS.ingame.showShapeTooltip).pressed;
 
         // return false if any other placer is active
         return (

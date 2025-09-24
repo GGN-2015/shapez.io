@@ -767,7 +767,7 @@ storyRewards:
             您也可以输入开关值（1 / 0）信号来激活或者禁用它。
     reward_demo_end:
         title: 试玩结束
-        desc: 恭喜！您已经通关了试玩版本！<br>更多挑战，请至 Steam 商城购买完整版！谢谢支持！
+        desc: 恭喜！您已经通关了试玩版本！
 settings:
     title: 设置
     categories:
@@ -936,9 +936,9 @@ keybindings:
         menuOpenStats: 统计菜单
         toggleHud: 开关 HUD
         toggleFPSInfo: 开关帧数与调试信息
-        belt: 传送带
+        belt: 编辑路径
         underground_belt: 隧道
-        miner: 开采器
+        miner: 定向整理
         cutter: 切割机
         rotater: 旋转机
         stacker: 堆叠机
@@ -965,16 +965,16 @@ keybindings:
         pipette: 吸取器
         menuClose: 关闭菜单
         switchLayers: 切换层
-        wire: 电线
+        wire: 绿线
         balancer: 平衡器
         storage: 存储器
         constant_signal: 恒定信号
         logic_gate: 逻辑门
         lever: 控制杆
         filter: 过滤器
-        wire_tunnel: 电线隧道
-        display: 显示器
-        reader: 传送带读取器
+        wire_tunnel: 分割器
+        display: 减距
+        reader: 增距
         virtual_processor: 模拟处理器
         transistor: 晶体管
         analyzer: 图形分析器

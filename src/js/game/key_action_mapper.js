@@ -68,7 +68,7 @@ export const KEYMAPPINGS = {
 
         switchLayers: { keyCode: keyToKeyCode("E") },
 
-        showShapeTooltip: { keyCode: KEYCODES.Alt },
+        //showShapeTooltip: { keyCode: KEYCODES.Alt },
     },
 
     navigation: {
@@ -81,46 +81,46 @@ export const KEYMAPPINGS = {
         centerMap: { keyCode: KEYCODES.Space },
         mapZoomIn: { keyCode: KEYCODES.Plus, repeated: true },
         mapZoomOut: { keyCode: KEYCODES.Minus, repeated: true },
-        createMarker: { keyCode: keyToKeyCode("M") },
+        //createMarker: { keyCode: keyToKeyCode("M") },
     },
 
     buildings: {
         // Puzzle buildings
-        constant_producer: { keyCode: keyToKeyCode("H") },
-        goal_acceptor: { keyCode: keyToKeyCode("N") },
-        block: { keyCode: keyToKeyCode("4") },
+        //constant_producer: { keyCode: keyToKeyCode("H") },
+        //goal_acceptor: { keyCode: keyToKeyCode("N") },
+        //block: { keyCode: keyToKeyCode("4") },
 
         // Primary Toolbar
         belt: { keyCode: keyToKeyCode("1") },
-        balancer: { keyCode: keyToKeyCode("2") },
-        underground_belt: { keyCode: keyToKeyCode("3") },
+        //balancer: { keyCode: keyToKeyCode("2") },
+        //underground_belt: { keyCode: keyToKeyCode("3") },
         miner: { keyCode: keyToKeyCode("4") },
-        cutter: { keyCode: keyToKeyCode("5") },
-        rotater: { keyCode: keyToKeyCode("6") },
-        stacker: { keyCode: keyToKeyCode("7") },
-        mixer: { keyCode: keyToKeyCode("8") },
-        painter: { keyCode: keyToKeyCode("9") },
-        trash: { keyCode: keyToKeyCode("0") },
+        //cutter: { keyCode: keyToKeyCode("5") },
+        //rotater: { keyCode: keyToKeyCode("6") },
+        //stacker: { keyCode: keyToKeyCode("7") },
+        //mixer: { keyCode: keyToKeyCode("8") },
+        //painter: { keyCode: keyToKeyCode("9") },
+        //trash: { keyCode: keyToKeyCode("0") },
 
         // Sandbox
-        item_producer: { keyCode: keyToKeyCode("L") },
+        //item_producer: { keyCode: keyToKeyCode("L") },
 
         // Secondary toolbar
-        storage: { keyCode: keyToKeyCode("Y") },
+        //storage: { keyCode: keyToKeyCode("Y") },
         reader: { keyCode: keyToKeyCode("U") },
-        lever: { keyCode: keyToKeyCode("I") },
-        filter: { keyCode: keyToKeyCode("O") },
+        //lever: { keyCode: keyToKeyCode("I") },
+        //filter: { keyCode: keyToKeyCode("O") },
         display: { keyCode: keyToKeyCode("P") },
 
         // Wires toolbar
         wire: { keyCode: keyToKeyCode("1") },
         wire_tunnel: { keyCode: keyToKeyCode("2") },
-        constant_signal: { keyCode: keyToKeyCode("3") },
-        logic_gate: { keyCode: keyToKeyCode("4") },
-        virtual_processor: { keyCode: keyToKeyCode("5") },
-        analyzer: { keyCode: keyToKeyCode("6") },
-        comparator: { keyCode: keyToKeyCode("7") },
-        transistor: { keyCode: keyToKeyCode("8") },
+        //constant_signal: { keyCode: keyToKeyCode("3") },
+        //logic_gate: { keyCode: keyToKeyCode("4") },
+        //virtual_processor: { keyCode: keyToKeyCode("5") },
+        //analyzer: { keyCode: keyToKeyCode("6") },
+        //comparator: { keyCode: keyToKeyCode("7") },
+        //transistor: { keyCode: keyToKeyCode("8") },
     },
 
     placement: {
@@ -131,11 +131,11 @@ export const KEYMAPPINGS = {
         rotateToDown: { keyCode: KEYCODES.ArrowDown },
         rotateToRight: { keyCode: KEYCODES.ArrowRight },
         rotateToLeft: { keyCode: KEYCODES.ArrowLeft },
-        cycleBuildingVariants: { keyCode: keyToKeyCode("T") },
+        //cycleBuildingVariants: { keyCode: keyToKeyCode("T") },
         cycleBuildings: { keyCode: KEYCODES.Tab },
         switchDirectionLockSide: { keyCode: keyToKeyCode("R") },
 
-        copyWireValue: { keyCode: keyToKeyCode("Z") },
+        //copyWireValue: { keyCode: keyToKeyCode("Z") },
     },
 
     massSelect: {
@@ -148,12 +148,12 @@ export const KEYMAPPINGS = {
         pasteLastBlueprint: { keyCode: keyToKeyCode("V") },
     },
 
-    placementModifiers: {
-        lockBeltDirection: { keyCode: KEYCODES.Shift },
-        placementDisableAutoOrientation: { keyCode: KEYCODES.Ctrl },
-        placeMultiple: { keyCode: KEYCODES.Shift },
-        placeInverse: { keyCode: KEYCODES.Alt },
-    },
+    // placementModifiers: {
+    //     lockBeltDirection: { keyCode: KEYCODES.Shift },
+    //     placementDisableAutoOrientation: { keyCode: KEYCODES.Ctrl },
+    //     placeMultiple: { keyCode: KEYCODES.Shift },
+    //     placeInverse: { keyCode: KEYCODES.Alt },
+    // },
 };
 
 // Assign ids

@@ -123,9 +123,9 @@ export class HUDWaypoints extends BaseHUDPart {
         // Catch mouse and key events
         if (!G_WEGAME_VERSION) {
             this.root.camera.downPreHandler.add(this.onMouseDown, this);
-            this.root.keyMapper
-                .getBinding(KEYMAPPINGS.navigation.createMarker)
-                .add(() => this.requestSaveMarker({}));
+            // this.root.keyMapper
+            //     .getBinding(KEYMAPPINGS.navigation.createMarker)
+            //     .add(() => this.requestSaveMarker({}));
         }
 
         /**

@@ -262,14 +262,14 @@ function initializeSettings() {
         new BoolSetting("alwaysMultiplace", enumCategories.advanced, (app, value) => {}),
         new BoolSetting("zoomToCursor", enumCategories.advanced, (app, value) => {}),
         new BoolSetting("clearCursorOnDeleteWhilePlacing", enumCategories.advanced, (app, value) => {}),
-        new BoolSetting("enableTunnelSmartplace", enumCategories.advanced, (app, value) => {}),
+        //new BoolSetting("enableTunnelSmartplace", enumCategories.advanced, (app, value) => {}),
         new BoolSetting("vignette", enumCategories.userInterface, (app, value) => {}),
         new BoolSetting("compactBuildingInfo", enumCategories.userInterface, (app, value) => {}),
         new BoolSetting("disableCutDeleteWarnings", enumCategories.advanced, (app, value) => {}),
         new BoolSetting("rotationByBuilding", enumCategories.advanced, (app, value) => {}),
         new BoolSetting("displayChunkBorders", enumCategories.advanced, (app, value) => {}),
-        new BoolSetting("pickMinerOnPatch", enumCategories.advanced, (app, value) => {}),
-        new RangeSetting("mapResourcesScale", enumCategories.advanced, () => null),
+        //new BoolSetting("pickMinerOnPatch", enumCategories.advanced, (app, value) => {}),
+        //new RangeSetting("mapResourcesScale", enumCategories.advanced, () => null),
 
         new EnumSetting("refreshRate", {
             options: refreshRateOptions,
@@ -296,22 +296,22 @@ class SettingsStorage {
         this.uiScale = "regular";
         this.fullscreen = false;
 
-        this.soundVolume = 0.0;
-        this.musicVolume = 0.0;
+        this.soundVolume = 0;
+        this.musicVolume = 0;
 
         this.theme = "light";
         this.refreshRate = "60";
         this.scrollWheelSensitivity = "regular";
         this.movementSpeed = "regular";
         this.language = "auto-detect";
-        this.autosaveInterval = "two_minutes";
+        this.autosaveInterval = "disabled";
 
-        this.alwaysMultiplace = false;
+        this.alwaysMultiplace = true;
         this.shapeTooltipAlwaysOn = false;
-        this.offerHints = true;
-        this.enableTunnelSmartplace = true;
+        this.offerHints = false;
+        //this.enableTunnelSmartplace = true;
         this.vignette = true;
-        this.compactBuildingInfo = false;
+        this.compactBuildingInfo = true;
         this.disableCutDeleteWarnings = false;
         this.rotationByBuilding = true;
         this.clearCursorOnDeleteWhilePlacing = true;
@@ -319,12 +319,12 @@ class SettingsStorage {
         this.pickMinerOnPatch = true;
         this.enableMousePan = true;
 
-        this.enableColorBlindHelper = false;
+        this.enableColorBlindHelper = true;
 
         this.lowQualityMapResources = false;
         this.disableTileGrid = false;
         this.lowQualityTextures = false;
-        this.simplifiedBelts = false;
+        this.simplifiedBelts = true;
         this.zoomToCursor = true;
         this.mapResourcesScale = 0.5;
 
@@ -565,10 +565,10 @@ export class ApplicationSettings extends ReadWriteProxy {
             data.version = 6;
         }
 
-        if (data.version < 7) {
-            data.settings.offerHints = true;
-            data.version = 7;
-        }
+        // if (data.version < 7) {
+        //     data.settings.offerHints = true;
+        //     data.version = 7;
+        // }
 
         if (data.version < 8) {
             data.settings.scrollWheelSensitivity = "regular";
@@ -585,10 +585,10 @@ export class ApplicationSettings extends ReadWriteProxy {
             data.version = 10;
         }
 
-        if (data.version < 11) {
-            data.settings.enableTunnelSmartplace = true;
-            data.version = 11;
-        }
+        // if (data.version < 11) {
+        //     data.settings.enableTunnelSmartplace = true;
+        //     data.version = 11;
+        // }
 
         if (data.version < 12) {
             data.settings.vignette = true;
@@ -610,11 +610,11 @@ export class ApplicationSettings extends ReadWriteProxy {
             data.version = 15;
         }
 
-        if (data.version < 16) {
-            // RE-ENABLE this setting, it already existed
-            data.settings.enableTunnelSmartplace = true;
-            data.version = 16;
-        }
+        // if (data.version < 16) {
+        //     // RE-ENABLE this setting, it already existed
+        //     data.settings.enableTunnelSmartplace = true;
+        //     data.version = 16;
+        // }
 
         if (data.version < 17) {
             data.settings.enableColorBlindHelper = false;
@@ -690,7 +690,7 @@ export class ApplicationSettings extends ReadWriteProxy {
             data.settings.mapResourcesScale = 0.5;
 
             // Re-enable hints as well
-            data.settings.offerHints = true;
+            //data.settings.offerHints = true;
 
             data.version = 30;
         }

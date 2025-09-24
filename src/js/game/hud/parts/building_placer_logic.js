@@ -116,7 +116,7 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
         keyActionMapper.getBinding(KEYMAPPINGS.placement.rotateToRight).add(this.trySetRotate, this);
         keyActionMapper.getBinding(KEYMAPPINGS.placement.rotateToLeft).add(this.trySetRotate, this);
 
-        keyActionMapper.getBinding(KEYMAPPINGS.placement.cycleBuildingVariants).add(this.cycleVariants, this);
+        //keyActionMapper.getBinding(KEYMAPPINGS.placement.cycleBuildingVariants).add(this.cycleVariants, this);
         keyActionMapper
             .getBinding(KEYMAPPINGS.placement.switchDirectionLockSide)
             .add(this.switchDirectionLockSide, this);
@@ -475,7 +475,7 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
             // Check if we should stop placement
             if (
                 !metaBuilding.getStayInPlacementMode() &&
-                !this.root.keyMapper.getBinding(KEYMAPPINGS.placementModifiers.placeMultiple).pressed &&
+                //!this.root.keyMapper.getBinding(KEYMAPPINGS.placementModifiers.placeMultiple).pressed &&
                 !this.root.app.settings.getAllSettings().alwaysMultiplace
             ) {
                 // Stop placement
@@ -576,11 +576,11 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
         let startTile = this.lastDragTile;
 
         // if the alt key is pressed, reverse belt planner direction by switching start and end tile
-        if (this.root.keyMapper.getBinding(KEYMAPPINGS.placementModifiers.placeInverse).pressed) {
-            let tmp = startTile;
-            startTile = endTile;
-            endTile = tmp;
-        }
+        // if (this.root.keyMapper.getBinding(KEYMAPPINGS.placementModifiers.placeInverse).pressed) {
+        //     let tmp = startTile;
+        //     startTile = endTile;
+        //     endTile = tmp;
+        // }
 
         // Place from start to corner
         const pathToCorner = this.currentDirectionLockCorner.sub(startTile);
