@@ -196,7 +196,7 @@ export class KnotSimplifier {
                     return;
                 }
             }
-            redPath.push(curNode);
+            redPath.push(curNode.clone());
             curIndex = (curIndex + 1) % this.root.knot.nodes.length;
         }
 

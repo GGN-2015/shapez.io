@@ -134,7 +134,7 @@ function gulptasksStandalone($, gulp) {
                 name: "KnotSimplify",
                 out: tempDestDir,
                 overwrite: true,
-                appBundleId: "tobspr.shapezio." + variant,
+                appBundleId: "tobspr.KnotSimplify." + variant,
                 appCategoryType: "public.app-category.games",
                 ...(isRelease &&
                     platform === "darwin" && {
@@ -176,7 +176,7 @@ function gulptasksStandalone($, gulp) {
                                 // Write launcher script
                                 fs.writeFileSync(
                                     path.join(appPath, "play.sh"),
-                                    '#!/usr/bin/env bash\n./shapezio --no-sandbox "$@"\n'
+                                    '#!/usr/bin/env bash\n./KnotSimplify --no-sandbox "$@"\n'
                                 );
                                 fs.chmodSync(path.join(appPath, "play.sh"), 0o775);
                             }

@@ -993,16 +993,16 @@ keybindings:
 about:
     title: 关于游戏
     body: >-
-        本游戏由 <a href="https://github.com/tobspr" target="_blank">Tobias
-        Springer</a>（我）开发，并且已经开源。<br><br>
+        本游戏最初由 王晁 先生提出设想和理论支持. <br>
+        目前主要由 周壑 基于开源项目 shapez.io (作者 <a href="https://github.com/tobspr" target="_blank"> Tobias
+        Springer</a>) 进行开发, 并受到来自 GGN_2015 的大量技术支持. <br><br>
 
-        如果您想参与开发，请查看 <a href="<githublink>" target="_blank">GitHub 上的 shapez</a>。<br><br>
+        目前本游戏的开源地址为 <a href="https://github.com/GGN-2015/shapez.io/tree/KnotSimplify" target="_blank">https://github.com/GGN-2015/shapez.io/tree/KnotSimplify</a>. <br><br>
 
-        这个游戏的开发获得了 Discord 社区内热情玩家的巨大支持。诚挚邀请您加入我们的 <a href="<discordlink>" target="_blank">Discord 服务器</a>！<br><br>
+        由于能力所限, 目前主要的开发模式主要是基于 shapez.io 的局部修改和部分换皮, 并且没有经历大规模测试,
+        难免您在游戏中可能遇到原游戏的信息, 链接等元素, 请见谅. <br><br>
 
-        本游戏的音乐由 <a href="https://soundcloud.com/pettersumelius" target="_blank">Peppsen</a> 制作——他是个很棒的伙伴。<br><br>
-
-        最后，我想感谢我最好的朋友 <a href="https://github.com/niklas-dahl" target="_blank">Niklas</a> ——如果没有他的《异星工厂》（factorio）带给我的体验和启发，《异形工厂》（shapez）将不会存在。
+        目前的版本部分使用了原游戏的美术和音乐资源, 如果造成侵权请联系作者.
 changelog:
     title: 更新日志
 demo:

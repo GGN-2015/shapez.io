@@ -218,9 +218,9 @@ export class PreloadState extends GameState {
 
             .then(() => this.setStatus("Checking changelog", 95))
             .then(() => {
-                if (G_IS_DEV && globalConfig.debug.disableUpgradeNotification) {
-                    return;
-                }
+                // if (G_IS_DEV && globalConfig.debug.disableUpgradeNotification) {
+                return;
+                // }
 
                 if (G_CHINA_VERSION || G_WEGAME_VERSION) {
                     return;

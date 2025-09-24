@@ -23,8 +23,8 @@ const roamingFolder =
         ? process.env.HOME + "/Library/Preferences"
         : process.env.HOME + "/.local/share");
 
-let storePath = path.join(roamingFolder, "shapez.io", "saves");
-let modsPath = path.join(roamingFolder, "shapez.io", "mods");
+let storePath = path.join(roamingFolder, "KnotSimplify", "saves");
+let modsPath = path.join(roamingFolder, "KnotSimplify", "mods");
 
 if (!fs.existsSync(storePath)) {
     // No try-catch by design
@@ -60,7 +60,7 @@ function createWindow() {
         useContentSize: false,
         minWidth: 800,
         minHeight: 600,
-        title: "shapez",
+        title: "KnotSimplify",
         transparent: false,
         icon: path.join(__dirname, "favicon" + faviconExtension),
         // fullscreen: true,
@@ -194,7 +194,7 @@ function createWindow() {
         const mainMenu = new Menu();
         mainMenu.append(
             new MenuItem({
-                label: "shapez.io",
+                label: "KnotSimplify",
                 submenu: menu,
             })
         );

@@ -106,33 +106,33 @@ function trimKnot() {
         }
         keyRelations.push({ strand: reverseStrand, next: outStrand, opposite: outStrand.opposite().next() });
     }
-    for (let r of keyRelations) {
-        console.log(
-            "(" +
-                r.strand.node.origin.x +
-                "," +
-                r.strand.node.origin.y +
-                "," +
-                r.strand.rot +
-                ")" +
-                " | " +
-                "(" +
-                r.next.node.origin.x +
-                "," +
-                r.next.node.origin.y +
-                "," +
-                r.next.rot +
-                ")" +
-                " | " +
-                "(" +
-                r.opposite.node.origin.x +
-                "," +
-                r.opposite.node.origin.y +
-                "," +
-                r.opposite.rot +
-                ")"
-        );
-    }
+    // for (let r of keyRelations) {
+    //     console.log(
+    //         "(" +
+    //             r.strand.node.origin.x +
+    //             "," +
+    //             r.strand.node.origin.y +
+    //             "," +
+    //             r.strand.rot +
+    //             ")" +
+    //             " | " +
+    //             "(" +
+    //             r.next.node.origin.x +
+    //             "," +
+    //             r.next.node.origin.y +
+    //             "," +
+    //             r.next.rot +
+    //             ")" +
+    //             " | " +
+    //             "(" +
+    //             r.opposite.node.origin.x +
+    //             "," +
+    //             r.opposite.node.origin.y +
+    //             "," +
+    //             r.opposite.rot +
+    //             ")"
+    //     );
+    // }
 }
 /**
  *
@@ -191,6 +191,28 @@ function keyStrandNext(strand) {
 
 /**
  *
+ * @param {Node[]} arr
+ */
+function debugLogNodeArr(arr) {
+    for (let n of arr) {
+        console.log("(" + n.origin.x + "," + n.origin.y + ")" + n.crosType);
+    }
+}
+
+/**
+ *
+ * @param {Strand[]} check_result_crossings
+ */
+function debugPrintCheck_result_crossings(check_result_crossings) {
+    for (let strand of check_result_crossings) {
+        console.log(
+            "(" + strand.node.origin.x + "," + strand.node.origin.y + ")" + strand.rot + "|" + strand.crosType
+        );
+    }
+}
+
+/**
+ *
  * @param {Node[]} red_path
  * @param {Node[]} green_path
  * @param {String} direction
@@ -203,6 +225,11 @@ function do_check(red_path, green_path, direction) {
     let green_crossing_strands = [];
 
     let good_path = true;
+
+    // console.log("====red_path========");
+    // debugLogNodeArr(red_path);
+    // console.log("========greenNodes===");
+    // debugLogNodeArr(greenNodes);
 
     for (let g of greenNodes) {
         if (g.isCrossing) {
@@ -248,24 +275,37 @@ function do_check(red_path, green_path, direction) {
         check_result_crossings.push(strand);
     }
 
+    // console.log("====red_boundary_crossings========");
+    // debugLogNodeArr(red_boundary_crossings);
+
     let nnnn = 0;
     while (to_check_set.length) {
+        //console.log("====green_crossing_strands===");
+        //debugPrintCheck_result_crossings(green_crossing_strands);
         let cross_strand = to_check_set.pop();
+        // console.log(
+        //     "L269: (" + cross_strand.node.origin.x + "," + cross_strand.node.origin.y + ")" + cross_strand.rot
+        // );
         //msg_label.innerHTML = "already: " + nnnn + ", left: " + to_check_set.length;
-        console.log("already: " + nnnn + ", left: " + to_check_set.length);
+        // console.log("already: " + nnnn + ", left: " + to_check_set.length);
         self.postMessage({ type: "update", str: "already: " + nnnn + ", left: " + to_check_set.length });
         nnnn++;
         for (;;) {
-            let r = get_strand_from_array(check_result_crossings, keyStrandOpposite(cross_strand));
-            if (r && r.crosType !== "" && r.crosType !== cross_strand.crosType) {
-                good_path = false;
-                break;
-            }
-            r = get_strand_from_array(green_crossing_strands, cross_strand);
+            //console.log("====check_result_crossings===");
+            //debugPrintCheck_result_crossings(check_result_crossings);
+            let r = get_strand_from_array(green_crossing_strands, cross_strand);
             if (r) {
+                // console.log(2);
                 r.crosType = cross_strand.crosType;
                 break;
             }
+            r = get_strand_from_array(check_result_crossings, keyStrandOpposite(cross_strand));
+            if (r && r.crosType !== "" && r.crosType !== cross_strand.crosType) {
+                // console.log(1);
+                good_path = false;
+                break;
+            }
+
             r = keyStrandOpposite(cross_strand);
             r.crosType = cross_strand.crosType;
             if (!get_strand_from_array(check_result_crossings, r)) {
@@ -284,6 +324,7 @@ function do_check(red_path, green_path, direction) {
                 ) {
                     b = true;
                     if (c.crosType !== cross_strand.crosType) {
+                        // console.log(3);
                         good_path = false;
                     }
                     break;
@@ -351,7 +392,7 @@ function do_check(red_path, green_path, direction) {
             }
             let nStrand = keyStrandNext(cross_strand);
             nStrand.crosType = cross_strand.crosType;
-            console.log(nStrand.node.origin);
+            // console.log(nStrand.node.origin);
             r = get_strand_from_array(check_result_crossings, nStrand);
             if (!r) {
                 nStrand.crosType = cross_strand.crosType;

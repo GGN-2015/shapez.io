@@ -34,9 +34,9 @@ export class SettingsState extends TextualGameState {
                 G_WEGAME_VERSION
                     ? ""
                     : `
-                <button class="styledButton categoryButton manageMods">${T.mods.title}
+                <!--button class="styledButton categoryButton manageMods">${T.mods.title}
                     <span class="newBadge">${T.settings.newBadge}</span>
-                </button>`
+                </button-->`
             }
 
 
@@ -47,7 +47,7 @@ export class SettingsState extends TextualGameState {
                     ? ""
                     : `
                 <button class="styledButton about">${T.about.title}</button>
-                <button class="styledButton privacy">Privacy Policy</button>
+                <!--button class="styledButton privacy">Privacy Policy</button-->
 
 `
             }
@@ -126,9 +126,9 @@ export class SettingsState extends TextualGameState {
             this.trackClicks(this.htmlElement.querySelector(".about"), this.onAboutClicked, {
                 preventDefault: false,
             });
-            this.trackClicks(this.htmlElement.querySelector(".privacy"), this.onPrivacyClicked, {
-                preventDefault: false,
-            });
+            // this.trackClicks(this.htmlElement.querySelector(".privacy"), this.onPrivacyClicked, {
+            //     preventDefault: false,
+            // });
         }
 
         const keybindingsButton = this.htmlElement.querySelector(".editKeybindings");

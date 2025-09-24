@@ -57,6 +57,9 @@ function getPDcodeWorker(nodes) {
             crossings.push(n);
         }
     }
+    // for (let n of nodes) {
+    //     console.log("nodes:(" + n.origin.x + "," + n.origin.y + ")", n.crosType);
+    // }
     for (let c of crossings) {
         //msg_label.innerHTML = crossings.indexOf(c) + "/" + crossings.length;
         self.postMessage({ type: "update", str: crossings.indexOf(c) + "/" + crossings.length });
@@ -88,7 +91,9 @@ function getPDcodeWorker(nodes) {
             } else {
                 res += ", ";
             }
+            console.log("(" + c.origin.x + "," + c.origin.y + ")");
             res += "(" + pd[0] + ", " + pd[1] + ", " + pd[2] + ", " + pd[3] + ")";
+            console.log("(" + pd[0] + ", " + pd[1] + ", " + pd[2] + ", " + pd[3] + ")");
         }
     }
     if (res !== "") {

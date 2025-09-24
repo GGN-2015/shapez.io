@@ -294,10 +294,10 @@ function initializeSettings() {
 class SettingsStorage {
     constructor() {
         this.uiScale = "regular";
-        this.fullscreen = G_IS_STANDALONE;
+        this.fullscreen = false;
 
-        this.soundVolume = 1.0;
-        this.musicVolume = 1.0;
+        this.soundVolume = 0.0;
+        this.musicVolume = 0.0;
 
         this.theme = "light";
         this.refreshRate = "60";
