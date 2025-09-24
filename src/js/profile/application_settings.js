@@ -201,7 +201,7 @@ function initializeSettings() {
             (app, value) => null
         ),
 
-        new BoolSetting("offerHints", enumCategories.userInterface, (app, value) => {}),
+        //new BoolSetting("offerHints", enumCategories.userInterface, (app, value) => {}),
 
         new EnumSetting("theme", {
             options: Object.keys(THEMES),

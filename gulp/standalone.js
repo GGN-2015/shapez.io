@@ -288,8 +288,8 @@ function gulptasksStandalone($, gulp) {
             gulp.series(
                 taskPrefix + ".prepare",
                 // 没必要同时编译两个平台吧
-                // gulp.parallel(taskPrefix + ".package.win64", taskPrefix + ".package.linux64")
-                gulp.parallel(taskPrefix + ".package.win64")
+                gulp.parallel(taskPrefix + ".package.win64", taskPrefix + ".package.linux64")
+                //gulp.parallel(taskPrefix + ".package.win64")
             )
         );
         gulp.task(
