@@ -19,6 +19,7 @@ import { WireNetwork } from "./systems/wire";
 const LZString = require("lz-string");
 const logger = createLogger("ingame/logic");
 import { stages } from "./stages";
+import { T } from "../translations";
 
 /**
  * Typing helper
@@ -131,7 +132,7 @@ export class GameLogic {
             return;
         }
 
-        this.root.hud.signals.notification.dispatch("定向整理", enumNotificationType.success);
+        this.root.hud.signals.notification.dispatch(T.knot.str24, enumNotificationType.success);
 
         // 确实与目标定向相同或相反
         sMapEntity.rotation = sMapEntity.originalRotation = rotation;
@@ -265,7 +266,7 @@ export class GameLogic {
      * @returns
      */
     increaseDistance(origin, rotation) {
-        this.root.hud.signals.notification.dispatch("增距", enumNotificationType.success);
+        this.root.hud.signals.notification.dispatch(T.knot.str25, enumNotificationType.success);
 
         if (rotation % 180 === 0) {
             // 加一列
@@ -596,7 +597,7 @@ export class GameLogic {
      * @returns
      */
     decreaseDistance(origin, rotation) {
-        this.root.hud.signals.notification.dispatch("减距", enumNotificationType.success);
+        this.root.hud.signals.notification.dispatch(T.knot.str26, enumNotificationType.success);
         if (rotation % 180 === 0) {
             // 减一列
             let toBuildTiles = [];
@@ -722,11 +723,11 @@ export class GameLogic {
     setSeperator(origin) {
         let entity = this.root.map.getLayerContentXY(origin.x, origin.y, "wires");
         if (entity && entity.components.StaticMapEntity.code === 39) {
-            this.root.hud.signals.notification.dispatch("不能重复设置分割点", enumNotificationType.error);
+            this.root.hud.signals.notification.dispatch(T.knot.str27, enumNotificationType.error);
             return true;
         }
         if (this.root.knotSimplifier.seperators.length === 2) {
-            this.root.hud.signals.notification.dispatch("只能设置两个分割点", enumNotificationType.error);
+            this.root.hud.signals.notification.dispatch(T.knot.str28, enumNotificationType.error);
             return true;
         }
         if (this.root.knotSimplifier.checkSeperatorIleagle(origin)) return true;

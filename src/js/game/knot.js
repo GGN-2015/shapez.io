@@ -9,6 +9,7 @@ import { DialogWithForm } from "../core/modal_dialog_elements";
 import { fillInLinkIntoTranslation } from "../core/utils";
 import { THIRDPARTY_URLS } from "../core/config";
 import { FormElementInput } from "../core/modal_dialog_forms";
+import { T } from "../translations";
 
 const copy = require("clipboard-copy");
 
@@ -59,7 +60,7 @@ export class Knot {
         // 检查 regular 层的 belt 是否构成合法扭结
         let initEntity = reg_entities[0];
         if (!initEntity) {
-            this.clear("请先绘制扭结");
+            this.clear(T.knot.str1);
             return;
         }
 
@@ -68,7 +69,7 @@ export class Knot {
             initEntity.components.StaticMapEntity.code > 3
         ) {
             //不是 belt 的 building
-            this.clear("存在非 belt 的建筑块");
+            this.clear(T.knot.str2);
             return;
         }
         let initOrigin = initEntity.components.StaticMapEntity.origin;
@@ -81,7 +82,7 @@ export class Knot {
             initOrigin = initEntity.components.StaticMapEntity.origin;
         }
         if (this.root.map.isCrossingEntity(initOrigin)) {
-            this.clear("连续的 crossing 或 corner");
+            this.clear(T.knot.str3);
             return;
         }
 
@@ -107,7 +108,7 @@ export class Knot {
             }
             if (!nextEntity) {
                 // 未完整闭合
-                this.clear("未完整闭合");
+                this.clear(T.knot.str4);
                 return;
             }
             if (
@@ -115,7 +116,7 @@ export class Knot {
                 !this.root.map.isCrossingEntity(nextEntity.components.StaticMapEntity.origin)
             ) {
                 // 通常点二次到达
-                this.clear("定向整理错误");
+                this.clear(T.knot.str5);
                 return;
             }
             if (
@@ -124,7 +125,7 @@ export class Knot {
             ) {
                 // crossing 已经经过两次以上
                 // 交点的三次到达
-                this.clear("定向整理错误");
+                this.clear(T.knot.str5);
                 return;
             }
             passedEntities.push(nextEntity);
@@ -177,11 +178,11 @@ export class Knot {
                 this.nodes.push(node);
             } else if (nextEntity.components.StaticMapEntity.code !== 1) {
                 // 非法
-                this.clear("存在非 belt 的建筑块");
+                this.clear(T.knot.str2);
                 return;
             } else {
                 if (!this.root.map.checkNeighborsNull(nextEntity, "regular")) {
-                    this.clear("过密 lines");
+                    this.clear(T.knot.str6);
                     return;
                 }
                 let node = this.createNodeFromEntity(
@@ -198,14 +199,14 @@ export class Knot {
 
         if (mapBeltCount + 1 !== reg_entities.length) {
             // 有多余 tile
-            this.clear("有多余 tile");
+            this.clear(T.knot.str7);
             return;
         }
 
         for (let cros of this.crossings) {
             if (!this.root.map.checkDiagonalEntities(cros.components.StaticMapEntity.origin, "regular")) {
                 // 过密位置非法
-                this.clear("过密 crossing");
+                this.clear(T.knot.str8);
                 return;
             }
         }
@@ -213,7 +214,7 @@ export class Knot {
         for (let cor of this.corners) {
             if (!this.root.map.checkDiagonalEntities(cor.components.StaticMapEntity.origin, "regular")) {
                 // 过密位置非法
-                this.clear("过密 corner");
+                this.clear(T.knot.str9);
                 return;
             }
         }
@@ -275,7 +276,7 @@ export class Knot {
                 msg_label.innerHTML = e.data.str;
             } else if (e.data.type === "res") {
                 copy(e.data.str);
-                this.root.hud.signals.notification.dispatch("PD code 已复制", enumNotificationType.success);
+                this.root.hud.signals.notification.dispatch(T.knot.str10, enumNotificationType.success);
                 this.root.app.gPaused = false;
                 worker.terminate();
                 const markerNameInput = new FormElementInput({
@@ -288,7 +289,7 @@ export class Knot {
                 const dialog = new DialogWithForm({
                     app: this.root.app,
                     title: "PD code",
-                    desc: fillInLinkIntoTranslation("按 ctrl + C 复制", THIRDPARTY_URLS.shapeViewer),
+                    desc: fillInLinkIntoTranslation(T.knot.str11, THIRDPARTY_URLS.shapeViewer),
                     formElements: [markerNameInput],
                     buttons: ["ok:good"],
                 });

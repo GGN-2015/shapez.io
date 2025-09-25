@@ -8,6 +8,7 @@ import { MetaBeltBuilding } from "./buildings/belt";
 import { Node } from "./knotUtils";
 import { Strand } from "./knotUtils";
 import { gMetaBuildingRegistry } from "../core/global_registries";
+import { T } from "../translations";
 
 export class KnotSimplifier {
     /**
@@ -104,7 +105,7 @@ export class KnotSimplifier {
     checkSeperatorIleagle(origin) {
         let entity = this.root.map.getLayerContentXY(origin.x, origin.y, "regular");
         if (!entity) {
-            this.root.hud.signals.notification.dispatch("只能在扭结上设置分割点", enumNotificationType.error);
+            this.root.hud.signals.notification.dispatch(T.knot.str31, enumNotificationType.error);
             return true;
         }
         if (this.root.map.isCrossingEntity(origin)) {
@@ -117,7 +118,7 @@ export class KnotSimplifier {
             this.root.map.isCrossingEntity(new Vector(origin.x, origin.y - 1)) ||
             this.root.map.isCrossingEntity(new Vector(origin.x, origin.y + 1))
         ) {
-            this.root.hud.signals.notification.dispatch("不能离交点太近", enumNotificationType.error);
+            this.root.hud.signals.notification.dispatch(T.knot.str32, enumNotificationType.error);
             return true;
         }
         if (
@@ -126,14 +127,11 @@ export class KnotSimplifier {
             this.root.map.isCornerEntity(new Vector(origin.x, origin.y - 1)) ||
             this.root.map.isCornerEntity(new Vector(origin.x, origin.y + 1))
         ) {
-            this.root.hud.signals.notification.dispatch(
-                "不能离 corner 太近 (可以设置在 corner 上)",
-                enumNotificationType.error
-            );
+            this.root.hud.signals.notification.dispatch(T.knot.str33, enumNotificationType.error);
             return true;
         }
         if (this.seperators.length > 2) {
-            this.root.hud.signals.notification.dispatch("只能设置两个分割点", enumNotificationType.error);
+            this.root.hud.signals.notification.dispatch(T.knot.str28, enumNotificationType.error);
             return true;
         }
         // this.root.knot.seperators.push(origin);
@@ -240,10 +238,7 @@ export class KnotSimplifier {
         }
 
         if (!initGreen) {
-            this.root.hud.signals.notification.dispatch(
-                "没有找到连接两个分离器的绿线",
-                enumNotificationType.error
-            );
+            this.root.hud.signals.notification.dispatch(T.knot.str12, enumNotificationType.error);
             return false;
         }
 
@@ -270,7 +265,7 @@ export class KnotSimplifier {
             }
             let nextGreen = this.root.map.getLayerContentXY(nextOrigin.x, nextOrigin.y, "wires");
             if (!nextGreen) {
-                this.root.hud.signals.notification.dispatch("绿线有开放端点", enumNotificationType.error);
+                this.root.hud.signals.notification.dispatch(T.knot.str13, enumNotificationType.error);
                 return false;
             }
             if (nextGreen.components.StaticMapEntity.code === 39) {
@@ -281,10 +276,7 @@ export class KnotSimplifier {
                 // 通常绿线
                 nextGreen.components.StaticMapEntity.rotation = outRot;
                 if (!this.root.map.checkNeighborsNull(nextGreen, "wires")) {
-                    this.root.hud.signals.notification.dispatch(
-                        "绿线 lines 过密",
-                        enumNotificationType.error
-                    );
+                    this.root.hud.signals.notification.dispatch(T.knot.str14, enumNotificationType.error);
                     return false;
                 }
                 let belowEnt = this.root.map.getLayerContentXY(
@@ -296,10 +288,7 @@ export class KnotSimplifier {
                 if (belowEnt) {
                     bCross = true;
                     if (belowEnt.components.StaticMapEntity.code !== 1) {
-                        this.root.hud.signals.notification.dispatch(
-                            "绿线 lines 与下层位置矛盾",
-                            enumNotificationType.error
-                        );
+                        this.root.hud.signals.notification.dispatch(T.knot.str15, enumNotificationType.error);
                         return false;
                     }
                     if (
@@ -308,17 +297,11 @@ export class KnotSimplifier {
                             180 ===
                         0
                     ) {
-                        this.root.hud.signals.notification.dispatch(
-                            "绿线 lines 下方错误",
-                            enumNotificationType.error
-                        );
+                        this.root.hud.signals.notification.dispatch(T.knot.str15, enumNotificationType.error);
                         return false;
                     }
                 } else if (!this.root.map.checkNeighborsNull(nextGreen, "regular")) {
-                    this.root.hud.signals.notification.dispatch(
-                        "绿线 lines 距离扭结过近",
-                        enumNotificationType.error
-                    );
+                    this.root.hud.signals.notification.dispatch(T.knot.str15, enumNotificationType.error);
                     return false;
                 }
 
@@ -331,7 +314,7 @@ export class KnotSimplifier {
                     if (!belowEnt) {
                         if (!this.root.map.checkNeighborsNull(nextGreen, "wires")) {
                             this.root.hud.signals.notification.dispatch(
-                                "绿线 lines 与下层位置矛盾",
+                                T.knot.str15,
                                 enumNotificationType.error
                             );
                             return false;
@@ -353,10 +336,7 @@ export class KnotSimplifier {
                     )
                 ) {
                     // 过密位置非法
-                    this.root.hud.signals.notification.dispatch(
-                        "绿线 corner 过密",
-                        enumNotificationType.error
-                    );
+                    this.root.hud.signals.notification.dispatch(T.knot.str16, enumNotificationType.error);
                     return false;
                 }
                 if (nextGreen.components.StaticMapEntity.rotation === outRot) {
@@ -364,10 +344,7 @@ export class KnotSimplifier {
                 } else if (nextGreen.components.StaticMapEntity.rotation === (outRot + 90) % 360) {
                     outRot = (outRot + 270) % 360;
                 } else {
-                    this.root.hud.signals.notification.dispatch(
-                        "绿线 corner 错误",
-                        enumNotificationType.error
-                    );
+                    this.root.hud.signals.notification.dispatch(T.knot.str16, enumNotificationType.error);
                     return false;
                 }
                 let node = this.root.knot.createNodeFromEntity(
@@ -378,7 +355,7 @@ export class KnotSimplifier {
                 );
                 this.greenNodes.push(node);
             } else {
-                this.root.hud.signals.notification.dispatch("非法上层建筑", enumNotificationType.error);
+                this.root.hud.signals.notification.dispatch(T.knot.str17, enumNotificationType.error);
                 return false;
             }
             curGreen = nextGreen;
@@ -839,7 +816,7 @@ export class KnotSimplifier {
             this.root.knot.rebuild();
             this.rebuild();
             this.root.hud.signals.notification.dispatch(
-                "新扭结 crossings: " + this.root.knot.crossings.length,
+                T.knot.str18 + this.root.knot.crossings.length,
                 enumNotificationType.success
             );
             this.root.systemMgr.systems.wire.bUpdateSuround = true;
@@ -848,7 +825,7 @@ export class KnotSimplifier {
             }
             return;
         } else {
-            this.root.hud.signals.notification.dispatch("请先选择合适红绿线位置", enumNotificationType.error);
+            this.root.hud.signals.notification.dispatch(T.knot.str19, enumNotificationType.error);
         }
         return;
     }
@@ -883,10 +860,7 @@ export class KnotSimplifier {
     checkGreenLine() {
         if (!this.check_result_array.length) {
             if (this.seperators.length !== 2) {
-                this.root.hud.signals.notification.dispatch(
-                    "请先设置 2 个分离器",
-                    enumNotificationType.error
-                );
+                this.root.hud.signals.notification.dispatch(T.knot.str20, enumNotificationType.error);
                 return;
             }
 
@@ -927,10 +901,7 @@ export class KnotSimplifier {
                 this.root.knot.crossings.length > 100 &&
                 !this.root.app.settings.getAllSettings().enableColorBlindHelper
             ) {
-                this.root.hud.signals.notification.dispatch(
-                    '交点数过多, 只计算 pickup 化简, 如需要请在设置中开启 "精确搜索"',
-                    enumNotificationType.warning
-                );
+                this.root.hud.signals.notification.dispatch(T.knot.str21, enumNotificationType.warning);
                 for (let ent of red_path_array) {
                     let r_path = ent.path;
                     let bSameDir = ent.dir;
@@ -1015,14 +986,14 @@ export class KnotSimplifier {
             this.readyToMove = true;
 
             this.root.hud.signals.notification.dispatch(
-                "发现移动位置 " + (this.checkResultIndex + 1) + "/" + this.check_result_array.length,
+                T.knot.str22 + (this.checkResultIndex + 1) + "/" + this.check_result_array.length,
                 enumNotificationType.success
             );
             this.checkResultIndex = (this.checkResultIndex + 1) % this.check_result_array.length;
             return;
         }
 
-        this.root.hud.signals.notification.dispatch("没找到合法红线", enumNotificationType.error);
+        this.root.hud.signals.notification.dispatch(T.knot.str23, enumNotificationType.error);
         this.root.systemMgr.systems.wire.bUpdateSuround = true;
     }
 }

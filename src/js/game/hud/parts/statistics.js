@@ -162,7 +162,7 @@ export class HUDStatistics extends BaseHUDPart {
             this.root.knot.getPDcode();
             //this.root.hud.signals.notification.dispatch("PD code 已复制", enumNotificationType.success);
         } else {
-            this.root.hud.signals.notification.dispatch("请先构建扭结", enumNotificationType.error);
+            this.root.hud.signals.notification.dispatch(T.knot.str1, enumNotificationType.error);
         }
         return;
         this.visible = true;

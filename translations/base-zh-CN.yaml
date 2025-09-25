@@ -1,3 +1,37 @@
+knot:
+    str1: 请先绘制扭结
+    str2: 存在非 belt 的建筑块
+    str3: 连续的 crossing 或 corner
+    str4: 未完整闭合
+    str5: 定向整理错误
+    str6: 过密 lines
+    str7: 有多余 tile
+    str8: 过密 crossing
+    str9: 过密 corner
+    str10: PD code 已复制
+    str11: 按 ctrl + C 复制
+    str12: 没有找到连接两个分离器的绿线
+    str13: 绿线有开放端点
+    str14: 绿线 lines 过密
+    str15: 绿线 lines 与下层位置矛盾
+    str16: 绿线 corner 错误
+    str17: 非法上层建筑
+    str18: '新扭结 crossings: '
+    str19: 请先设置合适红绿线
+    str20: 请先设置 2 个分离器
+    str21: 交点数过多, 只计算 pickup 化简, 如需要请在设置中开启 "精确搜索"'
+    str22: '发现移动位置 '
+    str23: 没找到合法红线
+    str24: 定向整理
+    str25: 增距
+    str26: 减距
+    str27: 不能重复设置分割点
+    str28: 只能设置两个分割点
+    str29: 构建扭结成功
+    str30: 化简模式禁止切换图层
+    str31: 只能在扭结上设置分割点
+    str32: 不能在交点上设置分割点
+    str33: 不能离 corner 太近 (可以设置在 corner 上)
 steamPage:
     shortText: “唯一能限制您的，只有您的想象力！”《异形工厂》（shapez）
         是一款在无限拓展的地图上，通过建造各类工厂设施，来自动化生产与组合出愈加复杂图形的游戏。
@@ -483,7 +517,7 @@ buildings:
     belt:
         default:
             name: 编辑模式
-            description: 绘制扭结，选中后<strong>按住鼠标并拖动</strong>进行绘制, 按住 shift 可快速绘制; 点击交点可改变交点状态. 改变交点状态注意保持原位非转动状态, 才会自适应交点类型.
+            description: 绘制扭结，选中后<strong>按住鼠标并拖动</strong>进行绘制; 点击交点可改变交点状态. 改变交点状态注意保持原位非转动状态, 才会自适应交点类型.
     miner:
         default:
             name: 反向工具

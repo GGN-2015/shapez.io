@@ -9,6 +9,7 @@ import { enumHubGoalRewards } from "../../tutorial_goals";
 import { BaseHUDPart } from "../base_hud_part";
 import { Knot } from "../../knot";
 import { enumNotificationType } from "./notifications";
+import { T } from "../../../translations";
 
 const copy = require("clipboard-copy");
 const wiresBackgroundDpi = 4;
@@ -65,7 +66,7 @@ export class HUDWiresOverlay extends BaseHUDPart {
             }
         }
 
-        this.root.hud.signals.notification.dispatch("构建扭结成功", enumNotificationType.success);
+        this.root.hud.signals.notification.dispatch(T.knot.str29, enumNotificationType.success);
         // 打开 wire 路径自适应, 方便绘制绿线
         this.root.systemMgr.systems.wire.bUpdateSuround = true;
         return true;
@@ -79,7 +80,7 @@ export class HUDWiresOverlay extends BaseHUDPart {
             return;
         }
         if (this.root.hubGoals.level < 13 && this.root.currentLayer === "wires") {
-            this.root.hud.signals.notification.dispatch("化简模式禁止切换图层", enumNotificationType.error);
+            this.root.hud.signals.notification.dispatch(T.knot.str30, enumNotificationType.error);
             return;
         }
         if (this.root.currentLayer === "regular") {

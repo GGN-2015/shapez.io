@@ -20,6 +20,40 @@
 #
 
 ---
+knot:
+    str1: Please first draw the knot
+    str2: There is building other than belt
+    str3: Successive crossings or corners
+    str4: Knot not closed
+    str5: Orientation build error
+    str6: Too closed lines
+    str7: Redundant tiles
+    str8: Too closed crossings
+    str9: Too closed corners
+    str10: PD code copied
+    str11: Press ctrl + C to copy
+    str12: Not found green path connected two seperators
+    str13: Green path with open ends
+    str14: Too closed green lines
+    str15: Green lines are inconsistent with the underlying position
+    str16: Green corner error
+    str17: Illegal upper layer structures
+    str18: 'new crossings: '
+    str19: Please first set the green/red path
+    str20: Please first set two seperators
+    str21: Too many crossings, only use 'pick up' simplifying. In setting menu turn on 'precise search' if needed
+    str22: 'Found position '
+    str23: Not found legal red path
+    str24: Rebuild direction
+    str25: Increase distance
+    str26: Decrease distance
+    str27: Can not repeat setting seperator
+    str28: Can only set two seperators
+    str29: Knot constructed 
+    str30: Can not swith to edit mode when playing
+    str31: Can only set seperators on the knot
+    str32: Can not set seperators on crossings
+    str33: Can not set seperators too closed to a corner (can set on a corner)
 steamPage:
     # This is the short text appearing on the steam page
     shortText: shapez is a game about building factories to automate the creation and processing of increasingly complex shapes across an infinitely expanding map.
@@ -596,7 +630,7 @@ ingame:
     # Settings menu, when you press "ESC"
     settingsMenu:
         playtime: Playtime
-        buildingsPlaced: Buildings
+        buildingsPlaced: crossings
         beltsPlaced: Belts
 
     # Bottom left tutorial hints
@@ -787,18 +821,18 @@ buildings:
 
     belt:
         default:
-            name: &belt Conveyor Belt
-            description: Transports items, hold and drag to place multiple.
+            name: &belt Edit Mode
+            description: To draw a knot, select it and hold the mouse while dragging to draw; clicking on the intersection point can change its status.
 
     # Internal name for the Extractor
     miner:
         default:
-            name: &miner Extractor
+            name: &miner Direction Rebuild
             description: Place over a shape or color to extract it.
 
         chainable:
-            name: Extractor (Chain)
-            description: Place over a shape or color to extract it. Can be chained.
+            name: Direction Rebuild
+            description: Rebuild the direction of the knot.
 
     # Internal name for the Tunnel
     underground_belt:
@@ -880,8 +914,8 @@ buildings:
 
     trash:
         default:
-            name: &trash Trash
-            description: Accepts inputs from all sides and destroys them. Forever.
+            name: &trash Move Path
+            description: Move the red path to the green path's position. After movement, all the crossings' type will be set reasonably.
 
     storage:
         default:
@@ -890,8 +924,8 @@ buildings:
 
     wire:
         default:
-            name: &wire Wire
-            description: &wire_desc Transfers signals, which can be items, colours or booleans (1 or 0). Differently-coloured wires do not connect to each other.
+            name: &wire Target Path
+            description: &wire_desc The green path is the target position you want to move to.
 
         second:
             name: *wire
@@ -899,8 +933,8 @@ buildings:
 
     wire_tunnel:
         default:
-            name: &wire_tunnel Wire Crossing
-            description: Allows two wires to cross without connecting to each other.
+            name: &wire_tunnel Seperator
+            description: Two seperators will cut the knot into two paths, one of which is to be moved to the green path.
 
     constant_signal:
         default:
@@ -942,13 +976,13 @@ buildings:
 
     display:
         default:
-            name: &display Display
-            description: Connect a signal to show it on the display - It can be a shape, color or boolean.
+            name: &display Decrease Tool
+            description: Decrease the distance between two lines, can be used with rotation.
 
     reader:
         default:
-            name: &reader Belt Reader
-            description: Allows to measure the average belt throughput. Outputs the last read item on the wires layer (once unlocked).
+            name: &reader Increase Tool
+            description: Increase the distance between two lines, can be used with rotation.
 
     analyzer:
         default:
@@ -957,8 +991,8 @@ buildings:
 
     comparator:
         default:
-            name: &comparator Compare
-            description: Returns boolean "1" if both signals are exactly equal. Can compare shapes, colors and booleans.
+            name: &comparator Find Position
+            description: Loop dispalying all the legal posions on the knot which can be moved to the green path.
 
     virtual_processor:
         default:
@@ -1005,23 +1039,20 @@ storyRewards:
     # Those are the rewards gained from completing the store
     reward_cutter_and_trash:
         title: Cutting Shapes
-        desc: >-
-            You just unlocked the <strong>cutter</strong>, which cuts shapes in half from top to bottom <strong>regardless of its orientation</strong>!<br><br>Be sure to get rid of the waste, or
-            otherwise <strong>it will clog and stall</strong> - For this purpose I have given you the <strong>trash</strong>, which destroys everything you put into it!
+        desc: Congratulations! You just unknooted the first knot.
 
     reward_rotater:
         title: Rotating
-        desc: The <strong>rotator</strong> has been unlocked! It rotates shapes clockwise by 90 degrees.
+        desc: By using the distance increasing and decreasing tools, the simplification can be done more comfortably.
 
     reward_painter:
         title: Painting
         desc: >-
-            The <strong>painter</strong> has been unlocked - Extract some color veins (just as you do with shapes) and combine it with a shape in the painter to color them!<br><br>PS: If you are
-            colorblind, there is a <strong>colorblind mode</strong> in the settings!
+            Keep patient; if the simplification position is not observed, organizing the shapes first is also a good choice.
 
     reward_mixer:
         title: Color Mixing
-        desc: The <strong>mixer</strong> has been unlocked - It mixes two colors using <strong>additive blending</strong>!
+        desc: Continue please!
 
     reward_stacker:
         title: Stacker
@@ -1031,11 +1062,11 @@ storyRewards:
 
     reward_balancer:
         title: Balancer
-        desc: The multifunctional <strong>balancer</strong> has been unlocked - It can be used to build bigger factories by <strong>splitting and merging items</strong> onto multiple belts!
+        desc: Discover those trivial places, and always prioritize simplifying them.
 
     reward_tunnel:
         title: Tunnel
-        desc: The <strong>tunnel</strong> has been unlocked - You can now tunnel items below belts and buildings with it!
+        desc: The following will attempt to simplify some knots with more crossings.
 
     reward_rotater_ccw:
         title: CCW Rotating
@@ -1165,7 +1196,7 @@ storyRewards:
             You have reached the end of the demo version!
 
 mods:
-    title: Mods
+    title: Edit Mode
 
     author: Author
     version: Version
@@ -1254,9 +1285,9 @@ settings:
                 Change the language. All translations are user-contributed and might be incomplete!
 
         enableColorBlindHelper:
-            title: Color Blind Mode
+            title: Precise Search
             description: >-
-                Enables various tools which allow you to play the game if you are color blind.
+                Search all possible movement positions (speed will be slow if the crossing number is large).
 
         fullscreen:
             title: Fullscreen
@@ -1491,15 +1522,16 @@ keybindings:
 about:
     title: About this Game
     body: >-
-        This game is open source and developed by <a href="https://github.com/tobspr" target="_blank">Tobias Springer</a> (this is me).<br><br>
+        This game was originally conceived and theoretically supported by Mr. Wang, Chao. <br>
+        Currently, it is primarily developed by Zhou, He based on the open-source project shapez.io (author <a href="https://github.com/tobspr" target="_blank"> Tobias
+        Springer</a>), with substantial technical support from GGN_2015. <br><br>
 
-        If you want to contribute, check out <a href="<githublink>" target="_blank">shapez on GitHub</a>.<br><br>
+        The current open-source version of this game is available at <a href="https://github.com/GGN-2015/shapez.io/tree/KnotSimplify" target="_blank">https://github.com/GGN-2015/shapez.io/tree/KnotSimplify</a>. <br><br>
 
-        This game wouldn't have been possible without the great Discord community around my games - You should really join the <a href="<discordlink>" target="_blank">Discord server</a>!<br><br>
+        Due to limited modding capabilities, the current development model is primarily based on partial reskins of shapez.io, and it has not undergone extensive testing.
+        You may encounter information, links, and other elements from the original game in the game. Please excuse any inconsistencies. <br><br>
 
-        The soundtrack was made by <a href="https://soundcloud.com/pettersumelius" target="_blank">Peppsen</a> - He's awesome.<br><br>
-
-        Finally, huge thanks to my best friend <a href="https://github.com/niklas-dahl" target="_blank">Niklas</a> - Without our Factorio sessions, this game would never have existed.
+        This current version partially uses art and music assets from the original game. If this causes any problems, please contact the author. <br><br>
 
 changelog:
     title: Changelog
