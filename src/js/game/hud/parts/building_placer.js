@@ -146,13 +146,13 @@ export class HUDBuildingPlacer extends HUDBuildingPlacerLogic {
 
         removeAllChildren(this.buildingInfoElements.additionalInfo);
         const additionalInfo = metaBuilding.getAdditionalStatistics(this.root, this.currentVariant.get());
-        for (let i = 0; i < additionalInfo.length; ++i) {
-            const [label, contents] = additionalInfo[i];
-            this.buildingInfoElements.additionalInfo.innerHTML += `
-                <label>${label}:</label>
-                <span>${contents}</contents>
-            `;
-        }
+        // for (let i = 0; i < additionalInfo.length; ++i) {
+        //     const [label, contents] = additionalInfo[i];
+        //     this.buildingInfoElements.additionalInfo.innerHTML += `
+        //         <label>${label}:</label>
+        //         <span>${contents}</contents>
+        //     `;
+        // }
     }
 
     cleanup() {
