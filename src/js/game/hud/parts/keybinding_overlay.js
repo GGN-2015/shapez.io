@@ -179,12 +179,12 @@ export class HUDKeybindingOverlay extends BaseHUDPart {
                     !this.anyPlacementActive && !this.mapOverviewActive && !this.anythingSelectedOnMap,
             },
 
-            {
-                // Pipette
-                label: T.ingame.keybindingsOverlay.pipette,
-                keys: [k.placement.pipette],
-                condition: () => !this.mapOverviewActive && !this.blueprintPlacementActive,
-            },
+            // {
+            //     // Pipette
+            //     label: T.ingame.keybindingsOverlay.pipette,
+            //     keys: [k.placement.pipette],
+            //     condition: () => !this.mapOverviewActive && !this.blueprintPlacementActive,
+            // },
 
             {
                 // Area select

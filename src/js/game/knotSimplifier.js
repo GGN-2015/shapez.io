@@ -220,7 +220,7 @@ export class KnotSimplifier {
         this.greenNodes = [];
         //this.greenCrossings = []
         let startSep = this.seperators[0];
-        let belowBelt = this.root.map.getLayerContentXY(startSep.x, startSep.y, "regular");
+        //let belowBelt = this.root.map.getLayerContentXY(startSep.x, startSep.y, "regular");
         let initGreen;
 
         let neighbors = [];
@@ -232,6 +232,10 @@ export class KnotSimplifier {
         for (let nei of neighbors) {
             initGreen = this.root.map.getLayerContentXY(nei.x, nei.y, "wires");
             if (initGreen) {
+                if (initGreen.components.StaticMapEntity.code !== 27) {
+                    this.root.hud.signals.notification.dispatch(T.knot.str16, enumNotificationType.error);
+                    return false;
+                }
                 initGreen.components.StaticMapEntity.rotation = neighbors.indexOf(nei) * 90;
                 break;
             }

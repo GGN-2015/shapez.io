@@ -124,7 +124,7 @@ export const KEYMAPPINGS = {
     },
 
     placement: {
-        pipette: { keyCode: keyToKeyCode("Q") },
+        //pipette: { keyCode: keyToKeyCode("Q") },
         rotateWhilePlacing: { keyCode: keyToKeyCode("R") },
         rotateInverseModifier: { keyCode: KEYCODES.Shift },
         rotateToUp: { keyCode: KEYCODES.ArrowUp },

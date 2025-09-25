@@ -121,7 +121,7 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
             .getBinding(KEYMAPPINGS.placement.switchDirectionLockSide)
             .add(this.switchDirectionLockSide, this);
         keyActionMapper.getBinding(KEYMAPPINGS.general.back).add(this.abortPlacement, this);
-        keyActionMapper.getBinding(KEYMAPPINGS.placement.pipette).add(this.startPipette, this);
+        //keyActionMapper.getBinding(KEYMAPPINGS.placement.pipette).add(this.startPipette, this);
         this.root.gameState.inputReciever.keyup.add(this.checkForDirectionLockSwitch, this);
 
         // BINDINGS TO GAME EVENTS
