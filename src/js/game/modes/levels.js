@@ -61,7 +61,7 @@ const WEB_DEMO_LEVELS = app => {
         {
             shape: "Cu------", // miners t2
             required: 50,
-            reward: enumHubGoalRewards.reward_rotater_ccw,
+            reward: enumHubGoalRewards.reward_mixer,
         },
 
         // 7
@@ -110,7 +110,7 @@ const STEAM_DEMO_LEVELS = () => [
     // Circle
     {
         shape: "CuCuCuCu", // belts t1
-        required: 35,
+        required: 10,
         reward: enumHubGoalRewards.reward_cutter_and_trash,
     },
 
@@ -118,56 +118,71 @@ const STEAM_DEMO_LEVELS = () => [
     // Cutter
     {
         shape: "----CuCu", //
-        required: 45,
-        reward: enumHubGoalRewards.no_reward,
+        required: 20,
+        reward: enumHubGoalRewards.reward_balancer,
     },
 
     // 3
     // Rectangle
     {
         shape: "RuRuRuRu", // miners t1
-        required: 90,
-        reward: enumHubGoalRewards.reward_balancer,
+        required: 30,
+        reward: enumHubGoalRewards.reward_rotater,
     },
 
     // 4
     {
         shape: "RuRu----", // processors t2
-        required: 70,
-        reward: enumHubGoalRewards.reward_rotater,
+        required: 30,
+        reward: enumHubGoalRewards.reward_tunnel,
     },
 
     // 5
     // Rotater
     {
         shape: "Cu----Cu", // belts t2
-        required: 160,
-        reward: enumHubGoalRewards.reward_tunnel,
-    },
-
-    // 6
-    {
-        shape: "Cu------", // miners t2
-        required: 160,
+        required: 75,
         reward: enumHubGoalRewards.reward_painter,
     },
 
-    // 7
+    // 6
     // Painter
     {
-        shape: "CrCrCrCr", // unused
-        required: 140,
-        reward: enumHubGoalRewards.reward_rotater_ccw,
+        shape: "Cu------", // miners t2
+        required: 50,
+        reward: enumHubGoalRewards.reward_mixer,
     },
+
+    // 7
+    {
+        shape: "CrCrCrCr", // unused
+        required: 85,
+        reward: enumHubGoalRewards.reward_mixer,
+    },
+
     // 8
     {
         shape: "RbRb----", // painter t2
-        required: 225,
+        required: 100,
         reward: enumHubGoalRewards.reward_mixer,
     },
-    // End of demo
     {
-        shape: "CpCpCpCp",
+        shape: "RbRb----", // painter t2
+        required: 100,
+        reward: enumHubGoalRewards.reward_mixer,
+    },
+    {
+        shape: "RbRb----", // painter t2
+        required: 100,
+        reward: enumHubGoalRewards.reward_mixer,
+    },
+    {
+        shape: "RbRb----", // painter t2
+        required: 100,
+        reward: enumHubGoalRewards.reward_mixer,
+    },
+    {
+        shape: "RpRp----",
         required: 0,
         reward: enumHubGoalRewards.reward_demo_end,
     },
@@ -176,7 +191,8 @@ const STEAM_DEMO_LEVELS = () => [
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 
-const STANDALONE_LEVELS = () => [
+const STANDALONE_LEVELS = STEAM_DEMO_LEVELS;
+() => [
     // 1
     // Circle
     {

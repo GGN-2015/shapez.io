@@ -67,7 +67,7 @@ export const enumHubGoalRewardsToContentUnlocked = {
     [enumHubGoalRewards.reward_demo_end]: null,
 };
 
-if (G_IS_DEV) {
+if (true || G_IS_DEV) {
     // Sanity check
     for (const rewardId in enumHubGoalRewards) {
         const mapping = enumHubGoalRewardsToContentUnlocked[rewardId];
