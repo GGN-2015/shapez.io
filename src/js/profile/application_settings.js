@@ -311,7 +311,7 @@ class SettingsStorage {
         this.offerHints = false;
         //this.enableTunnelSmartplace = true;
         this.vignette = true;
-        this.compactBuildingInfo = true;
+        this.compactBuildingInfo = false;
         this.disableCutDeleteWarnings = false;
         this.rotationByBuilding = true;
         this.clearCursorOnDeleteWhilePlacing = true;

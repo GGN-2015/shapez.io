@@ -822,7 +822,7 @@ buildings:
     belt:
         default:
             name: &belt Edit Mode
-            description: To draw a knot, select it and hold the mouse while dragging to draw; clicking on the intersection point can change its status.
+            description: To draw a knot, select it and hold the mouse while dragging to draw. Clicking on the intersection point can change its status.
 
     # Internal name for the Extractor
     miner:
