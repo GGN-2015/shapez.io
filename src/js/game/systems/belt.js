@@ -538,10 +538,11 @@ export class BeltSystem extends GameSystem {
                 if (entity.components.Belt) {
                     const direction = entity.components.Belt.direction;
                     let sprite = this.beltAnimations[direction][0];
+                    if (this.root.currentLayer === "regular") sprite = this.beltAnimations[direction][1];
 
-                    if (entity.components.Belt.assignedPath === hoveredBeltPath) {
-                        sprite = this.beltAnimations[direction][animationIndex % BELT_ANIM_COUNT];
-                    }
+                    // if (entity.components.Belt.assignedPath === hoveredBeltPath) {
+                    //     sprite = this.beltAnimations[direction][animationIndex % BELT_ANIM_COUNT];
+                    // }
 
                     // Culling happens within the static map entity component
                     entity.components.StaticMapEntity.drawSpriteOnBoundsClipped(parameters, sprite, 0);

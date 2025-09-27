@@ -32,7 +32,7 @@ knot:
     str9: Too closed corners
     str10: PD code copied
     str11: Press ctrl + C to copy
-    str12: Not found green path connected two seperators
+    str12: Not found green path connected two separators
     str13: Green path with open ends
     str14: Too closed green lines
     str15: Green lines are inconsistent with the underlying position
@@ -40,20 +40,20 @@ knot:
     str17: Illegal upper layer structures
     str18: 'new crossings: '
     str19: Please first set the green/red path
-    str20: Please first set two seperators
+    str20: Please first set two separators
     str21: Too many crossings, only use 'pick up' simplifying. In setting menu turn on 'precise search' if needed
     str22: 'Found position '
     str23: Not found legal red path
     str24: Rebuild direction
     str25: Increase distance
     str26: Decrease distance
-    str27: Can not repeat setting seperator
-    str28: Can only set two seperators
+    str27: Can not repeat setting separator
+    str28: Can only set two separators
     str29: Knot constructed 
     str30: Can not swith to edit mode when playing
-    str31: Can only set seperators on the knot
-    str32: Can not set seperators on crossings
-    str33: Can not set seperators too closed to a corner (can set on a corner)
+    str31: Can only set separators on the knot
+    str32: Can not set separators on crossings
+    str33: Can not set separators too closed to a corner (can set on a corner)
 steamPage:
     # This is the short text appearing on the steam page
     shortText: shapez is a game about building factories to automate the creation and processing of increasingly complex shapes across an infinitely expanding map.
@@ -646,7 +646,7 @@ ingame:
     # Map markers
     waypoints:
         waypoints: Markers
-        hub: HUB
+        hub: Center
         description: >-
             Left-click a marker to jump to it, right-click to delete it.<br><br>Press <keybinding> to create a marker from the current view, or <strong>right-click</strong> to create a marker at the
             selected location.
@@ -933,8 +933,8 @@ buildings:
 
     wire_tunnel:
         default:
-            name: &wire_tunnel Seperator
-            description: Two seperators will cut the knot into two paths, one of which is to be moved to the green path.
+            name: &wire_tunnel separator
+            description: Two separators will cut the knot into two paths, one of which is to be moved to the green path.
 
     constant_signal:
         default:

@@ -38,45 +38,44 @@ function gulptasksSounds($, gulp, buildFolder) {
     }
 
     // Encodes the game music
-    // gulp.task("sounds.music", () => {
-    //     return gulp
-    //         .src([path.join(soundsDir, "music", "**", "*.wav"), path.join(soundsDir, "music", "**", "*.mp3")])
-    //         .pipe($.plumber())
-    //         .pipe(
-    //             $.cache(
-    //                 $.fluentFfmpeg("mp3", function (cmd) {
-    //                     return cmd
-    //                         .audioBitrate(48)
-    //                         .audioChannels(1)
-    //                         .audioFrequency(22050)
-    //                         .audioCodec("libmp3lame")
-    //                         .audioFilters(["volume=0.15"]);
-    //                 }),
-    //                 {
-    //                     name: "music",
-    //                     fileCache,
-    //                     value: getFileCacheValue,
-    //                 }
-    //             )
-    //         )
-    //         .pipe(gulp.dest(path.join(builtSoundsDir, "music")));
-    // });
+    gulp.task("sounds.music", () => {
+        return gulp
+            .src([path.join(soundsDir, "music", "**", "*.wav"), path.join(soundsDir, "music", "**", "*.mp3")])
+            .pipe($.plumber())
+            .pipe(
+                $.cache(
+                    $.fluentFfmpeg("mp3", function (cmd) {
+                        return cmd
+                            .audioBitrate(48)
+                            .audioChannels(1)
+                            .audioFrequency(22050)
+                            .audioCodec("libmp3lame")
+                            .audioFilters(["volume=0.15"]);
+                    }),
+                    {
+                        name: "music",
+                        fileCache,
+                        value: getFileCacheValue,
+                    }
+                )
+            )
+            .pipe(gulp.dest(path.join(builtSoundsDir, "music")));
+    });
     const through2 = require('through2');
 
     gulp.task("sounds.music", () => {
         return gulp
-            .src([
-                path.join(soundsDir, "music", "**", "*.wav"),
-                path.join(soundsDir, "music", "**", "*.mp3")
-            ])
+            .src([path.join(soundsDir, "music", "**", "*.wav"), path.join(soundsDir, "music", "**", "*.mp3")])
             .pipe($.plumber()) // 保留错误处理
             .pipe(
                 $.cache(
-                    // 使用through2创建一个空操作流，兼容gulp-cache的接口要求
-                    through2.obj(function(file, enc, callback) {
-                        // 不做任何处理，直接传递文件
-                        this.push(file);
-                        callback();
+                    $.fluentFfmpeg("mp3", function (cmd) {
+                        return cmd
+                            .audioBitrate(48)
+                            .audioChannels(1)
+                            .audioFrequency(22050)
+                            .audioCodec("libmp3lame")
+                            .audioFilters(["volume=0.15"]);
                     }),
                     {
                         name: "music",

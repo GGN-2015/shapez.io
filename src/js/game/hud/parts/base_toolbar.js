@@ -2,6 +2,7 @@ import { gMetaBuildingRegistry } from "../../../core/global_registries";
 import { globalWarn } from "../../../core/logging";
 import { STOP_PROPAGATION } from "../../../core/signal";
 import { makeDiv, safeModulo } from "../../../core/utils";
+import { SOUNDS } from "../../../platform/sound";
 import { MetaBlockBuilding } from "../../buildings/block";
 import { MetaConstantProducerBuilding } from "../../buildings/constant_producer";
 import { MetaGoalAcceptorBuilding } from "../../buildings/goal_acceptor";
@@ -253,6 +254,7 @@ export class HUDBaseToolbar extends BaseHUDPart {
 
         if (metaBuilding.id === "comparator") {
             this.root.knotSimplifier.moveGreenLine();
+            this.root.soundProxy.playUi(metaBuilding.getPlacementSound());
             return;
         }
 

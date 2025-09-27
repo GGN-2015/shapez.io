@@ -287,7 +287,7 @@ function initializeSettings() {
         new BoolSetting("disableTileGrid", enumCategories.performance, (app, value) => {}),
         new BoolSetting("lowQualityTextures", enumCategories.performance, (app, value) => {}),
 
-        new BoolSetting("simplifiedBelts", enumCategories.performance, (app, value) => {}),
+        //new BoolSetting("simplifiedBelts", enumCategories.performance, (app, value) => {}),
     ];
 }
 
@@ -296,10 +296,10 @@ class SettingsStorage {
         this.uiScale = "regular";
         this.fullscreen = false;
 
-        this.soundVolume = 0;
-        this.musicVolume = 0;
+        this.soundVolume = 1.0;
+        this.musicVolume = 1.0;
 
-        this.theme = "light";
+        this.theme = "dark";
         this.refreshRate = "60";
         this.scrollWheelSensitivity = "regular";
         this.movementSpeed = "regular";
@@ -671,10 +671,10 @@ export class ApplicationSettings extends ReadWriteProxy {
             data.version = 26;
         }
 
-        if (data.version < 27) {
-            data.settings.simplifiedBelts = false;
-            data.version = 27;
-        }
+        // if (data.version < 27) {
+        //     data.settings.simplifiedBelts = false;
+        //     data.version = 27;
+        // }
 
         if (data.version < 28) {
             data.settings.enableMousePan = true;

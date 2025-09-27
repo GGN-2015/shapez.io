@@ -9,6 +9,7 @@ import { Node } from "./knotUtils";
 import { Strand } from "./knotUtils";
 import { gMetaBuildingRegistry } from "../core/global_registries";
 import { T } from "../translations";
+import { SOUNDS } from "../platform/sound";
 
 export class KnotSimplifier {
     /**
@@ -994,10 +995,14 @@ export class KnotSimplifier {
                 enumNotificationType.success
             );
             this.checkResultIndex = (this.checkResultIndex + 1) % this.check_result_array.length;
+            this.root.soundProxy.playUi(SOUNDS.dialogOk);
+
             return;
         }
 
         this.root.hud.signals.notification.dispatch(T.knot.str23, enumNotificationType.error);
+        this.root.soundProxy.playUi(SOUNDS.uiError);
+
         this.root.systemMgr.systems.wire.bUpdateSuround = true;
     }
 }

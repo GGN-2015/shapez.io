@@ -285,10 +285,10 @@ export class SoundInterface {
                 this.currentMusic.stop();
             }
             this.currentMusic = music;
-            if (music && this.pageIsVisible) {
-                logger.log("Starting", this.currentMusic.key);
-                music.play(this.musicVolume);
-            }
+            // if (music && this.pageIsVisible) {
+            //     logger.log("Starting", this.currentMusic.key);
+            //     music.play(this.musicVolume);
+            // }
         }
     }
 }
