@@ -100,7 +100,7 @@ export const KEYMAPPINGS = {
         //stacker: { keyCode: keyToKeyCode("7") },
         //mixer: { keyCode: keyToKeyCode("8") },
         //painter: { keyCode: keyToKeyCode("9") },
-        //trash: { keyCode: keyToKeyCode("0") },
+        trash: { keyCode: keyToKeyCode("0") },
 
         // Sandbox
         //item_producer: { keyCode: keyToKeyCode("L") },

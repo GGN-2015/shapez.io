@@ -18,7 +18,7 @@ import { BeltSystem } from "./systems/belt";
 import { WireNetwork } from "./systems/wire";
 const LZString = require("lz-string");
 const logger = createLogger("ingame/logic");
-import { stages } from "./stages";
+import { G_STAGES } from "./stages";
 import { T } from "../translations";
 
 /**
@@ -775,14 +775,26 @@ export class GameLogic {
         } else if (building.id === "wire") {
             // 设置绿线
             this.root.knotSimplifier.readyToMove = false;
+            // this.saveState();
             return false;
         }
         return false;
     }
 
+    saveState() {
+        /////////
+        const savegame = this.root.app.savegameMgr.getSavegameById(
+            "a142e1332e28753ef7e4c5fc82f1ba764eb823fa"
+        );
+        savegame.readAsync().then(() => {
+            console.log(LZString.compressToBase64(JSON.stringify(savegame.getCurrentDump())));
+            debugger;
+        });
+    }
+
     loadState(i) {
         this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
-        if (i >= stages.length) {
+        if (i >= G_STAGES.length) {
             return;
         }
         //////////
@@ -794,18 +806,9 @@ export class GameLogic {
         for (let de of toDel) {
             this.root.logic.tryDeleteBuilding(de);
         }
-        ///////////
-        // const savegame = this.root.app.savegameMgr.getSavegameById(
-        //     "c9e2a07e617b1b45369923eb927138f61c061bcf"
-        // );
-        // savegame
-        //     .readAsync()
-        //     //.then(() => this.checkForModDifferences(savegame))
-        //     .then(() => {
-        //this.root.savegame = savegame;
 
         const serializer = new SavegameSerializer();
-        const savegame = JSON.parse(LZString.decompressFromBase64(stages[i].toString()));
+        const savegame = JSON.parse(LZString.decompressFromBase64(G_STAGES[i].toString()));
 
         this.root.entityMgr.deserialize(savegame.entityMgr);
         this.root.camera.deserialize(savegame.camera);
@@ -813,10 +816,6 @@ export class GameLogic {
         serializer.internal.deserializeEntityArray(this.root, savegame.entities);
         this.root.systemMgr.systems.belt.deserializePaths(savegame.beltPaths);
 
-        // console.log(LZString.compressToBase64(JSON.stringify(savegame.getCurrentDump())));
-        // console.log(JSON.parse(LZString.decompressFromBase64(stage1.toString())));
-        //console.log(LZString.decompressFromBase64(stages.toString()));
-        //console.log(stage1);
         this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
         if (this.root.hud.parts["wiresOverlay"].initKnot(this.root)) {
             //this.root.isPlayMode = true;

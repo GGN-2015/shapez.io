@@ -10,6 +10,7 @@ import { BaseHUDPart } from "../base_hud_part";
 import { Knot } from "../../knot";
 import { enumNotificationType } from "./notifications";
 import { T } from "../../../translations";
+import { G_STAGES } from "../../stages";
 
 const copy = require("clipboard-copy");
 const wiresBackgroundDpi = 4;
@@ -79,7 +80,7 @@ export class HUDWiresOverlay extends BaseHUDPart {
         if (!this.root.gameMode.getSupportsWires()) {
             return;
         }
-        if (this.root.hubGoals.level < 13 && this.root.currentLayer === "wires") {
+        if (this.root.hubGoals.level <= G_STAGES.length && this.root.currentLayer === "wires") {
             this.root.hud.signals.notification.dispatch(T.knot.str30, enumNotificationType.error);
             return;
         }
