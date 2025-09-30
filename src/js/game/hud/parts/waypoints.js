@@ -241,7 +241,7 @@ export class HUDWaypoints extends BaseHUDPart {
      * @param {Waypoint} waypoint
      */
     moveToWaypoint(waypoint) {
-        this.root.currentLayer = waypoint.layer;
+        //this.root.currentLayer = waypoint.layer;
         this.root.camera.setDesiredCenter(new Vector(waypoint.center.x, waypoint.center.y));
         this.root.camera.setDesiredZoom(waypoint.zoomLevel);
     }

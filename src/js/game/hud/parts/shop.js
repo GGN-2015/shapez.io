@@ -4,6 +4,7 @@ import { formatBigNumber, getRomanNumber, makeDiv } from "../../../core/utils";
 import { SOUNDS } from "../../../platform/sound";
 import { T } from "../../../translations";
 import { KeyActionMapper, KEYMAPPINGS } from "../../key_action_mapper";
+import { G_STAGES } from "../../stages";
 import { BaseHUDPart } from "../base_hud_part";
 import { DynamicDomAttach } from "../dynamic_dom_attach";
 import { enumNotificationType } from "./notifications";
@@ -23,39 +24,46 @@ export class HUDShop extends BaseHUDPart {
 
         this.upgradeToElements = {};
 
+        const stars = ["★☆☆☆☆", "★★☆☆☆", "★★★☆☆", "★★★★☆", "★★★★★"];
         // Upgrades
-        for (const upgradeId in this.root.gameMode.getUpgrades()) {
+        // for (const upgradeId in this.root.gameMode.getUpgrades()) {
+        for (let i = 0; i < G_STAGES.length; i++) {
             const handle = {};
             handle.requireIndexToElement = [];
 
             // Wrapper
             handle.elem = makeDiv(this.contentDiv, null, ["upgrade"]);
-            handle.elem.setAttribute("data-upgrade-id", upgradeId);
+            handle.elem.setAttribute("data-upgrade-id", i.toString());
 
             // Title
-            const title = makeDiv(handle.elem, null, ["title"], T.shopUpgrades[upgradeId].name);
+            const title = makeDiv(handle.elem, null, ["title"], stars[G_STAGES[i].difficulty - 1]);
+            makeDiv(handle.elem, null, ["title"], "level " + (i + 1));
+            makeDiv(handle.elem, null, ["tier"], T.knot.str36 + ": " + G_STAGES[i].crossings);
 
             // Title > Tier
             handle.elemTierLabel = makeDiv(title, null, ["tier"]);
 
             // Icon
-            handle.icon = makeDiv(handle.elem, null, ["icon"]);
-            handle.icon.setAttribute("data-icon", "upgrades/" + upgradeId + ".png");
+            // handle.icon = makeDiv(handle.elem, null, ["icon"]);
+            // handle.icon.setAttribute("data-icon", "upgrades/" + upgradeId + ".png");
 
             // Description
-            handle.elemDescription = makeDiv(handle.elem, null, ["description"], "??");
-            handle.elemRequirements = makeDiv(handle.elem, null, ["requirements"]);
+            handle.elemDescription = makeDiv(handle.elem, null, ["description"], "");
+            //handle.elemRequirements = makeDiv(handle.elem, null, ["requirements"]);
 
             // Buy button
             handle.buyButton = document.createElement("button");
             handle.buyButton.classList.add("buy", "styledButton");
             handle.buyButton.innerText = T.ingame.shop.buttonUnlock;
             handle.elem.appendChild(handle.buyButton);
+            if (i < 1) { // 此处 level 存档还没有被读取
+                handle.buyButton.classList.toggle("buyable", true);
+            }
 
-            this.trackClicks(handle.buyButton, () => this.tryUnlockNextTier(upgradeId));
+            this.trackClicks(handle.buyButton, () => this.tryUnlockNextTier(i));
 
             // Assign handle
-            this.upgradeToElements[upgradeId] = handle;
+            this.upgradeToElements[i.toString()] = handle;
         }
     }
 
@@ -69,12 +77,12 @@ export class HUDShop extends BaseHUDPart {
             const tierHandle = upgradeTiers[currentTier];
 
             // Set tier
-            handle.elemTierLabel.innerText = T.ingame.shop.tier.replace(
-                "<x>",
-                getRomanNumber(currentTier + 1)
-            );
+            // handle.elemTierLabel.innerText = T.ingame.shop.tier.replace(
+            //     "<x>",
+            //     getRomanNumber(currentTier + 1)
+            // );
 
-            handle.elemTierLabel.setAttribute("data-tier", currentTier);
+            // handle.elemTierLabel.setAttribute("data-tier", currentTier);
 
             // Cleanup detectors
             for (let i = 0; i < handle.requireIndexToElement.length; ++i) {
@@ -101,96 +109,94 @@ export class HUDShop extends BaseHUDPart {
             }
 
             // Set description
-            handle.elemDescription.innerText = T.shopUpgrades[upgradeId].description
-                .replace("<currentMult>", currentTierMultiplier.toFixed(2))
-                .replace("<newMult>", (currentTierMultiplier + tierHandle.improvement).toFixed(2));
+            // handle.elemDescription.innerText = T.shopUpgrades[upgradeId].description
+            //     .replace("<currentMult>", currentTierMultiplier.toFixed(2))
+            //     .replace("<newMult>", (currentTierMultiplier + tierHandle.improvement).toFixed(2));
 
-            tierHandle.required.forEach(({ shape, amount }) => {
-                const container = makeDiv(handle.elemRequirements, null, ["requirement"]);
+            // tierHandle.required.forEach(({ shape, amount }) => {
+            //     const container = makeDiv(handle.elemRequirements, null, ["requirement"]);
 
-                const shapeDef = this.root.shapeDefinitionMgr.getShapeFromShortKey(shape);
-                const shapeCanvas = shapeDef.generateAsCanvas(120);
-                shapeCanvas.classList.add();
-                container.appendChild(shapeCanvas);
+            //     const shapeDef = this.root.shapeDefinitionMgr.getShapeFromShortKey(shape);
+            //     const shapeCanvas = shapeDef.generateAsCanvas(120);
+            //     shapeCanvas.classList.add();
+            //     container.appendChild(shapeCanvas);
 
-                const progressContainer = makeDiv(container, null, ["amount"]);
-                const progressBar = document.createElement("label");
-                progressBar.classList.add("progressBar");
-                progressContainer.appendChild(progressBar);
+            //     const progressContainer = makeDiv(container, null, ["amount"]);
+            //     const progressBar = document.createElement("label");
+            //     progressBar.classList.add("progressBar");
+            //     progressContainer.appendChild(progressBar);
 
-                const progressLabel = document.createElement("label");
-                progressContainer.appendChild(progressLabel);
+            //     const progressLabel = document.createElement("label");
+            //     progressContainer.appendChild(progressLabel);
 
-                const pinButton = document.createElement("button");
-                pinButton.classList.add("pin");
-                container.appendChild(pinButton);
+            //     const pinButton = document.createElement("button");
+            //     pinButton.classList.add("pin");
+            //     container.appendChild(pinButton);
 
-                let infoDetector;
-                if (!G_WEGAME_VERSION) {
-                    const viewInfoButton = document.createElement("button");
-                    viewInfoButton.classList.add("showInfo");
-                    container.appendChild(viewInfoButton);
-                    infoDetector = new ClickDetector(viewInfoButton, {
-                        consumeEvents: true,
-                        preventDefault: true,
-                    });
-                    infoDetector.click.add(() =>
-                        this.root.hud.signals.viewShapeDetailsRequested.dispatch(shapeDef)
-                    );
-                }
+            //     let infoDetector;
+            //     if (!G_WEGAME_VERSION) {
+            //         const viewInfoButton = document.createElement("button");
+            //         viewInfoButton.classList.add("showInfo");
+            //         container.appendChild(viewInfoButton);
+            //         infoDetector = new ClickDetector(viewInfoButton, {
+            //             consumeEvents: true,
+            //             preventDefault: true,
+            //         });
+            //         infoDetector.click.add(() =>
+            //             this.root.hud.signals.viewShapeDetailsRequested.dispatch(shapeDef)
+            //         );
+            //     }
 
-                const currentGoalShape = this.root.hubGoals.currentGoal.definition.getHash();
-                if (shape === currentGoalShape) {
-                    pinButton.classList.add("isGoal");
-                } else if (this.root.hud.parts.pinnedShapes.isShapePinned(shape)) {
-                    pinButton.classList.add("alreadyPinned");
-                }
+            //     const currentGoalShape = this.root.hubGoals.currentGoal.definition.getHash();
+            //     if (shape === currentGoalShape) {
+            //         pinButton.classList.add("isGoal");
+            //     } else if (this.root.hud.parts.pinnedShapes.isShapePinned(shape)) {
+            //         pinButton.classList.add("alreadyPinned");
+            //     }
 
-                const pinDetector = new ClickDetector(pinButton, {
-                    consumeEvents: true,
-                    preventDefault: true,
-                });
-                pinDetector.click.add(() => {
-                    if (this.root.hud.parts.pinnedShapes.isShapePinned(shape)) {
-                        this.root.hud.signals.shapeUnpinRequested.dispatch(shape);
-                        pinButton.classList.add("unpinned");
-                        pinButton.classList.remove("pinned", "alreadyPinned");
-                    } else {
-                        this.root.hud.signals.shapePinRequested.dispatch(shapeDef);
-                        pinButton.classList.add("pinned");
-                        pinButton.classList.remove("unpinned");
-                    }
-                });
+            //     const pinDetector = new ClickDetector(pinButton, {
+            //         consumeEvents: true,
+            //         preventDefault: true,
+            //     });
+            //     pinDetector.click.add(() => {
+            //         if (this.root.hud.parts.pinnedShapes.isShapePinned(shape)) {
+            //             this.root.hud.signals.shapeUnpinRequested.dispatch(shape);
+            //             pinButton.classList.add("unpinned");
+            //             pinButton.classList.remove("pinned", "alreadyPinned");
+            //         } else {
+            //             this.root.hud.signals.shapePinRequested.dispatch(shapeDef);
+            //             pinButton.classList.add("pinned");
+            //             pinButton.classList.remove("unpinned");
+            //         }
+            //     });
 
-                handle.requireIndexToElement.push({
-                    container,
-                    progressLabel,
-                    progressBar,
-                    definition: shapeDef,
-                    required: amount,
-                    pinDetector,
-                    infoDetector,
-                });
-            });
+            //     handle.requireIndexToElement.push({
+            //         container,
+            //         progressLabel,
+            //         progressBar,
+            //         definition: shapeDef,
+            //         required: amount,
+            //         pinDetector,
+            //         infoDetector,
+            //     });
+            // });
         }
     }
 
     renderCountsAndStatus() {
-        for (const upgradeId in this.upgradeToElements) {
-            const handle = this.upgradeToElements[upgradeId];
-            for (let i = 0; i < handle.requireIndexToElement.length; ++i) {
-                const { progressLabel, progressBar, definition, required } = handle.requireIndexToElement[i];
-
-                const haveAmount = this.root.hubGoals.getShapesStored(definition);
-                const progress = Math.min(haveAmount / required, 1.0);
-
-                progressLabel.innerText = formatBigNumber(haveAmount) + " / " + formatBigNumber(required);
-                progressBar.style.width = progress * 100.0 + "%";
-                progressBar.classList.toggle("complete", progress >= 1.0);
-            }
-
-            handle.buyButton.classList.toggle("buyable", this.root.hubGoals.canUnlockUpgrade(upgradeId));
-        }
+        // for (const upgradeId in this.upgradeToElements) {
+        //     const handle = this.upgradeToElements[upgradeId];
+        //     // for (let i = 0; i < handle.requireIndexToElement.length; ++i) {
+        //     //     const { progressLabel, progressBar, definition, required } = handle.requireIndexToElement[i];
+        //     //     const haveAmount = this.root.hubGoals.getShapesStored(definition);
+        //     //     const progress = Math.min(haveAmount / required, 1.0);
+        //     //     progressLabel.innerText = formatBigNumber(haveAmount) + " / " + formatBigNumber(required);
+        //     //     progressBar.style.width = progress * 100.0 + "%";
+        //     //     progressBar.classList.toggle("complete", progress >= 1.0);
+        //     // }
+        //     // handle.buyButton.classList.toggle("buyable", this.root.hubGoals.canUnlockUpgrade(upgradeId));
+        //     //handle.buyButton.classList.toggle("buyable", true);
+        // }
     }
 
     initialize() {
@@ -207,7 +213,7 @@ export class HUDShop extends BaseHUDPart {
 
         this.close();
 
-        this.rerenderFull();
+        // this.rerenderFull();
         this.root.signals.upgradePurchased.add(this.rerenderFull, this);
     }
 
@@ -228,17 +234,17 @@ export class HUDShop extends BaseHUDPart {
     }
 
     show() {
-        if (this.root.knot && this.root.currentLayer === "wires") {
-            //console.log("pd code: " + this.root.knot.getPDcode());
-            this.root.knot.getPDcode();
-            //this.root.hud.signals.notification.dispatch("PD code 已复制", enumNotificationType.success);
-        } else {
-            this.root.hud.signals.notification.dispatch(T.knot.str1, enumNotificationType.error);
-        }
-        return;
+        // if (this.root.knot && this.root.currentLayer === "wires") {
+        //     //console.log("pd code: " + this.root.knot.getPDcode());
+        //     this.root.knot.getPDcode();
+        //     //this.root.hud.signals.notification.dispatch("PD code 已复制", enumNotificationType.success);
+        // } else {
+        //     this.root.hud.signals.notification.dispatch(T.knot.str1, enumNotificationType.error);
+        // }
+        // return;
         this.visible = true;
         this.root.app.inputMgr.makeSureAttachedAndOnTop(this.inputReciever);
-        this.rerenderFull();
+        // this.rerenderFull();
     }
 
     close() {
@@ -255,9 +261,18 @@ export class HUDShop extends BaseHUDPart {
     }
 
     tryUnlockNextTier(upgradeId) {
-        if (this.root.hubGoals.tryUnlockUpgrade(upgradeId)) {
-            this.root.app.sound.playUiSound(SOUNDS.unlockUpgrade);
-        }
+        // if (this.root.hubGoals.tryUnlockUpgrade(upgradeId)) {
+        //     this.root.app.sound.playUiSound(SOUNDS.unlockUpgrade);
+        // }
+        const signals = this.root.hud.parts.dialogs.showWarning(
+            T.knot.str34 + (upgradeId + 1) + " ?",
+            T.knot.str35,
+            ["cancel", "ok:good"]
+        );
+        signals.ok.add(() => {
+            this.root.logic.loadState(upgradeId);
+            this.close();
+        });
     }
 
     isBlockingOverlay() {

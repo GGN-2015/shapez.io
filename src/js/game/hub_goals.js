@@ -7,6 +7,7 @@ import { enumItemProcessorTypes } from "./components/item_processor";
 import { enumAnalyticsDataSource } from "./production_analytics";
 import { GameRoot } from "./root";
 import { enumSubShape, ShapeDefinition } from "./shape_definition";
+import { G_STAGES } from "./stages";
 import { enumHubGoalRewards } from "./tutorial_goals";
 
 export const MOD_ITEM_PROCESSOR_SPEEDS = {};
@@ -40,6 +41,10 @@ export class HubGoals extends BasicSerializableObject {
         // If freeplay is not available, clamp the level
         if (!root.gameMode.getIsFreeplayAvailable()) {
             this.level = Math.min(this.level, levels.length);
+        }
+
+        for (let i = 0; i < this.level && i < G_STAGES.length; i++) {
+            this.root.hud.parts["shop"].upgradeToElements[i].buyButton.classList.toggle("buyable", true);
         }
 
         // Compute gained rewards
@@ -271,7 +276,14 @@ export class HubGoals extends BasicSerializableObject {
         this.gainedRewards[reward] = (this.gainedRewards[reward] || 0) + 1;
 
         this.root.app.gameAnalytics.handleLevelCompleted(this.level);
-        ++this.level;
+        if (this.level < G_STAGES.length) {
+            this.root.hud.parts["shop"].upgradeToElements[this.level].buyButton.classList.toggle(
+                "buyable",
+                true
+            );
+        }
+        if (this.level <= G_STAGES.length) ++this.level;
+
         this.computeNextGoal();
 
         this.root.signals.storyGoalCompleted.dispatch(this.level - 1, reward);

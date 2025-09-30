@@ -193,7 +193,7 @@ export class GameCore {
         if (!this.app.bEditMode) {
             this.root.logic.loadState(0);
         } else {
-            this.root.hubGoals.level = 13;
+            this.root.hubGoals.level = 500;
         }
     }
 

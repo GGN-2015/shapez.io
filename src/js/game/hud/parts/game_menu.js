@@ -6,6 +6,7 @@ import { T } from "../../../translations";
 import { KEYMAPPINGS } from "../../key_action_mapper";
 import { DynamicDomAttach } from "../dynamic_dom_attach";
 import { TrackedState } from "../../../core/tracked_state";
+import { G_STAGES } from "../../stages";
 
 export class HUDGameMenu extends BaseHUDPart {
     createElements(parent) {
@@ -14,7 +15,7 @@ export class HUDGameMenu extends BaseHUDPart {
         const buttons = [
             {
                 id: "shop",
-                label: "Upgrades",
+                label: "Stages",
                 handler: () => this.root.hud.parts.shop.show(),
                 keybinding: KEYMAPPINGS.ingame.menuOpenShop,
                 badge: () => this.root.hubGoals.getAvailableUpgradeCount(),
@@ -22,7 +23,7 @@ export class HUDGameMenu extends BaseHUDPart {
                     T.ingame.notifications.newUpgrade,
                     enumNotificationType.upgrade,
                 ]),
-                visible: () => false,
+                visible: () => this.root.hubGoals.level < G_STAGES.length + 2,
                 // !this.root.app.settings.getAllSettings().offerHints || this.root.hubGoals.level >= 3,
             },
             {

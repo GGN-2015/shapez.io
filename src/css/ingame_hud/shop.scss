@@ -305,17 +305,20 @@
                 }
 
                 &.buyable {
-                    @include InlineAnimation(1s ease-in-out infinite) {
-                        0% {
-                        }
+                    // @include InlineAnimation(1s ease-in-out infinite) {
+                    //     0% {
+                    //     }
 
-                        50% {
-                            background-color: lighten($colorGreenBright, 10);
-                            transform: scale(1.02);
-                        }
-                        100% {
-                        }
-                    }
+                    //     50% {
+                    //         background-color: lighten($colorGreenBright, 10);
+                    //         transform: scale(1.02);
+                    //     }
+                    //     100% {
+                    //     }
+                    // }
+                    background-color: lighten($colorGreenBright, 10);
+                    cursor: default;
+                    // opacity: 0.3;
                 }
             }
 

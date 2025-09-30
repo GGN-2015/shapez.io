@@ -1,5 +1,10 @@
 export const CHANGELOG = [
     {
+        version: "0.0.5",
+        date: "30.09.2025",
+        entries: ["增加关卡选择"],
+    },
+    {
         version: "0.0.4",
         date: "30.09.2025",
         entries: ["最后关卡重新设计"],
