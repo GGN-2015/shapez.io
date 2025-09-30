@@ -14,7 +14,7 @@ import { WEB_STEAM_SSO_AUTHENTICATED } from "../../core/steam_sso";
 
 const logger = createLogger("game_analytics");
 
-const analyticsUrl = G_IS_DEV ? "http://localhost:8001" : "https://analytics.shapez.io";
+//const analyticsUrl = G_IS_DEV ? "http://localhost:8001" : "https://analytics.shapez.io";
 
 // Be sure to increment the ID whenever it changes
 const analyticsLocalFile = G_IS_STEAM_DEMO ? "shapez_token_steamdemo.bin" : "shapez_token_123.bin";
@@ -114,6 +114,7 @@ export class ShapezGameAnalytics extends GameAnalyticsInterface {
     initialize() {
         this.syncKey = null;
 
+        return;
         if (G_WEGAME_VERSION) {
             return;
         }

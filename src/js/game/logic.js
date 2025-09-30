@@ -784,10 +784,11 @@ export class GameLogic {
     saveState() {
         /////////
         const savegame = this.root.app.savegameMgr.getSavegameById(
-            "a142e1332e28753ef7e4c5fc82f1ba764eb823fa"
+            "8608622a28f13bfb9044918c24751891d01ecd97"
         );
         savegame.readAsync().then(() => {
             console.log(LZString.compressToBase64(JSON.stringify(savegame.getCurrentDump())));
+            // eslint-disable-next-line no-debugger
             debugger;
         });
     }

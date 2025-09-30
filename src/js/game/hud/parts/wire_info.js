@@ -16,6 +16,7 @@ export class HUDWireInfo extends BaseHUDPart {
      * @param {import("../../../core/draw_utils").DrawParameters} parameters
      */
     drawOverlays(parameters) {
+        return;
         if (this.root.currentLayer !== "wires") {
             // Not in the wires layer
             return;

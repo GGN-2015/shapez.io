@@ -93,6 +93,26 @@ const WEB_DEMO_LEVELS = app => {
             reward: enumHubGoalRewards.reward_mixer,
         },
         {
+            shape: "RbRb----", // painter t2
+            required: 100,
+            reward: enumHubGoalRewards.reward_mixer,
+        },
+        {
+            shape: "RbRb----", // painter t2
+            required: 100,
+            reward: enumHubGoalRewards.reward_mixer,
+        },
+        {
+            shape: "RbRb----", // painter t2
+            required: 100,
+            reward: enumHubGoalRewards.reward_mixer,
+        },
+        {
+            shape: "RbRb----", // painter t2
+            required: 100,
+            reward: enumHubGoalRewards.reward_mixer,
+        },
+        {
             shape: "RpRp----",
             required: 0,
             reward: enumHubGoalRewards.reward_demo_end,
@@ -161,6 +181,26 @@ const STEAM_DEMO_LEVELS = () => [
     },
 
     // 8
+    {
+        shape: "RbRb----", // painter t2
+        required: 100,
+        reward: enumHubGoalRewards.reward_mixer,
+    },
+    {
+        shape: "RbRb----", // painter t2
+        required: 100,
+        reward: enumHubGoalRewards.reward_mixer,
+    },
+    {
+        shape: "RbRb----", // painter t2
+        required: 100,
+        reward: enumHubGoalRewards.reward_mixer,
+    },
+    {
+        shape: "RbRb----", // painter t2
+        required: 100,
+        reward: enumHubGoalRewards.reward_mixer,
+    },
     {
         shape: "RbRb----", // painter t2
         required: 100,

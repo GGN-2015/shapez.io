@@ -336,14 +336,12 @@ export class MainMenuState extends GameState {
                     </div>
                     -->
 
-                    <!--
                     <div class="footerGrow">
                         ${showExternalLinks ? `<a class="changelog">${T.changelog.title}</a>` : ""}
-                        
+                        <!--
                         ${showExternalLinks ? `<a class="helpTranslate">${T.mainMenu.helpTranslate}</a>` : ""}
-
+                        -->
                     </div>
-                    -->
                     <!--
                         <div class="author"><a class="producerLink" href="https://tobspr.io" target="_blank" title="tobspr Games" rel="follow">
                         <img src="${cachebust("res/logo-tobspr-games.svg")}" alt="tobspr Games"

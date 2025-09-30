@@ -10,6 +10,7 @@ import { Strand } from "./knotUtils";
 import { gMetaBuildingRegistry } from "../core/global_registries";
 import { T } from "../translations";
 import { SOUNDS } from "../platform/sound";
+import { MetaComparatorBuilding } from "./buildings/comparator";
 
 export class KnotSimplifier {
     /**
@@ -235,6 +236,7 @@ export class KnotSimplifier {
             if (initGreen) {
                 if (initGreen.components.StaticMapEntity.code !== 27) {
                     this.root.hud.signals.notification.dispatch(T.knot.str16, enumNotificationType.error);
+                    this.drawErrorPosion(initGreen.components.StaticMapEntity.origin);
                     return false;
                 }
                 initGreen.components.StaticMapEntity.rotation = neighbors.indexOf(nei) * 90;
@@ -271,6 +273,7 @@ export class KnotSimplifier {
             let nextGreen = this.root.map.getLayerContentXY(nextOrigin.x, nextOrigin.y, "wires");
             if (!nextGreen) {
                 this.root.hud.signals.notification.dispatch(T.knot.str13, enumNotificationType.error);
+                this.drawErrorPosion(curGreen.components.StaticMapEntity.origin);
                 return false;
             }
             if (nextGreen.components.StaticMapEntity.code === 39) {
@@ -282,6 +285,7 @@ export class KnotSimplifier {
                 nextGreen.components.StaticMapEntity.rotation = outRot;
                 if (!this.root.map.checkNeighborsNull(nextGreen, "wires")) {
                     this.root.hud.signals.notification.dispatch(T.knot.str14, enumNotificationType.error);
+                    this.drawErrorPosion(nextGreen.components.StaticMapEntity.origin);
                     return false;
                 }
                 let belowEnt = this.root.map.getLayerContentXY(
@@ -294,6 +298,7 @@ export class KnotSimplifier {
                     bCross = true;
                     if (belowEnt.components.StaticMapEntity.code !== 1) {
                         this.root.hud.signals.notification.dispatch(T.knot.str15, enumNotificationType.error);
+                        this.drawErrorPosion(nextGreen.components.StaticMapEntity.origin);
                         return false;
                     }
                     if (
@@ -303,10 +308,12 @@ export class KnotSimplifier {
                         0
                     ) {
                         this.root.hud.signals.notification.dispatch(T.knot.str15, enumNotificationType.error);
+                        this.drawErrorPosion(nextGreen.components.StaticMapEntity.origin);
                         return false;
                     }
                 } else if (!this.root.map.checkNeighborsNull(nextGreen, "regular")) {
                     this.root.hud.signals.notification.dispatch(T.knot.str15, enumNotificationType.error);
+                    this.drawErrorPosion(nextGreen.components.StaticMapEntity.origin);
                     return false;
                 }
 
@@ -322,6 +329,7 @@ export class KnotSimplifier {
                                 T.knot.str15,
                                 enumNotificationType.error
                             );
+                            this.drawErrorPosion(nextGreen.components.StaticMapEntity.origin);
                             return false;
                         }
                     }
@@ -342,6 +350,7 @@ export class KnotSimplifier {
                 ) {
                     // 过密位置非法
                     this.root.hud.signals.notification.dispatch(T.knot.str16, enumNotificationType.error);
+                    this.drawErrorPosion(nextGreen.components.StaticMapEntity.origin);
                     return false;
                 }
                 if (nextGreen.components.StaticMapEntity.rotation === outRot) {
@@ -350,6 +359,7 @@ export class KnotSimplifier {
                     outRot = (outRot + 270) % 360;
                 } else {
                     this.root.hud.signals.notification.dispatch(T.knot.str16, enumNotificationType.error);
+                    this.drawErrorPosion(nextGreen.components.StaticMapEntity.origin);
                     return false;
                 }
                 let node = this.root.knot.createNodeFromEntity(
@@ -361,6 +371,7 @@ export class KnotSimplifier {
                 this.greenNodes.push(node);
             } else {
                 this.root.hud.signals.notification.dispatch(T.knot.str17, enumNotificationType.error);
+                this.drawErrorPosion(nextGreen.components.StaticMapEntity.origin);
                 return false;
             }
             curGreen = nextGreen;
@@ -742,6 +753,27 @@ export class KnotSimplifier {
                 this.root.logic.tryDeleteBuilding(de);
             }
         }
+    }
+
+    /**
+     *
+     * @param {Vector} origin
+     */
+    drawErrorPosion(origin) {
+        let _building = gMetaBuildingRegistry.findByClass(MetaComparatorBuilding);
+        let entity = _building.createEntity({
+            root: this.root,
+            origin: origin,
+            rotation: 0,
+            originalRotation: 0,
+            rotationVariant: 0,
+            variant: "default",
+        });
+
+        this.root.logic.freeEntityAreaBeforeBuild(entity);
+        this.root.map.placeStaticEntity(entity);
+        this.root.entityMgr.registerEntity(entity);
+        this.root.soundProxy.playUi(SOUNDS.uiError);
     }
 
     /**

@@ -1,8 +1,13 @@
 export const CHANGELOG = [
     {
+        version: "0.0.6",
+        date: "01.10.2025",
+        entries: ["增加至共 16 关", "增加绿线绘制非法位置图标提示"],
+    },
+    {
         version: "0.0.5",
         date: "30.09.2025",
-        entries: ["增加关卡选择"],
+        entries: ["增加历史关卡选择"],
     },
     {
         version: "0.0.4",

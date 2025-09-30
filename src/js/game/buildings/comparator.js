@@ -78,4 +78,8 @@ export class MetaComparatorBuilding extends MetaBuilding {
             })
         );
     }
+
+    getIsReplaceable(variant, rotationVariant) {
+        return true;
+    }
 }

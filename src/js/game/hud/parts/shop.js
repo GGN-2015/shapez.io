@@ -56,7 +56,8 @@ export class HUDShop extends BaseHUDPart {
             handle.buyButton.classList.add("buy", "styledButton");
             handle.buyButton.innerText = T.ingame.shop.buttonUnlock;
             handle.elem.appendChild(handle.buyButton);
-            if (i < 1) { // 此处 level 存档还没有被读取
+            if (i < 1) {
+                // 此处 level 存档还没有被读取
                 handle.buyButton.classList.toggle("buyable", true);
             }
 
