@@ -5,7 +5,7 @@ import { round3Digits } from "./utils";
 export const ORIGINAL_SPRITE_SCALE = "0.75";
 export const FULL_CLIP_RECT = new Rectangle(0, 0, 1, 1);
 
-const EXTRUDE = 0.1;
+// let EXTRUDE = 0.1;
 
 export class BaseSprite {
     /**
@@ -74,6 +74,7 @@ export class AtlasSprite extends BaseSprite {
         this.spriteName = spriteName;
 
         this.frozen = false;
+        this.extrude = 0.1;
     }
 
     getRawTexture() {
@@ -145,6 +146,20 @@ export class AtlasSprite extends BaseSprite {
      */
     drawCentered(context, x, y, size) {
         this.draw(context, x - size / 2, y - size / 2, size, size);
+    }
+
+    calcEXTRUDE(zoomLevel) {
+        if (zoomLevel > 3) {
+            this.extrude = 0.1;
+        } else if (zoomLevel > 2) {
+            this.extrude = 0.2;
+        } else if (zoomLevel > 1) {
+            this.extrude = 0.3;
+        } else if (zoomLevel > 0.75) {
+            this.extrude = 0.4;
+        } else {
+            this.extrude = 0.7;
+        }
     }
 
     /**
@@ -227,10 +242,10 @@ export class AtlasSprite extends BaseSprite {
             srcH,
 
             // dest pos and size
-            destX - EXTRUDE,
-            destY - EXTRUDE,
-            destW + 2 * EXTRUDE,
-            destH + 2 * EXTRUDE
+            destX - this.extrude,
+            destY - this.extrude,
+            destW + 2 * this.extrude,
+            destH + 2 * this.extrude
         );
     }
 
@@ -291,10 +306,10 @@ export class AtlasSprite extends BaseSprite {
             srcH,
 
             // dest pos and size
-            destX - EXTRUDE,
-            destY - EXTRUDE,
-            destW + 2 * EXTRUDE,
-            destH + 2 * EXTRUDE
+            destX - this.extrude,
+            destY - this.extrude,
+            destW + 2 * this.extrude,
+            destH + 2 * this.extrude
         );
     }
 

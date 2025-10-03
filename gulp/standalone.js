@@ -45,12 +45,12 @@ function gulptasksStandalone($, gulp) {
         });
 
         gulp.task(taskPrefix + ".prepare.writeAppId", cb => {
-            if (variantData.steamAppId) {
-                fs.writeFileSync(
-                    path.join(tempDestBuildDir, "steam_appid.txt"),
-                    String(variantData.steamAppId)
-                );
-            }
+            // if (variantData.steamAppId) {
+            //     fs.writeFileSync(
+            //         path.join(tempDestBuildDir, "steam_appid.txt"),
+            //         String(variantData.steamAppId)
+            //     );
+            // }
             cb();
         });
 
@@ -162,15 +162,15 @@ function gulptasksStandalone($, gulp) {
                         }
 
                         if (variantData.steamAppId) {
-                            fs.writeFileSync(
-                                path.join(appPath, "LICENSE"),
-                                fs.readFileSync(path.join(__dirname, "..", "LICENSE"))
-                            );
+                            // fs.writeFileSync(
+                            //     path.join(appPath, "LICENSE"),
+                            //     fs.readFileSync(path.join(__dirname, "..", "LICENSE"))
+                            // );
 
-                            fs.writeFileSync(
-                                path.join(appPath, "steam_appid.txt"),
-                                String(variantData.steamAppId)
-                            );
+                            // fs.writeFileSync(
+                            //     path.join(appPath, "steam_appid.txt"),
+                            //     String(variantData.steamAppId)
+                            // );
 
                             if (platform === "linux") {
                                 // Write launcher script
@@ -184,16 +184,16 @@ function gulptasksStandalone($, gulp) {
                             if (platform === "darwin") {
                                 if (!isRelease) {
                                     // Needs special location
-                                    fs.writeFileSync(
-                                        path.join(
-                                            appPath,
-                                            "shapez.app",
-                                            "Contents",
-                                            "MacOS",
-                                            "steam_appid.txt"
-                                        ),
-                                        String(variantData.steamAppId)
-                                    );
+                                    // fs.writeFileSync(
+                                    //     path.join(
+                                    //         appPath,
+                                    //         "shapez.app",
+                                    //         "Contents",
+                                    //         "MacOS",
+                                    //         "steam_appid.txt"
+                                    //     ),
+                                    //     String(variantData.steamAppId)
+                                    // );
                                 }
                             }
                         }
@@ -218,25 +218,25 @@ function gulptasksStandalone($, gulp) {
                     const appFileInner = path.join(appFile, "shapez.app");
                     console.warn("++ Signing ++");
 
-                    if (variantData.steamAppId) {
-                        const appIdDest = path.join(
-                            path.join(appFileInner, "Contents", "MacOS"),
-                            "steam_appid.txt"
-                        );
-                        // console.warn("++ Preparing ++");
-                        // fse.copySync(path.join(tempDestBuildDir, "steam_appid.txt"), appIdDest);
+                    // if (variantData.steamAppId) {
+                    //     const appIdDest = path.join(
+                    //         path.join(appFileInner, "Contents", "MacOS"),
+                    //         "steam_appid.txt"
+                    //     );
+                    //     // console.warn("++ Preparing ++");
+                    //     // fse.copySync(path.join(tempDestBuildDir, "steam_appid.txt"), appIdDest);
 
-                        console.warn("Signing steam_appid.txt");
+                    //     console.warn("Signing steam_appid.txt");
 
-                        execSync(
-                            `codesign --force --verbose --options runtime --timestamp --no-strict --sign "${
-                                process.env.SHAPEZ_CLI_APPLE_CERT_NAME
-                            }" --entitlements "${path.join(__dirname, "entitlements.plist")}" ${appIdDest}`,
-                            {
-                                cwd: appFile,
-                            }
-                        );
-                    }
+                    //     execSync(
+                    //         `codesign --force --verbose --options runtime --timestamp --no-strict --sign "${
+                    //             process.env.SHAPEZ_CLI_APPLE_CERT_NAME
+                    //         }" --entitlements "${path.join(__dirname, "entitlements.plist")}" ${appIdDest}`,
+                    //         {
+                    //             cwd: appFile,
+                    //         }
+                    //     );
+                    // }
 
                     console.warn("Base dir:", appFile);
 

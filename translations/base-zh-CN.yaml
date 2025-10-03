@@ -981,7 +981,7 @@ keybindings:
         stacker: 堆叠机
         mixer: 混色器
         painter: 上色器
-        trash: 垃圾桶
+        trash: 道路移动
         rotateWhilePlacing: 顺时针旋转
         rotateInverseModifier: "修饰键: 改为逆时针旋转"
         cycleBuildingVariants: 切换所选择设施变体

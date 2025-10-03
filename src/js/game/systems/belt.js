@@ -540,6 +540,8 @@ export class BeltSystem extends GameSystem {
                     let sprite = this.beltAnimations[direction][0];
                     if (this.root.currentLayer === "regular") sprite = this.beltAnimations[direction][1];
 
+                    sprite.calcEXTRUDE(this.root.camera.zoomLevel);
+
                     // if (entity.components.Belt.assignedPath === hoveredBeltPath) {
                     //     sprite = this.beltAnimations[direction][animationIndex % BELT_ANIM_COUNT];
                     // }

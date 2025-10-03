@@ -1,5 +1,10 @@
 export const CHANGELOG = [
     {
+        version: "0.0.7",
+        date: "03.10.2025",
+        entries: ["动态 extrude 消除 tile gap"],
+    },
+    {
         version: "0.0.6",
         date: "01.10.2025",
         entries: ["增加至共 16 关", "增加绿线绘制非法位置图标提示"],
