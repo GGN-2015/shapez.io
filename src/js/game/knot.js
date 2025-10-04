@@ -283,14 +283,21 @@ export class Knot {
                     id: "markerName",
                     label: null,
                     placeholder: "",
-                    defaultValue: e.data.str,
+                    defaultValue: e.data.str.split("#")[0],
+                    validator: val => val.length > 0,
+                });
+                const markerNameInput1 = new FormElementInput({
+                    id: "markerName",
+                    label: null,
+                    placeholder: "",
+                    defaultValue: e.data.str.split("#")[1],
                     validator: val => val.length > 0,
                 });
                 const dialog = new DialogWithForm({
                     app: this.root.app,
                     title: "PD code",
                     desc: fillInLinkIntoTranslation(T.knot.str11, THIRDPARTY_URLS.shapeViewer),
-                    formElements: [markerNameInput],
+                    formElements: [markerNameInput, markerNameInput1],
                     buttons: ["ok:good"],
                 });
                 this.root.hud.parts.dialogs.internalShowDialog(dialog);

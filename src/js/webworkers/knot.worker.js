@@ -60,10 +60,12 @@ function getPDcodeWorker(nodes) {
     // for (let n of nodes) {
     //     console.log("nodes:(" + n.origin.x + "," + n.origin.y + ")", n.crosType);
     // }
+    let idx = 0;
+    let debugStr = "";
     for (let c of crossings) {
         //msg_label.innerHTML = crossings.indexOf(c) + "/" + crossings.length;
         self.postMessage({ type: "update", str: crossings.indexOf(c) + "/" + crossings.length });
-        console.log(crossings.indexOf(c) + "/" + crossings.length);
+        // console.log(crossings.indexOf(c) + "/" + crossings.length);
         let pd = [-1, -1, -1, -1];
 
         if (c.crosType === "over") {
@@ -91,14 +93,18 @@ function getPDcodeWorker(nodes) {
             } else {
                 res += ", ";
             }
-            console.log("(" + c.origin.x + "," + c.origin.y + ")");
+            debugStr += idx + ": (" + c.origin.x + "," + c.origin.y + ") | ";
+            //console.log(idx + ": (" + c.origin.x + "," + c.origin.y + ")");
+            idx++;
             res += "(" + pd[0] + ", " + pd[1] + ", " + pd[2] + ", " + pd[3] + ")";
-            console.log("(" + pd[0] + ", " + pd[1] + ", " + pd[2] + ", " + pd[3] + ")");
+            //console.log("(" + pd[0] + ", " + pd[1] + ", " + pd[2] + ", " + pd[3] + ")");
+            debugStr += "(" + pd[0] + ", " + pd[1] + ", " + pd[2] + ", " + pd[3] + ")  ";
         }
     }
+    // console.log(debugStr);
     if (res !== "") {
         res += "]";
     }
     self.postMessage({ type: "update", str: "" });
-    self.postMessage({ type: "res", str: res });
+    self.postMessage({ type: "res", str: res + "#" + debugStr });
 }
