@@ -6,7 +6,7 @@ import { GameRoot } from "./root";
 import { MetaWireBuilding } from "./buildings/wire";
 import { MetaBeltBuilding } from "./buildings/belt";
 import { Node } from "./knotUtils";
-import { Strand } from "./knotUtils";
+// import { Strand } from "./knotUtils";
 import { gMetaBuildingRegistry } from "../core/global_registries";
 import { T } from "../translations";
 import { SOUNDS } from "../platform/sound";
@@ -61,6 +61,11 @@ export class KnotSimplifier {
         this.redPathReverse;
         //this.greenCrossings = [];
 
+        /**
+         * @type {Node[]} curComponent
+         */
+        this.curComponent;
+
         this.rebuild();
     }
 
@@ -77,6 +82,7 @@ export class KnotSimplifier {
         this.redPathForward = [];
         this.redPathReverse = [];
         let del_entities = [];
+        this.curComponent = [];
 
         for (let ent of this.root.entityMgr.entities) {
             if (ent.layer === "wires" && ent.components.StaticMapEntity.code === 39) {
@@ -166,6 +172,14 @@ export class KnotSimplifier {
     initRedPath(bForward, redPath) {
         let startOrigin;
         let endOrigine;
+
+        let comp = this.root.knot.getNodeComponent(this.seperators[0]);
+        this.curComponent = comp;
+        if (comp !== this.root.knot.getNodeComponent(this.seperators[1])) {
+            // this.root.hud.signals.notification.dispatch(T.knot.str23, enumNotificationType.error);
+            return;
+        }
+
         if (bForward) {
             startOrigin = this.seperators[0];
             endOrigine = this.seperators[1];
@@ -174,12 +188,12 @@ export class KnotSimplifier {
             endOrigine = this.seperators[0];
         }
 
-        let initIndex = (this.root.knot.getBeltNodeIndex(startOrigin) + 1) % this.root.knot.nodes.length;
-        let lastIndex = (this.root.knot.getBeltNodeIndex(endOrigine) + 1) % this.root.knot.nodes.length;
+        let initIndex = (this.root.knot.getBeltNodeIndex(startOrigin, comp) + 1) % comp.length;
+        let lastIndex = (this.root.knot.getBeltNodeIndex(endOrigine, comp) + 1) % comp.length;
         let curIndex = initIndex;
         for (;;) {
-            let curNode = this.root.knot.nodes[curIndex];
-            if ((curIndex + 1) % this.root.knot.nodes.length === lastIndex) {
+            let curNode = comp[curIndex];
+            if ((curIndex + 1) % comp.length === lastIndex) {
                 break;
             }
             for (let no of redPath) {
@@ -197,7 +211,7 @@ export class KnotSimplifier {
                 }
             }
             redPath.push(curNode.clone());
-            curIndex = (curIndex + 1) % this.root.knot.nodes.length;
+            curIndex = (curIndex + 1) % comp.length;
         }
 
         for (let rNode of redPath) {
@@ -379,20 +393,20 @@ export class KnotSimplifier {
         }
     }
 
-    /**
-     *
-     * @param {Strand[]} check_result_crossings
-     * @param {Strand} strand
-     * @returns {Strand}
-     */
-    get_strand_from_array(check_result_crossings, strand) {
-        for (let s of check_result_crossings) {
-            if (s.node.origin.equals(strand.node.origin) && s.rot === strand.rot) {
-                return s;
-            }
-        }
-        return null;
-    }
+    // /**
+    //  *
+    //  * @param {Strand[]} check_result_crossings
+    //  * @param {Strand} strand
+    //  * @returns {Strand}
+    //  */
+    // get_strand_from_array(check_result_crossings, strand) {
+    //     for (let s of check_result_crossings) {
+    //         if (s.node.origin.equals(strand.node.origin) && s.rot === strand.rot) {
+    //             return s;
+    //         }
+    //     }
+    //     return null;
+    // }
 
     do_pickup(red_path, defaultType) {
         let type = defaultType;
@@ -666,7 +680,7 @@ export class KnotSimplifier {
     drawSepratorBelow(red_path) {
         for (let sep of this.seperators) {
             let sep_node;
-            for (sep_node of this.root.knot.nodes) {
+            for (sep_node of this.curComponent) {
                 if (sep_node.origin.equals(sep)) {
                     break;
                 }
@@ -837,6 +851,7 @@ export class KnotSimplifier {
 
     moveGreenLine() {
         if (this.readyToMove) {
+            this.hiddenNodes = [];
             this.root.systemMgr.systems.wire.bUpdateSuround = false;
             this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
             // 已经合规, 第二阶段的 move knot
@@ -914,6 +929,10 @@ export class KnotSimplifier {
             // 关闭道路自适应
             this.root.systemMgr.systems.wire.bUpdateSuround = false;
             this.initRedPath(true, this.redPathForward);
+            // if (!this.redPathForward.length) {
+            //     // seperators 不在同一分支上, 放弃
+            //     return;
+            // }
             this.initRedPath(false, this.redPathReverse);
             this.redPathReverse = this.redPathReverse.reverse();
             // 打开道路自适应
@@ -990,7 +1009,7 @@ export class KnotSimplifier {
                     } else if (e.data.type === "res") {
                         //copy(e.data.str);
                         //this.root.hud.signals.notification.dispatch("PD code 已复制", enumNotificationType.success);
-                        console.log(e.data.check_result_array);
+                        // console.log(e.data.check_result_array);
                         this.check_result_array = e.data.check_result_array;
                         this.root.app.gPaused = false;
                         worker.terminate();

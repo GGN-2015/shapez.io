@@ -964,6 +964,8 @@ export class GameLogic {
                     this.root.knotSimplifier.seperators.indexOf(building.components.StaticMapEntity.origin),
                     1
                 );
+                this.root.knotSimplifier.recoverHiddenLines();
+                this.root.systemMgr.systems.wire.bUpdateSuround = true;
             }
         }
         this.root.map.removeStaticEntity(building);

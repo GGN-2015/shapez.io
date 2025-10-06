@@ -23,7 +23,7 @@ export class Knot {
         this.unLeagleMessage;
 
         /**
-         * @type {Node[]} nodes
+         * @type {Node[][]} nodes
          */
         this.nodes; // 按扭结序的各坐标点, 构造后可直接遍历, 相当于沿扭结 travel
 
@@ -44,164 +44,188 @@ export class Knot {
         this.rebuild();
     }
 
+    /**
+     *
+     * @param {Map} reg_entities
+     * @param {*} node
+     * @param {*} component
+     */
+    pushEntity(reg_entities, node, component) {
+        component.push(node);
+        // for (let i = 0; i < reg_entities.length; i++) {
+        //     let ent = reg_entities[i];
+        //     if (
+        //         ent.components.StaticMapEntity.origin.x === node.origin.x &&
+        //         ent.components.StaticMapEntity.origin.y === node.origin.y
+        //     ) {
+        //         reg_entities.splice(i, 1);
+        //     }
+        // }
+        // 换成 map 应该能快一点
+        if (reg_entities.has(node.origin)) {
+            reg_entities.delete(node.origin);
+        }
+    }
+
     rebuild() {
         this.unLeagleMessage = "";
         this.nodes = [];
         this.crossings = [];
         this.corners = [];
-        let reg_entities = [];
+        let reg_entities = new Map();
 
         for (let ent of this.root.entityMgr.entities) {
             if (ent.layer === "regular") {
-                reg_entities.push(ent);
+                reg_entities.set(ent.components.StaticMapEntity.origin, ent);
             }
         }
-
-        // 检查 regular 层的 belt 是否构成合法扭结
-        let initEntity = reg_entities[0];
-        if (!initEntity) {
-            this.clear(T.knot.str1);
-            return;
-        }
-
-        if (
-            initEntity.components.StaticMapEntity.code < 1 ||
-            initEntity.components.StaticMapEntity.code > 3
-        ) {
-            //不是 belt 的 building
-            this.clear(T.knot.str2);
-            return;
-        }
-        let initOrigin = initEntity.components.StaticMapEntity.origin;
-        if (this.root.map.isCrossingEntity(initOrigin)) {
-            if (initEntity.components.StaticMapEntity.rotation % 180 === 0) {
-                initEntity = this.root.map.getLayerContentXY(initOrigin.x, initOrigin.y + 1, "regular");
-            } else {
-                initEntity = this.root.map.getLayerContentXY(initOrigin.x + 1, initOrigin.y, "regular");
-            }
-            initOrigin = initEntity.components.StaticMapEntity.origin;
-        }
-        if (this.root.map.isCrossingEntity(initOrigin)) {
-            this.clear(T.knot.str3);
-            return;
-        }
-
-        let curEntity = initEntity;
-        let mapBeltCount = 0;
 
         let passedEntities = [];
-        passedEntities.push(curEntity);
-        let node = this.createNodeFromEntity(
-            curEntity,
-            "black",
-            curEntity.components.StaticMapEntity.rotation,
-            false
-        );
-        this.nodes.push(node);
 
-        // 这种 travel along knot 的做法多次用到, logic.js 中的 定向整理 也用到, 或许可以整理一个 travel 函数, 传入回调
-        for (;;) {
-            let nextOrigin = this.root.map.getNextOrigin(curEntity);
-            let nextEntity = this.root.map.getLayerContentXY(nextOrigin.x, nextOrigin.y, "regular");
-            if (nextEntity === initEntity) {
-                break;
-            }
-            if (!nextEntity) {
-                // 未完整闭合
-                this.clear(T.knot.str4);
+        while (reg_entities.size) {
+            let initEntity = reg_entities.values().next().value;
+            if (!initEntity) {
+                this.clear(T.knot.str1);
                 return;
             }
+
             if (
-                passedEntities.indexOf(nextEntity) > 0 &&
-                !this.root.map.isCrossingEntity(nextEntity.components.StaticMapEntity.origin)
+                initEntity.components.StaticMapEntity.code < 1 ||
+                initEntity.components.StaticMapEntity.code > 3
             ) {
-                // 通常点二次到达
-                this.clear(T.knot.str5);
+                //不是 belt 的 building
+                this.clear(T.knot.str2);
                 return;
             }
-            if (
-                passedEntities.indexOf(nextEntity) !== passedEntities.lastIndexOf(nextEntity) &&
-                this.root.map.isCrossingEntity(nextEntity.components.StaticMapEntity.origin)
-            ) {
-                // crossing 已经经过两次以上
-                // 交点的三次到达
-                this.clear(T.knot.str5);
-                return;
-            }
-            passedEntities.push(nextEntity);
-            if (this.root.map.isCrossingEntity(nextOrigin)) {
-                if (this.crossings.indexOf(nextEntity) < 0) {
-                    // 对于交点会遍历到两次, 但只添加一次
-                    this.crossings.push(nextEntity);
-                    mapBeltCount++;
-                }
-                // 交点的 inRot 是之前到达它的 inRot
-                let node = this.createNodeFromEntity(
-                    nextEntity,
-                    "black",
-                    curEntity.components.StaticMapEntity.rotation,
-                    true
-                );
-                if (nextEntity.components.StaticMapEntity.rotation === node.outRotation) {
-                    node.crosType = "over";
+            let initOrigin = initEntity.components.StaticMapEntity.origin;
+            if (this.root.map.isCrossingEntity(initOrigin)) {
+                if (initEntity.components.StaticMapEntity.rotation % 180 === 0) {
+                    initEntity = this.root.map.getLayerContentXY(initOrigin.x, initOrigin.y + 1, "regular");
                 } else {
-                    node.crosType = "under";
+                    initEntity = this.root.map.getLayerContentXY(initOrigin.x + 1, initOrigin.y, "regular");
                 }
-                this.nodes.push(node);
-                // 这是一个交点, 需要去寻找下一个位置
-                let curOrigine = curEntity.components.StaticMapEntity.origin;
-                nextOrigin.x = 2 * nextOrigin.x - curOrigine.x;
-                nextOrigin.y = 2 * nextOrigin.y - curOrigine.y;
-                nextEntity = this.root.map.getLayerContentXY(nextOrigin.x, nextOrigin.y, "regular");
+                initOrigin = initEntity.components.StaticMapEntity.origin;
+            }
+            if (this.root.map.isCrossingEntity(initOrigin)) {
+                this.clear(T.knot.str3);
+                return;
+            }
+
+            let componet = [];
+            let curEntity = initEntity;
+
+            passedEntities.push(curEntity);
+            let node = this.createNodeFromEntity(
+                curEntity,
+                "black",
+                curEntity.components.StaticMapEntity.rotation,
+                false
+            );
+            this.pushEntity(reg_entities, node, componet);
+
+            for (;;) {
+                let nextOrigin = this.root.map.getNextOrigin(curEntity);
+                let nextEntity = this.root.map.getLayerContentXY(nextOrigin.x, nextOrigin.y, "regular");
                 if (nextEntity === initEntity) {
                     break;
                 }
-                node = this.createNodeFromEntity(
-                    nextEntity,
-                    "black",
-                    nextEntity.components.StaticMapEntity.rotation,
-                    false
-                );
-                this.nodes.push(node);
-            } else if (
-                nextEntity.components.StaticMapEntity.code === 2 ||
-                nextEntity.components.StaticMapEntity.code === 3
-            ) {
-                //是 corner
-                this.corners.push(nextEntity);
-                let node = this.createNodeFromEntity(
-                    nextEntity,
-                    "black",
-                    nextEntity.components.StaticMapEntity.rotation,
-                    false
-                );
-                this.nodes.push(node);
-            } else if (nextEntity.components.StaticMapEntity.code !== 1) {
-                // 非法
-                this.clear(T.knot.str2);
-                return;
-            } else {
-                if (!this.root.map.checkNeighborsNull(nextEntity, "regular")) {
-                    this.clear(T.knot.str6);
+                if (!nextEntity) {
+                    // 未完整闭合
+                    this.clear(T.knot.str4);
                     return;
                 }
-                let node = this.createNodeFromEntity(
-                    nextEntity,
-                    "black",
-                    nextEntity.components.StaticMapEntity.rotation,
-                    false
-                );
-                this.nodes.push(node);
+                if (
+                    passedEntities.indexOf(nextEntity) > 0 &&
+                    !this.root.map.isCrossingEntity(nextEntity.components.StaticMapEntity.origin)
+                ) {
+                    // 通常点二次到达
+                    this.clear(T.knot.str5);
+                    return;
+                }
+                if (
+                    passedEntities.indexOf(nextEntity) !== passedEntities.lastIndexOf(nextEntity) &&
+                    this.root.map.isCrossingEntity(nextEntity.components.StaticMapEntity.origin)
+                ) {
+                    // crossing 已经经过两次以上
+                    // 交点的三次到达
+                    this.clear(T.knot.str5);
+                    return;
+                }
+                passedEntities.push(nextEntity);
+                if (this.root.map.isCrossingEntity(nextOrigin)) {
+                    if (this.crossings.indexOf(nextEntity) < 0) {
+                        // 对于交点会遍历到两次, 但只添加一次
+                        this.crossings.push(nextEntity);
+                    }
+                    // 交点的 inRot 是之前到达它的 inRot
+                    let node = this.createNodeFromEntity(
+                        nextEntity,
+                        "black",
+                        curEntity.components.StaticMapEntity.rotation,
+                        true
+                    );
+                    if (nextEntity.components.StaticMapEntity.rotation === node.outRotation) {
+                        node.crosType = "over";
+                    } else if (
+                        nextEntity.components.StaticMapEntity.rotation ===
+                        (node.outRotation + 180) % 360
+                    ) {
+                        this.clear(T.knot.str5);
+                        return;
+                    } else {
+                        node.crosType = "under";
+                    }
+                    this.pushEntity(reg_entities, node, componet);
+                    // 这是一个交点, 需要去寻找下一个位置
+                    let curOrigine = curEntity.components.StaticMapEntity.origin;
+                    nextOrigin.x = 2 * nextOrigin.x - curOrigine.x;
+                    nextOrigin.y = 2 * nextOrigin.y - curOrigine.y;
+                    nextEntity = this.root.map.getLayerContentXY(nextOrigin.x, nextOrigin.y, "regular");
+                    if (nextEntity === initEntity) {
+                        break;
+                    }
+                    node = this.createNodeFromEntity(
+                        nextEntity,
+                        "black",
+                        nextEntity.components.StaticMapEntity.rotation,
+                        false
+                    );
+                    this.pushEntity(reg_entities, node, componet);
+                } else if (
+                    nextEntity.components.StaticMapEntity.code === 2 ||
+                    nextEntity.components.StaticMapEntity.code === 3
+                ) {
+                    //是 corner
+                    this.corners.push(nextEntity);
+                    let node = this.createNodeFromEntity(
+                        nextEntity,
+                        "black",
+                        nextEntity.components.StaticMapEntity.rotation,
+                        false
+                    );
+                    this.pushEntity(reg_entities, node, componet);
+                } else if (nextEntity.components.StaticMapEntity.code !== 1) {
+                    // 非法
+                    this.clear(T.knot.str2);
+                    return;
+                } else {
+                    if (!this.root.map.checkNeighborsNull(nextEntity, "regular")) {
+                        this.clear(T.knot.str6);
+                        return;
+                    }
+                    let node = this.createNodeFromEntity(
+                        nextEntity,
+                        "black",
+                        nextEntity.components.StaticMapEntity.rotation,
+                        false
+                    );
+                    this.pushEntity(reg_entities, node, componet);
+                }
+                curEntity = nextEntity;
             }
-            curEntity = nextEntity;
-            mapBeltCount++;
+            this.nodes.push(componet);
         }
-
-        if (mapBeltCount + 1 !== reg_entities.length) {
-            // 有多余 tile
-            this.clear(T.knot.str7);
-            return;
-        }
+        // console.log(this.nodes);
 
         for (let cros of this.crossings) {
             if (!this.root.map.checkDiagonalEntities(cros.components.StaticMapEntity.origin, "regular")) {
@@ -232,13 +256,28 @@ export class Knot {
 
     /**
      *
+     * @param {Vector} origin
+     * @returns {Node[]}
+     */
+    getNodeComponent(origin) {
+        for (let comp of this.nodes) {
+            for (let n of comp) {
+                if (origin.equals(n.origin)) return comp;
+            }
+        }
+        return null;
+    }
+
+    /**
+     *
      * @param {Node} cros
      * @returns {Node}
      */
     getNextCrossingNode(cros) {
         let c = cros;
+        let comp = this.getNodeComponent(cros.origin);
         for (;;) {
-            c = this.nodes[(this.nodes.indexOf(c) + 1) % this.nodes.length];
+            c = comp[(comp.indexOf(c) + 1) % comp.length];
             if (c.isCrossing) {
                 return c;
             }
@@ -251,7 +290,8 @@ export class Knot {
      * @returns {Node}
      */
     getPrevCrossingNode(cros) {
-        for (let c of this.nodes) {
+        let comp = this.getNodeComponent(cros.origin);
+        for (let c of comp) {
             if (c.isCrossing && this.getNextCrossingNode(c) === cros) {
                 return c;
             }
@@ -351,14 +391,15 @@ export class Knot {
     }
 
     /**
-     *
+     * 注意 origin 不可以是交点!
      * @param {Vector} origin
      * @returns {number}
      */
-    getBeltNodeIndex(origin) {
-        for (let n of this.nodes) {
+    getBeltNodeIndex(origin, comp) {
+        // let comp = this.getNodeComponent(origin);
+        for (let n of comp) {
             if (n.origin.equals(origin)) {
-                return this.nodes.indexOf(n);
+                return comp.indexOf(n);
             }
         }
         return Infinity;

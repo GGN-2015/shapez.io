@@ -30,7 +30,7 @@ export class Node {
 export class Strand {
     // strand 是指一个 node 加上一个 rotation(direction)
     /**
-     * @param {Node[]} knotNodes
+     * @param {Node[][]} knotNodes
      * @param {Node} node
      * @param {number} rot
      * @param {String} type
@@ -54,34 +54,36 @@ export class Strand {
      */
 
     opposite() {
-        for (let i = 0; i < this.knotNodes.length; i++) {
-            let node = this.knotNodes[i];
-            if (node.origin.x === this.node.origin.x && node.origin.y === this.node.origin.y) {
-                if (node.isCorner) {
-                    if (node.outRotation === this.rot) {
-                        return new Strand(
-                            this.knotNodes,
-                            this.knotNodes[(i + 1) % this.knotNodes.length],
-                            (this.rot + 180) % 360,
-                            ""
-                        );
+        for (let comp of this.knotNodes) {
+            for (let i = 0; i < comp.length; i++) {
+                let node = comp[i];
+                if (node.origin.x === this.node.origin.x && node.origin.y === this.node.origin.y) {
+                    if (node.isCorner) {
+                        if (node.outRotation === this.rot) {
+                            return new Strand(
+                                this.knotNodes,
+                                comp[(i + 1) % comp.length],
+                                (this.rot + 180) % 360,
+                                ""
+                            );
+                        } else {
+                            return new Strand(
+                                this.knotNodes,
+                                comp[(i + comp.length - 1) % comp.length],
+                                (this.rot + 180) % 360,
+                                ""
+                            );
+                        }
                     } else {
-                        return new Strand(
-                            this.knotNodes,
-                            this.knotNodes[(i + this.knotNodes.length - 1) % this.knotNodes.length],
-                            (this.rot + 180) % 360,
-                            ""
-                        );
-                    }
-                } else {
-                    if ((node.outRotation - this.rot) % 180 === 0) {
-                        let delta = node.outRotation === this.rot ? 1 : this.knotNodes.length - 1;
-                        return new Strand(
-                            this.knotNodes,
-                            this.knotNodes[(i + delta) % this.knotNodes.length],
-                            (this.rot + 180) % 360,
-                            ""
-                        );
+                        if ((node.outRotation - this.rot) % 180 === 0) {
+                            let delta = node.outRotation === this.rot ? 1 : comp.length - 1;
+                            return new Strand(
+                                this.knotNodes,
+                                comp[(i + delta) % comp.length],
+                                (this.rot + 180) % 360,
+                                ""
+                            );
+                        }
                     }
                 }
             }
@@ -90,46 +92,48 @@ export class Strand {
     }
 
     next() {
-        for (let i = 0; i < this.knotNodes.length; i++) {
-            let node = this.knotNodes[i];
-            if (this.node.isCorner) {
-                if (node.origin.x === this.node.origin.x && node.origin.y === this.node.origin.y) {
-                    if (node.outRotation === this.rot) {
+        for (let comp of this.knotNodes) {
+            for (let i = 0; i < comp.length; i++) {
+                let node = comp[i];
+                if (this.node.isCorner) {
+                    if (node.origin.x === this.node.origin.x && node.origin.y === this.node.origin.y) {
+                        if (node.outRotation === this.rot) {
+                            return new Strand(
+                                this.knotNodes,
+                                comp[(i + 1) % comp.length],
+                                comp[(i + 1) % comp.length].outRotation,
+                                ""
+                            );
+                        } else {
+                            return new Strand(
+                                this.knotNodes,
+                                comp[(i + comp.length - 1) % comp.length],
+                                this.rot,
+                                ""
+                            );
+                        }
+                    }
+                } else if (
+                    node.origin.x === this.node.origin.x &&
+                    node.origin.y === this.node.origin.y &&
+                    (node.outRotation - this.rot) % 180 === 0
+                ) {
+                    let delta = node.outRotation === this.rot ? 1 : comp.length - 1;
+                    if (delta === 1) {
                         return new Strand(
                             this.knotNodes,
-                            this.knotNodes[(i + 1) % this.knotNodes.length],
-                            this.knotNodes[(i + 1) % this.knotNodes.length].outRotation,
+                            comp[(i + delta) % comp.length],
+                            comp[(i + delta) % comp.length].outRotation,
                             ""
                         );
                     } else {
                         return new Strand(
                             this.knotNodes,
-                            this.knotNodes[(i + this.knotNodes.length - 1) % this.knotNodes.length],
-                            this.rot,
+                            comp[(i + delta) % comp.length],
+                            (comp[(i + delta - 1) % comp.length].outRotation + 180) % 360,
                             ""
                         );
                     }
-                }
-            } else if (
-                node.origin.x === this.node.origin.x &&
-                node.origin.y === this.node.origin.y &&
-                (node.outRotation - this.rot) % 180 === 0
-            ) {
-                let delta = node.outRotation === this.rot ? 1 : this.knotNodes.length - 1;
-                if (delta === 1) {
-                    return new Strand(
-                        this.knotNodes,
-                        this.knotNodes[(i + delta) % this.knotNodes.length],
-                        this.knotNodes[(i + delta) % this.knotNodes.length].outRotation,
-                        ""
-                    );
-                } else {
-                    return new Strand(
-                        this.knotNodes,
-                        this.knotNodes[(i + delta) % this.knotNodes.length],
-                        (this.knotNodes[(i + delta - 1) % this.knotNodes.length].outRotation + 180) % 360,
-                        ""
-                    );
                 }
             }
         }

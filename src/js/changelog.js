@@ -1,5 +1,10 @@
 export const CHANGELOG = [
     {
+        version: "0.1.0",
+        date: "06.10.2025",
+        entries: ["支持 link (多分支)"],
+    },
+    {
         version: "0.0.7",
         date: "03.10.2025",
         entries: ["动态 extrude 消除 tile gap"],

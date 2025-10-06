@@ -1,3 +1,4 @@
+import { Vector } from "../core/vector";
 import { Node } from "../game/knotUtils";
 
 /**
@@ -11,8 +12,22 @@ self.addEventListener("message", event => {
     // @ts-ignore
     nodes = event.data.nodes;
     getPDcodeWorker(nodes);
-    //self.postMessage("子线程返回消息");
 });
+
+/**
+ *
+ * @param {Node} node
+ * @returns {Node[]}
+ */
+function getNodeComponent(node) {
+    for (let comp of nodes) {
+        for (let n of comp) {
+            if (node.origin.x === n.origin.x && node.origin.y === n.origin.y && node.crosType === n.crosType)
+                return comp;
+        }
+    }
+    return null;
+}
 
 /**
  *
@@ -21,8 +36,9 @@ self.addEventListener("message", event => {
  */
 function getNextCrossingNode(cros) {
     let c = cros;
+    let comp = getNodeComponent(cros);
     for (;;) {
-        c = nodes[(nodes.indexOf(c) + 1) % nodes.length];
+        c = comp[(comp.indexOf(c) + 1) % comp.length];
         if (c.isCrossing) {
             return c;
         }
@@ -35,7 +51,8 @@ function getNextCrossingNode(cros) {
  * @returns {Node}
  */
 function getPrevCrossingNode(cros) {
-    for (let c of nodes) {
+    let comp = getNodeComponent(cros);
+    for (let c of comp) {
         if (c.isCrossing && getNextCrossingNode(c) === cros) {
             return c;
         }
@@ -44,7 +61,6 @@ function getPrevCrossingNode(cros) {
 }
 
 function getPDcodeWorker(nodes) {
-    //let msg_label = document.getElementById("keybinding message");
     let res = "";
     let crossings = [];
     if (!nodes.length) {
@@ -52,16 +68,19 @@ function getPDcodeWorker(nodes) {
     }
 
     // 用每个 cros node 表示它的 out strand
-    for (let n of nodes) {
-        if (n.isCrossing) {
-            crossings.push(n);
+    for (let comp of nodes) {
+        for (let n of comp) {
+            if (n.isCrossing) {
+                crossings.push(n);
+            }
         }
     }
-    // for (let n of nodes) {
-    //     console.log("nodes:(" + n.origin.x + "," + n.origin.y + ")", n.crosType);
-    // }
+
     let idx = 0;
     let debugStr = "";
+    // for (let c of crossings) {
+    //     console.log(c.origin.x + "," + c.origin.y + "|" + c.crosType);
+    // }
     for (let c of crossings) {
         //msg_label.innerHTML = crossings.indexOf(c) + "/" + crossings.length;
         self.postMessage({ type: "update", str: crossings.indexOf(c) + "/" + crossings.length });
@@ -69,14 +88,17 @@ function getPDcodeWorker(nodes) {
         let pd = [-1, -1, -1, -1];
 
         if (c.crosType === "over") {
-            //console.log(nodes.indexOf(c.x));
             let under_c;
-            for (under_c of nodes) {
-                if (under_c.origin.x === c.origin.x && under_c.origin.y === c.origin.y && under_c !== c) {
+            for (under_c of crossings) {
+                console.log(under_c.origin.x + "," + under_c.origin.y + "|" + under_c.crosType);
+                if (
+                    under_c.origin.x === c.origin.x &&
+                    under_c.origin.y === c.origin.y &&
+                    under_c.crosType === "under"
+                ) {
                     break;
                 }
             }
-            //console.log(nodes.indexOf(under_c.x));
             if (c.outRotation === (under_c.outRotation + 90) % 360) {
                 pd[0] = crossings.indexOf(getPrevCrossingNode(under_c));
                 pd[2] = crossings.indexOf(under_c);

@@ -4,7 +4,7 @@ import { Vector } from "../core/vector";
 
 let greenNodes;
 
-/** @type {Node[]} */
+/** @type {Node[][]} */
 let knotNodes;
 /** @type {Node[]} */
 let keyNodes;
@@ -74,15 +74,17 @@ function trimKnot() {
     keyNodes = [];
     keyRelations = [];
 
-    for (let node of knotNodes) {
-        // 只保留: 1. 交点; 2, 绿色交点下方; 3, seprator
-        if (
-            node.crosType !== "" ||
-            isNodeInArray(node, greenNodes) ||
-            (node.origin.x === seperators[0].x && node.origin.y === seperators[0].y) ||
-            (node.origin.x === seperators[1].x && node.origin.y === seperators[1].y)
-        ) {
-            keyNodes.push(node);
+    for (let comp of knotNodes) {
+        for (let node of comp) {
+            // 只保留: 1. 交点; 2, 绿色交点下方; 3, seprator
+            if (
+                node.crosType !== "" ||
+                isNodeInArray(node, greenNodes) ||
+                (node.origin.x === seperators[0].x && node.origin.y === seperators[0].y) ||
+                (node.origin.x === seperators[1].x && node.origin.y === seperators[1].y)
+            ) {
+                keyNodes.push(node);
+            }
         }
     }
 
@@ -280,7 +282,7 @@ function do_check(red_path, green_path, direction) {
 
     let nnnn = 0;
     while (to_check_set.length) {
-        //console.log("====green_crossing_strands===");
+        // console.log("====green_crossing_strands===");
         //debugPrintCheck_result_crossings(green_crossing_strands);
         let cross_strand = to_check_set.pop();
         // console.log(
@@ -290,8 +292,14 @@ function do_check(red_path, green_path, direction) {
         // console.log("already: " + nnnn + ", left: " + to_check_set.length);
         self.postMessage({ type: "update", str: "already: " + nnnn + ", left: " + to_check_set.length });
         nnnn++;
+        let already_checked_strand = [];
         for (;;) {
-            //console.log("====check_result_crossings===");
+            // 避免多分支时候死循环
+            if (already_checked_strand.indexOf(cross_strand) >= 0) {
+                break;
+            }
+
+            // console.log("====check_result_crossings===");
             //debugPrintCheck_result_crossings(check_result_crossings);
             let r = get_strand_from_array(green_crossing_strands, cross_strand);
             if (r) {
@@ -398,6 +406,8 @@ function do_check(red_path, green_path, direction) {
                 nStrand.crosType = cross_strand.crosType;
                 check_result_crossings.push(nStrand);
             }
+
+            already_checked_strand.push(cross_strand);
             cross_strand = nStrand;
         }
         if (!good_path) {
