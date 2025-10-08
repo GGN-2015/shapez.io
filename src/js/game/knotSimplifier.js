@@ -597,7 +597,7 @@ export class KnotSimplifier {
         }
     }
 
-    drawGreenLineBelow() {
+    drawGreenLineBelow(cptIdx) {
         let toDel = [];
         for (let ent of this.root.entityMgr.entities) {
             if (
@@ -668,6 +668,7 @@ export class KnotSimplifier {
                 rotationVariant: rotVar,
                 variant: "default",
             });
+            entity.cptIdx = cptIdx;
             this.root.logic.freeEntityAreaBeforeBuild(entity);
             this.root.map.placeStaticEntity(entity);
             this.root.entityMgr.registerEntity(entity);
@@ -677,7 +678,7 @@ export class KnotSimplifier {
     /**
      * @param {Node[]} red_path
      */
-    drawSepratorBelow(red_path) {
+    drawSepratorBelow(red_path, cptIdx) {
         for (let sep of this.seperators) {
             let sep_node;
             for (sep_node of this.curComponent) {
@@ -749,6 +750,7 @@ export class KnotSimplifier {
                 rotationVariant: rotVar,
                 variant: "default",
             });
+            entity.cptIdx = cptIdx;
             this.root.logic.freeEntityAreaBeforeBuild(entity);
             this.root.map.placeStaticEntity(entity);
             this.root.entityMgr.registerEntity(entity);
@@ -856,12 +858,18 @@ export class KnotSimplifier {
             this.root.systemMgr.systems.belt.bUpdateSurrounding = false;
             // 已经合规, 第二阶段的 move knot
             this.deleteRedLineBelow();
-            this.drawGreenLineBelow();
+            let cptIdx = this.root.map.getLayerContentXY(
+                this.seperators[0].x,
+                this.seperators[0].y,
+                "regular"
+            ).cptIdx;
+            this.drawGreenLineBelow(cptIdx);
             this.drawSepratorBelow(
                 this.check_result_array[
                     (this.checkResultIndex + this.check_result_array.length - 1) %
                         this.check_result_array.length
-                ].rPath
+                ].rPath,
+                cptIdx
             );
             this.root.systemMgr.systems.wire.bUpdateSuround = true;
             //this.root.systemMgr.systems.belt.bUpdateSurrounding = true;

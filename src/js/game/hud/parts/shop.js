@@ -234,18 +234,80 @@ export class HUDShop extends BaseHUDPart {
         }
     }
 
+    // Zanellati http://arxiv.org/abs/1508.03226
+    // KnotSolver .kns 的存储格式
+    knsString() {
+        let max_x = -Infinity;
+        let min_x = Infinity;
+        let max_y = -Infinity;
+        let min_y = Infinity;
+        for (let entity of this.root.entityMgr.entities) {
+            if (entity.layer !== "regular") {
+                continue;
+            }
+            if (entity.components.StaticMapEntity.origin.x < min_x) {
+                min_x = entity.components.StaticMapEntity.origin.x;
+            }
+            if (entity.components.StaticMapEntity.origin.x > max_x) {
+                max_x = entity.components.StaticMapEntity.origin.x;
+            }
+            if (entity.components.StaticMapEntity.origin.y < min_y) {
+                min_y = entity.components.StaticMapEntity.origin.y;
+            }
+            if (entity.components.StaticMapEntity.origin.y > max_y) {
+                max_y = entity.components.StaticMapEntity.origin.y;
+            }
+        }
+        let width = max_x - min_x + 1;
+        let height = max_y - min_y + 1;
+        let arr = [];
+        for (let i = 0; i < width; i++) {
+            let line = [];
+            for (let j = 0; j < height; j++) {
+                line.push(" ");
+            }
+            arr.push(line);
+        }
+
+        for (let entity of this.root.entityMgr.entities) {
+            if (entity.layer !== "regular") {
+                continue;
+            }
+            if (entity.components.StaticMapEntity.code === 1) {
+                if (this.root.map.isCrossingEntity(entity.components.StaticMapEntity.origin)) {
+                    if (entity.components.StaticMapEntity.rotation % 180 === 0) {
+                        arr[entity.components.StaticMapEntity.origin.x - min_x][
+                            entity.components.StaticMapEntity.origin.y - min_y
+                        ] = "-";
+                    } else {
+                        arr[entity.components.StaticMapEntity.origin.x - min_x][
+                            entity.components.StaticMapEntity.origin.y - min_y
+                        ] = "|";
+                    }
+                } else {
+                    arr[entity.components.StaticMapEntity.origin.x - min_x][
+                        entity.components.StaticMapEntity.origin.y - min_y
+                    ] = "*";
+                }
+            }
+        }
+
+        let str = "" + width + "," + height + "," + "Source=C:\\Users\\A\\Desktop\\无标题.jpg,Size=3\n";
+        for (let i = 0; i < width; i++) {
+            for (let j = 0; j < height; j++) {
+                str += arr[i][j];
+            }
+            str += "\n";
+        }
+        return str;
+    }
+
     show() {
-        // if (this.root.knot && this.root.currentLayer === "wires") {
-        //     //console.log("pd code: " + this.root.knot.getPDcode());
-        //     this.root.knot.getPDcode();
-        //     //this.root.hud.signals.notification.dispatch("PD code 已复制", enumNotificationType.success);
-        // } else {
-        //     this.root.hud.signals.notification.dispatch(T.knot.str1, enumNotificationType.error);
-        // }
-        // return;
+        // let str = this.knsString();
+        // copy(str);
+        // console.log(str);
         this.visible = true;
         this.root.app.inputMgr.makeSureAttachedAndOnTop(this.inputReciever);
-        // this.rerenderFull();
     }
 
     close() {

@@ -24,6 +24,7 @@ export class HUDGameMenu extends BaseHUDPart {
                     enumNotificationType.upgrade,
                 ]),
                 visible: () => this.root.hubGoals.level < G_STAGES.length + 2,
+                // visible: () => true,
                 // !this.root.app.settings.getAllSettings().offerHints || this.root.hubGoals.level >= 3,
             },
             {

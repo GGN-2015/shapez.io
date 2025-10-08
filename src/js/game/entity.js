@@ -46,6 +46,9 @@ export class Entity extends BasicSerializableObject {
          */
         this.uid = 0;
 
+        // 所在分支
+        this.cptIdx = -1;
+
         /* typehints:start */
 
         /**
@@ -97,6 +100,7 @@ export class Entity extends BasicSerializableObject {
             rotationVariant: buildingData.rotationVariant,
             variant: buildingData.variant,
         });
+        clone.cptIdx = this.cptIdx;
 
         for (const key in this.components) {
             /** @type {Component} */ (this.components[key]).copyAdditionalStateTo(clone.components[key]);

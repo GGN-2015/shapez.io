@@ -16,7 +16,7 @@ import { GameSystemWithFilter } from "../game_system_with_filter";
 import { MapChunkView } from "../map_chunk_view";
 import { defaultBuildingVariant } from "../meta_building";
 
-export const BELT_ANIM_COUNT = 14;
+export const BELT_ANIM_COUNT = 5;
 
 const logger = createLogger("belt");
 
@@ -535,10 +535,14 @@ export class BeltSystem extends GameSystem {
 
             for (let i = 0; i < contents.length; ++i) {
                 const entity = contents[i];
+                // console.log(entity.cptIdx);
                 if (entity.components.Belt) {
                     const direction = entity.components.Belt.direction;
-                    let sprite = this.beltAnimations[direction][0];
-                    if (this.root.currentLayer === "regular") sprite = this.beltAnimations[direction][1];
+                    // let sprite = this.beltAnimations[direction][0];
+                    // if (entity.cptIdx) {
+                    let sprite = this.beltAnimations[direction][entity.cptIdx % 4];
+                    // }
+                    if (this.root.currentLayer === "regular") sprite = this.beltAnimations[direction][4];
 
                     sprite.calcEXTRUDE(this.root.camera.zoomLevel);
 

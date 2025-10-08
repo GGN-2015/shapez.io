@@ -369,6 +369,7 @@ export class GameLogic {
                     rotationVariant: 0,
                     variant: "default",
                 });
+                entity.cptIdx = left_entity.cptIdx;
 
                 this.freeEntityAreaBeforeBuild(entity);
                 this.root.map.placeStaticEntity(entity);
@@ -425,6 +426,7 @@ export class GameLogic {
                     rotationVariant: 0,
                     variant: "default",
                 });
+                entity.cptIdx = right_entity.cptIdx;
 
                 this.freeEntityAreaBeforeBuild(entity);
                 this.root.map.placeStaticEntity(entity);
@@ -434,8 +436,8 @@ export class GameLogic {
             // 加一行
             let toBuildTiles = [];
             let toDeleteTiles = [];
-            let max_x = -4096; // 先写死成这样吧, 大概够用
-            let min_x = 4096;
+            let max_x = -Infinity;
+            let min_x = Infinity;
             for (let entity of this.root.entityMgr.entities) {
                 // 非破坏性遍历, 不要一边遍历一边删除, 会死的很惨
                 if (entity.layer !== "regular") {
@@ -452,18 +454,9 @@ export class GameLogic {
                         }
                     }
                     //let _building = new MetaBeltBuilding();
-                    let _building = gMetaBuildingRegistry.findByClass(MetaBeltBuilding);
-                    let new_entity = _building.createEntity({
-                        root: this.root,
-                        origin: new Vector(
-                            entity.components.StaticMapEntity.origin.x,
-                            entity.components.StaticMapEntity.origin.y + 1
-                        ),
-                        rotation: entity.components.StaticMapEntity.rotation,
-                        originalRotation: entity.components.StaticMapEntity.originalRotation,
-                        rotationVariant: entity.components.StaticMapEntity.getRotationVariant(),
-                        variant: entity.components.StaticMapEntity.getVariant(),
-                    });
+                    // let _building = gMetaBuildingRegistry.findByClass(MetaBeltBuilding);
+                    let new_entity = entity.clone();
+                    new_entity.components.StaticMapEntity.origin.y += 1;
                     toBuildTiles.push(new_entity);
                     toDeleteTiles.push(entity);
                 }
@@ -522,6 +515,7 @@ export class GameLogic {
                     rotationVariant: 0,
                     variant: "default",
                 });
+                entity.cptIdx = top_entity.cptIdx;
 
                 this.freeEntityAreaBeforeBuild(entity);
                 this.root.map.placeStaticEntity(entity);
@@ -578,6 +572,7 @@ export class GameLogic {
                     rotationVariant: 0,
                     variant: "default",
                 });
+                entity.cptIdx = bottom_entity.cptIdx;
 
                 this.freeEntityAreaBeforeBuild(entity);
                 this.root.map.placeStaticEntity(entity);
@@ -641,6 +636,7 @@ export class GameLogic {
                         rotationVariant: entity.components.StaticMapEntity.getRotationVariant(),
                         variant: entity.components.StaticMapEntity.getVariant(),
                     });
+                    new_entity.cptIdx = entity.cptIdx;
                     toBuildTiles.push(new_entity);
                     toDeleteTiles.push(entity);
                 }
@@ -696,6 +692,7 @@ export class GameLogic {
                         rotationVariant: entity.components.StaticMapEntity.getRotationVariant(),
                         variant: entity.components.StaticMapEntity.getVariant(),
                     });
+                    new_entity.cptIdx = entity.cptIdx;
                     toBuildTiles.push(new_entity);
                     toDeleteTiles.push(entity);
                 }
@@ -784,7 +781,7 @@ export class GameLogic {
     saveState() {
         /////////
         const savegame = this.root.app.savegameMgr.getSavegameById(
-            "8608622a28f13bfb9044918c24751891d01ecd97"
+            "dd6245223f6a43075a6a767ad43d4ca47a05b836"
         );
         savegame.readAsync().then(() => {
             console.log(LZString.compressToBase64(JSON.stringify(savegame.getCurrentDump())));

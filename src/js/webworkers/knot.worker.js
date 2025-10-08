@@ -81,6 +81,7 @@ function getPDcodeWorker(nodes) {
     // for (let c of crossings) {
     //     console.log(c.origin.x + "," + c.origin.y + "|" + c.crosType);
     // }
+
     for (let c of crossings) {
         //msg_label.innerHTML = crossings.indexOf(c) + "/" + crossings.length;
         self.postMessage({ type: "update", str: crossings.indexOf(c) + "/" + crossings.length });
@@ -127,6 +128,105 @@ function getPDcodeWorker(nodes) {
     if (res !== "") {
         res += "]";
     }
+
     self.postMessage({ type: "update", str: "" });
     self.postMessage({ type: "res", str: res + "#" + debugStr });
+}
+
+// 测试
+function GaussCode(crossings) {
+    let GaussStr = "GaussCode=";
+    let initC = crossings[0];
+
+    let iGauss = 0;
+    let curC = initC;
+    let already = new Map();
+
+    console.log("crossing length: " + crossings.length);
+    // already.set(initC.origin, iGauss);
+    for (;;) {
+        // console.log(iGauss);
+        let indice;
+        if (curC.crosType === "over") {
+            let under_c;
+            for (under_c of crossings) {
+                // console.log(under_c.origin.x + "," + under_c.origin.y + "|" + under_c.crosType);
+                if (
+                    under_c.origin.x === curC.origin.x &&
+                    under_c.origin.y === curC.origin.y &&
+                    under_c.crosType === "under"
+                ) {
+                    break;
+                }
+            }
+            if (curC.outRotation === (under_c.outRotation + 90) % 360) {
+                console.log(
+                    "ind 1 " +
+                        curC.origin.x +
+                        "," +
+                        curC.origin.y +
+                        "|" +
+                        curC.crosType +
+                        "|" +
+                        curC.outRotation
+                );
+                console.log(
+                    "ind 1 " +
+                        under_c.origin.x +
+                        "," +
+                        under_c.origin.y +
+                        "|" +
+                        under_c.crosType +
+                        "|" +
+                        under_c.outRotation
+                );
+                indice = 1;
+            } else {
+                indice = -1;
+            }
+        } else {
+            let over_c;
+            for (over_c of crossings) {
+                // console.log(over_c.origin.x + "," + over_c.origin.y + "|" + over_c.crosType);
+                if (
+                    over_c.origin.x === curC.origin.x &&
+                    over_c.origin.y === curC.origin.y &&
+                    over_c.crosType === "over"
+                ) {
+                    break;
+                }
+            }
+            if (over_c.outRotation === (curC.outRotation + 90) % 360) {
+                indice = 1;
+            } else {
+                indice = -1;
+            }
+        }
+        let idx;
+        if (already.has(curC.origin)) {
+            idx = already.get(curC.origin).idx;
+        } else {
+            idx = ++iGauss;
+            already.set(curC.origin, { idx: idx, indice: indice });
+        }
+        if (curC.crosType === "under") {
+            GaussStr += "-";
+        }
+        GaussStr += idx + ",";
+        let nextC = getNextCrossingNode(curC);
+        // console.log(nextC.origin.x + "," + nextC.origin.y);
+        if (nextC === initC) break;
+        curC = nextC;
+    }
+    GaussStr += "Indices=";
+    console.log(already.size);
+    for (let i = 0; i < already.size; i++) {
+        for (let value of already.values()) {
+            if (value.idx === i + 1) {
+                GaussStr += value.indice + ",";
+                break;
+            }
+        }
+    }
+    return GaussStr;
 }

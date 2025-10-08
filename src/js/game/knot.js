@@ -50,7 +50,7 @@ export class Knot {
      * @param {*} node
      * @param {*} component
      */
-    pushEntity(reg_entities, node, component) {
+    pushEntity(reg_entities, node, component, componentIdx) {
         component.push(node);
         // for (let i = 0; i < reg_entities.length; i++) {
         //     let ent = reg_entities[i];
@@ -63,7 +63,11 @@ export class Knot {
         // }
         // 换成 map 应该能快一点
         if (reg_entities.has(node.origin)) {
-            reg_entities.delete(node.origin);
+            if (!node.isCrossing || node.crosType === "over") {
+                if (reg_entities.get(node.origin).cptIdx === -1)
+                    reg_entities.get(node.origin).cptIdx = componentIdx;
+                reg_entities.delete(node.origin);
+            }
         }
     }
 
@@ -82,7 +86,9 @@ export class Knot {
 
         let passedEntities = [];
 
+        let componentIdx = 0;
         while (reg_entities.size) {
+            // console.log(reg_entities.size);
             let initEntity = reg_entities.values().next().value;
             if (!initEntity) {
                 this.clear(T.knot.str1);
@@ -121,7 +127,7 @@ export class Knot {
                 curEntity.components.StaticMapEntity.rotation,
                 false
             );
-            this.pushEntity(reg_entities, node, componet);
+            this.pushEntity(reg_entities, node, componet, componentIdx);
 
             for (;;) {
                 let nextOrigin = this.root.map.getNextOrigin(curEntity);
@@ -175,7 +181,7 @@ export class Knot {
                     } else {
                         node.crosType = "under";
                     }
-                    this.pushEntity(reg_entities, node, componet);
+                    this.pushEntity(reg_entities, node, componet, componentIdx);
                     // 这是一个交点, 需要去寻找下一个位置
                     let curOrigine = curEntity.components.StaticMapEntity.origin;
                     nextOrigin.x = 2 * nextOrigin.x - curOrigine.x;
@@ -190,7 +196,7 @@ export class Knot {
                         nextEntity.components.StaticMapEntity.rotation,
                         false
                     );
-                    this.pushEntity(reg_entities, node, componet);
+                    this.pushEntity(reg_entities, node, componet, componentIdx);
                 } else if (
                     nextEntity.components.StaticMapEntity.code === 2 ||
                     nextEntity.components.StaticMapEntity.code === 3
@@ -203,7 +209,7 @@ export class Knot {
                         nextEntity.components.StaticMapEntity.rotation,
                         false
                     );
-                    this.pushEntity(reg_entities, node, componet);
+                    this.pushEntity(reg_entities, node, componet, componentIdx);
                 } else if (nextEntity.components.StaticMapEntity.code !== 1) {
                     // 非法
                     this.clear(T.knot.str2);
@@ -219,11 +225,12 @@ export class Knot {
                         nextEntity.components.StaticMapEntity.rotation,
                         false
                     );
-                    this.pushEntity(reg_entities, node, componet);
+                    this.pushEntity(reg_entities, node, componet, componentIdx);
                 }
                 curEntity = nextEntity;
             }
             this.nodes.push(componet);
+            componentIdx++;
         }
         // console.log(this.nodes);
 
