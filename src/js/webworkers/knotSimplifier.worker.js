@@ -8,7 +8,7 @@ let greenNodes;
 let knotNodes;
 /** @type {Node[]} */
 let keyNodes;
-/** @type {{strand: Strand, next: Strand, opposite: Strand}[]} */
+/** @type {Map} */
 let keyRelations;
 let redBlackSameDirection;
 let seperators;
@@ -31,16 +31,7 @@ self.addEventListener("message", e => {
         knotNodes = [];
         // @ts-ignore
         knotNodes = e.data.nodes;
-        // for (let node of e.data.nodes) {
-        //     // 为了让 node 有 .origin.equals 方法, 每个重新复制一遍
-        //     let n = new Node(node.origin);
-        //     n.color = node.color;
-        //     n.crosType = node.crosType;
-        //     n.isCorner = node.isCorner;
-        //     n.isCrossing = node.isCrossing;
-        //     n.outRotation = node.outRotation;
-        //     knotNodes.push(n);
-        // }
+
         console.log("knotSimplifier.worker start!");
 
         trimKnot();
@@ -72,7 +63,7 @@ function isNodeInArray(node, arr) {
 function trimKnot() {
     console.log("trimKnot start");
     keyNodes = [];
-    keyRelations = [];
+    keyRelations = new Map();
 
     for (let comp of knotNodes) {
         for (let node of comp) {
@@ -89,6 +80,10 @@ function trimKnot() {
     }
 
     for (let key of keyNodes) {
+        self.postMessage({
+            type: "update",
+            str: "trim knot: " + keyNodes.indexOf(key) + " / " + keyNodes.length,
+        });
         let initStrand = new Strand(knotNodes, key, key.outRotation, key.crosType);
         let outStrand = initStrand;
         for (;;) {
@@ -97,7 +92,8 @@ function trimKnot() {
                 break;
             }
         }
-        keyRelations.push({ strand: initStrand, next: outStrand, opposite: outStrand.opposite().next() });
+        // keyRelations.push({ strand: initStrand, next: outStrand, opposite: outStrand.opposite().next() });
+        keyRelations.set(initStrand.keyString(), { next: outStrand, opposite: outStrand.opposite().next() });
         let reverseStrand = initStrand.opposite().next();
         outStrand = reverseStrand;
         for (;;) {
@@ -106,8 +102,13 @@ function trimKnot() {
                 break;
             }
         }
-        keyRelations.push({ strand: reverseStrand, next: outStrand, opposite: outStrand.opposite().next() });
+        // keyRelations.push({ strand: reverseStrand, next: outStrand, opposite: outStrand.opposite().next() });
+        keyRelations.set(reverseStrand.keyString(), {
+            next: outStrand,
+            opposite: outStrand.opposite().next(),
+        });
     }
+    // debugger;
     // for (let r of keyRelations) {
     //     console.log(
     //         "(" +
@@ -161,16 +162,7 @@ function get_strand_from_array(check_result_crossings, strand) {
  * @returns {Strand}
  */
 function keyStrandOpposite(strand) {
-    for (let o of keyRelations) {
-        if (
-            o.strand.node.origin.x === strand.node.origin.x &&
-            o.strand.node.origin.y === strand.node.origin.y &&
-            o.strand.rot === strand.rot
-        ) {
-            return o.opposite;
-        }
-    }
-    return null;
+    return keyRelations.get(strand.keyString()).opposite;
 }
 
 /**
@@ -179,16 +171,7 @@ function keyStrandOpposite(strand) {
  * @returns {Strand}
  */
 function keyStrandNext(strand) {
-    for (let o of keyRelations) {
-        if (
-            o.strand.node.origin.x === strand.node.origin.x &&
-            o.strand.node.origin.y === strand.node.origin.y &&
-            o.strand.rot === strand.rot
-        ) {
-            return o.next;
-        }
-    }
-    return null;
+    return keyRelations.get(strand.keyString()).next;
 }
 
 /**

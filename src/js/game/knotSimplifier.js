@@ -962,7 +962,7 @@ export class KnotSimplifier {
             }
 
             if (
-                this.root.knot.crossings.length > 100 &&
+                // this.root.knot.crossings.length > 100 &&
                 !this.root.app.settings.getAllSettings().enableColorBlindHelper
             ) {
                 this.root.hud.signals.notification.dispatch(T.knot.str21, enumNotificationType.warning);

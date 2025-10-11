@@ -1,5 +1,10 @@
 export const CHANGELOG = [
     {
+        version: "0.1.3",
+        date: "12.10.2025",
+        entries: ["加快搜索速度", "pd code 生成加速"],
+    },
+    {
         version: "0.1.2",
         date: "08.10.2025",
         entries: ["分支染色 (最多 4 分支)", "第 16 关修改 (加难)"],

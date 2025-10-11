@@ -143,4 +143,10 @@ export class Strand {
     clone() {
         return new Strand(this.knotNodes, this.node.clone(), this.rot, this.crosType);
     }
+
+    keyString() {
+        return (
+            this.node.origin.x.toString() + "|" + this.node.origin.y.toString() + "|" + this.rot.toString()
+        );
+    }
 }
