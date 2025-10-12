@@ -17,6 +17,8 @@ export const beltOverlayMatrices = {
     [enumDirection.right]: generateMatrixRotations([0, 0, 0, 0, 1, 1, 0, 1, 0]),
 };
 
+const cptColor = ["#9096a3", "#9999cc", "#999933", "#cc9933"];
+
 export class MetaBeltBuilding extends MetaBuilding {
     constructor() {
         super("belt");
@@ -42,7 +44,8 @@ export class MetaBeltBuilding extends MetaBuilding {
         ];
     }
 
-    getSilhouetteColor() {
+    getSilhouetteColor(variant, rotationVariant, cptIdx) {
+        if (cptIdx >= 0) return cptColor[cptIdx];
         return THEME.map.chunkOverview.beltColor;
     }
 

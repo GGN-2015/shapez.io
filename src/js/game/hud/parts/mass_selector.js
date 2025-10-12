@@ -42,7 +42,7 @@ export class HUDMassSelector extends BaseHUDPart {
             .add(this.confirmDelete, this);
         this.root.keyMapper.getBinding(KEYMAPPINGS.massSelect.massSelectCut).add(this.confirmCut, this);
         this.root.keyMapper.getBinding(KEYMAPPINGS.massSelect.massSelectCopy).add(this.startCopy, this);
-        this.root.keyMapper.getBinding(KEYMAPPINGS.massSelect.massSelectClear).add(this.clearBelts, this);
+        // this.root.keyMapper.getBinding(KEYMAPPINGS.massSelect.massSelectClear).add(this.clearBelts, this);
 
         this.root.hud.signals.selectedPlacementBuildingChanged.add(this.clearSelection, this);
         this.root.signals.editModeChanged.add(this.clearSelection, this);
@@ -177,7 +177,7 @@ export class HUDMassSelector extends BaseHUDPart {
         //     );
         //     ok.add(() => this.doCut());
         // } else {
-            this.doCut();
+        this.doCut();
         //}
     }
 

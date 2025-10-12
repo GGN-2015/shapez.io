@@ -154,7 +154,7 @@ export class HUDBaseToolbar extends BaseHUDPart {
             attachClass: "visible",
         });
         this.lastSelectedIndex = 0;
-        actionMapper.getBinding(KEYMAPPINGS.placement.cycleBuildings).add(this.cycleBuildings, this);
+        // actionMapper.getBinding(KEYMAPPINGS.placement.cycleBuildings).add(this.cycleBuildings, this);
     }
 
     /**

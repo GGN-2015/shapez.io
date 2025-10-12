@@ -196,14 +196,12 @@ export class HUDWiresOverlay extends BaseHUDPart {
 
         const scaleFactor = 1 / wiresBackgroundDpi;
         parameters.context.globalCompositeOperation = "overlay";
-        parameters.context.fillStyle = "rgba(50, 200, 150, 0.04)";
+        parameters.context.fillStyle = "rgba(50, 200, 150, 0)";
         parameters.context.fillRect(bounds.x, bounds.y, bounds.w, bounds.h);
         parameters.context.globalCompositeOperation = "source-over";
 
         parameters.context.scale(scaleFactor, scaleFactor);
-        parameters.context.fillStyle = hasTileGrid
-            ? this.cachedPatternBackground
-            : "rgba(78, 137, 125, 0.04)";
+        parameters.context.fillStyle = hasTileGrid ? this.cachedPatternBackground : "rgba(78, 137, 125, 0)";
         parameters.context.fillRect(
             bounds.x / scaleFactor,
             bounds.y / scaleFactor,

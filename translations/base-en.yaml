@@ -994,7 +994,7 @@ buildings:
 
     comparator:
         default:
-            name: &comparator Find Position
+            name: &comparator Search Red Lines
             description: Loop dispalying all the legal posions on the knot which can be moved to the green path.
 
     virtual_processor:

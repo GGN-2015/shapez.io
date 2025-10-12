@@ -1015,7 +1015,7 @@ keybindings:
         virtual_processor: 模拟处理器
         transistor: 晶体管
         analyzer: 图形分析器
-        comparator: 比较器
+        comparator: 搜索红绿线
         item_producer: 物品生产器（沙盒模式）
         copyWireValue: 电线：复制指定电线上的值
         rotateToUp: 向上旋转

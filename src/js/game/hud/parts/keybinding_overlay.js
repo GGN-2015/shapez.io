@@ -255,12 +255,12 @@ export class HUDKeybindingOverlay extends BaseHUDPart {
                 condition: () => this.anythingSelectedOnMap,
             },
 
-            {
-                // [SELECTION] Clear
-                label: T.ingame.keybindingsOverlay.clearBelts,
-                keys: [k.massSelect.massSelectClear],
-                condition: () => this.anythingSelectedOnMap,
-            },
+            // {
+            //     // [SELECTION] Clear
+            //     label: T.ingame.keybindingsOverlay.clearBelts,
+            //     keys: [k.massSelect.massSelectClear],
+            //     condition: () => this.anythingSelectedOnMap,
+            // },
 
             {
                 // Switch layers

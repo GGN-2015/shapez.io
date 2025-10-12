@@ -190,7 +190,7 @@ export class MetaBuilding {
      * @param {string} variant
      * @param {number} rotationVariant
      */
-    getSilhouetteColor(variant, rotationVariant) {
+    getSilhouetteColor(variant, rotationVariant, cptIdx = 0) {
         return null;
     }
 

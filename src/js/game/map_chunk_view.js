@@ -183,7 +183,8 @@ export class MapChunkView extends MapChunk {
 
                         context.fillStyle = metaBuilding.getSilhouetteColor(
                             data.variant,
-                            data.rotationVariant
+                            data.rotationVariant,
+                            upperContent.cptIdx
                         );
                         for (let dx = 0; dx < 3; ++dx) {
                             for (let dy = 0; dy < 3; ++dy) {

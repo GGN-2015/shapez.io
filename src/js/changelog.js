@@ -1,8 +1,14 @@
 export const CHANGELOG = [
     {
-        version: "0.1.3",
+        version: "0.1.4",
         date: "12.10.2025",
-        entries: ["加快搜索速度", "pd code 生成加速"],
+        entries: [
+            "加快搜索速度",
+            "pd code 生成加速",
+            "第 15 关调整",
+            "overview 界面分支染色",
+            "快捷键设置菜单调整",
+        ],
     },
     {
         version: "0.1.2",

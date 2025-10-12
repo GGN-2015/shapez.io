@@ -616,10 +616,10 @@ export class ApplicationSettings extends ReadWriteProxy {
         //     data.version = 16;
         // }
 
-        if (data.version < 17) {
-            data.settings.enableColorBlindHelper = false;
-            data.version = 17;
-        }
+        // if (data.version < 17) {
+        //     data.settings.enableColorBlindHelper = false;
+        //     data.version = 17;
+        // }
 
         if (data.version < 18) {
             data.settings.rotationByBuilding = true;
